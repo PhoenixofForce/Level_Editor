@@ -1,10 +1,12 @@
+package window.elements;
+
 import javax.swing.*;
 
-public class Buttons extends JToolBar{
+public class MainToolBar extends JToolBar{
 
 	private JButton newMap, saveMap, importRessource;
 
-	public Buttons() {
+	public MainToolBar() {
 		this.setFloatable(false);
 		this.setRollover(true);
 

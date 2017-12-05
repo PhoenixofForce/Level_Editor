@@ -1,10 +1,16 @@
+package window;
+
+import window.elements.MainToolBar;
+import window.elements.MapViewer;
+import window.elements.layer.LayerPane;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class Window extends JFrame{
 
 	private LayerPane layers;
-	private Buttons buttons;
+	private MainToolBar buttons;
 	private MapViewer mapViewer;
 
 	public Window() {
@@ -16,7 +22,7 @@ public class Window extends JFrame{
 
 		layers = new LayerPane();
 		this.add(layers, BorderLayout.LINE_START);
-		buttons = new Buttons();
+		buttons = new MainToolBar();
 		this.add(buttons, BorderLayout.PAGE_START);
 		mapViewer = new MapViewer();
 		this.add(mapViewer, BorderLayout.CENTER);
