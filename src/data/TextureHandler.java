@@ -90,67 +90,15 @@ public class TextureHandler {
 		throw new RuntimeException("No such image: " + textureName);
 	}
 
-	public static String getTextureName(BufferedImage img) {
-		for(String s: textures_sprite_sheet.keySet()) {
-			if(compareImages(getImagePng(s), img)) {
-				return s;
-			}
-		}
-		return null;
-	}
-
-
-	public static String getTextureName(ImageIcon img) {
-		for(String s: textures_sprite_sheet.keySet()) {
-			if(compareImages(convertIcon(new ImageIcon(getImagePng(s))), convertIcon(img))) {
-				return s;
-			}
-		}
-		return null;
-	}
-
 	public static List<String> getImagesOnSpriteSheet(String spriteSheetName) {
 		return textures_sprite_sheet_texture.keySet().stream().filter(s -> getSpriteSheetImage(s).equals(spriteSheetName)).collect(Collectors.toList());
 	}
 
-	public static List<BufferedImage> getAllImages() {
-		List<BufferedImage> out = new ArrayList<>();
+	public static Map<String, ImageIcon> getAllImages() {
+		Map<String, ImageIcon> out = new HashMap<>();
 		for(String s: textures_sprite_sheet.keySet()) {
-			out.add(getImagePng(s));
+			out.put(s, new ImageIcon(getImagePng(s)));
 		}
 		return out;
-	}
-
-	private static boolean compareImages(BufferedImage imgA, BufferedImage imgB) {
-		// The images must be the same size.
-		if (imgA.getWidth() == imgB.getWidth() && imgA.getHeight() == imgB.getHeight()) {
-			int width = imgA.getWidth();
-			int height = imgA.getHeight();
-
-			// Loop over every pixel.
-			for (int y = 0; y < height; y++) {
-				for (int x = 0; x < width; x++) {
-					// Compare the pixels for equality.
-					if (imgA.getRGB(x, y) != imgB.getRGB(x, y)) {
-						return false;
-					}
-				}
-			}
-		} else {
-			return false;
-		}
-
-		return true;
-	}
-
-	private static BufferedImage convertIcon(ImageIcon icon) {
-		BufferedImage bi = new BufferedImage(
-				icon.getIconWidth(),
-				icon.getIconHeight(),
-				BufferedImage.TYPE_INT_RGB);
-		Graphics g = bi.createGraphics();
-		icon.paintIcon(null, g, 0,0);
-		g.dispose();
-		return bi;
 	}
 }

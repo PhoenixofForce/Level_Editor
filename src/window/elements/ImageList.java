@@ -3,16 +3,16 @@ package window.elements;
 import data.TextureHandler;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.util.*;
 
 public class ImageList extends JPanel{
 
 	private JScrollPane imagePane;
 	private JList<ImageIcon> images;
-	private DefaultListModel listModel;
+	private DefaultListModel<ImageIcon> listModel;
+
+	private Map<String, ImageIcon> icons;
 
 	public ImageList() {
 
@@ -27,16 +27,37 @@ public class ImageList extends JPanel{
 		update();
 		images.setSelectedIndex(0);
 
-		//this.add(images, BorderLayout.PAGE_START);
 		imagePane = new JScrollPane(images);
 		imagePane.setPreferredSize(new Dimension(200, 400));			//TODO: Responsive
 		this.add(imagePane, BorderLayout.PAGE_END);
+
+		images.addListSelectionListener(e -> System.out.println(getSelectedImageName()));
 	}
 
 	public void update() {
-		for(BufferedImage img: TextureHandler.getAllImages()) {
-			if(img != null) listModel.addElement(new ImageIcon(img));
+		if(icons == null) {
+			icons = new HashMap<>();
 		}
+
+		Map<String, ImageIcon> all = TextureHandler.getAllImages();
+		for(String s: all.keySet()) {
+			if(!icons.keySet().contains(s)) {
+				icons.put(s, all.get(s));
+				listModel.addElement(all.get(s));
+			}
+		}
+	}
+
+	public ImageIcon getSelectedIcon() {
+		return listModel.get(images.getSelectedIndex());
+	}
+
+	public String getSelectedImageName() {
+		for(String s: icons.keySet()) {
+			if(icons.get(s).equals(getSelectedIcon())) return s;
+		}
+
+		return null;
 	}
 
 }
