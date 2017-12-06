@@ -1,12 +1,11 @@
 package data;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TextureHandler {
 	private TextureHandler() {}
@@ -69,6 +68,10 @@ public class TextureHandler {
 		}
 
 		return c;
+	}
+
+	public static List<String> getImagesOnSpriteSheet(String spriteSheetName) {
+		return textures_sprite_sheet_texture.keySet().stream().filter(s -> getSpriteSheetImage(s).equals(spriteSheetName)).collect(Collectors.toList());
 	}
 
 	public static Rectangle getSpriteSheetBounds(String textureName) {
