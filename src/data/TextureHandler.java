@@ -3,6 +3,7 @@ package data;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class TextureHandler {
 
 	public static void loadImagePng(String textureName, String fileName) {
 		try {
-			textures_png.put(textureName, ImageIO.read(ClassLoader.getSystemResource("res/textures/" + fileName + ".png")));
+			textures_png.put(textureName, ImageIO.read(new File(fileName)));
 		} catch (IOException e) {
 			System.err.println("Error loading texture: " + textureName);
 			System.exit(-1);
@@ -35,7 +36,7 @@ public class TextureHandler {
 
 		try {
 			loadImagePng(spriteSheetName, fileName);
-			Scanner s = new Scanner(ClassLoader.getSystemResourceAsStream("res/textures/" + fileName + ".text"));
+			Scanner s = new Scanner(new File(fileName));
 
 			int amount = Integer.valueOf(s.nextLine());
 

@@ -14,7 +14,7 @@ public class Window extends JFrame{
 	private MapViewer mapViewer;
 
 	public Window() {
-		this.setTitle("Level Editor");
+		this.setTitle("POF - Level Editor");
 		this.setLayout(new BorderLayout());
 		this.setMinimumSize(new Dimension(800, 600));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -22,10 +22,10 @@ public class Window extends JFrame{
 
 		layers = new LayerPane();
 		this.add(layers, BorderLayout.LINE_START);
-		buttons = new MainToolBar();
-		this.add(buttons, BorderLayout.PAGE_START);
 		mapViewer = new MapViewer();
 		this.add(mapViewer, BorderLayout.CENTER);
+		buttons = new MainToolBar();
+		this.add(buttons, BorderLayout.PAGE_START);
 	}
 
 }

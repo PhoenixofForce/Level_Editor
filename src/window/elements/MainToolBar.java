@@ -1,6 +1,11 @@
 package window.elements;
 
+import data.TextureHandler;
+import window.Window;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
 
 public class MainToolBar extends JToolBar{
 
@@ -19,7 +24,28 @@ public class MainToolBar extends JToolBar{
 		this.addSeparator();
 
 		importRessource = new JButton("Add Res");
+		importRessource.addActionListener(e -> {
+			JFileChooser chooser = new JFileChooser();
+
+			//chooser.setOpaque(true);
+
+			chooser.setAcceptAllFileFilterUsed(false);
+			chooser.addChoosableFileFilter(new FileNameExtensionFilter(".text Files", "text"));
+
+			int returnVal = chooser.showDialog(new JFrame(), "Load Save");
+			if(returnVal == JFileChooser.APPROVE_OPTION){
+				File text = chooser.getSelectedFile();
+				File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length()-4) + "png");
+
+				if(text.exists() && image.exists()) {
+					TextureHandler.loadImagePngSpriteSheet(image.getAbsolutePath(), text.getAbsolutePath());
+				} else {
+					JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
+				}
+ 			}
+		});
 		this.add(importRessource);
+
 	}
 
 }
