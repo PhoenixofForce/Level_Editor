@@ -11,7 +11,7 @@ public class MainToolBar extends JToolBar{
 
 	private JButton newMap, saveMap, importRessource;
 
-	public MainToolBar() {
+	public MainToolBar(ImageList il) {
 		this.setFloatable(false);
 		this.setRollover(true);
 
@@ -38,7 +38,8 @@ public class MainToolBar extends JToolBar{
 				File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length()-4) + "png");
 
 				if(text.exists() && image.exists()) {
-					TextureHandler.loadImagePngSpriteSheet(image.getAbsolutePath(), text.getAbsolutePath());
+					TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length()-5), text.getAbsolutePath());
+					il.update();
 				} else {
 					JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
 				}

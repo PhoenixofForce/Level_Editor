@@ -12,7 +12,7 @@ public class LayerPane extends JPanel {
 
 	private LayerPane INSTANCE;
 
-	private JList jList;
+	private JList<String> jList;
 	private DefaultListModel listModel;
 	private LayerControll lc;
 

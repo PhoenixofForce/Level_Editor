@@ -1,5 +1,6 @@
 package window;
 
+import window.elements.ImageList;
 import window.elements.MainToolBar;
 import window.elements.MapViewer;
 import window.elements.layer.LayerPane;
@@ -12,6 +13,7 @@ public class Window extends JFrame{
 	private LayerPane layers;
 	private MainToolBar buttons;
 	private MapViewer mapViewer;
+	private ImageList images;
 
 	public Window() {
 		this.setTitle("POF - Level Editor");
@@ -24,7 +26,9 @@ public class Window extends JFrame{
 		this.add(layers, BorderLayout.LINE_START);
 		mapViewer = new MapViewer();
 		this.add(mapViewer, BorderLayout.CENTER);
-		buttons = new MainToolBar();
+		images = new ImageList();
+		this.add(images, BorderLayout.LINE_END);
+		buttons = new MainToolBar(images);
 		this.add(buttons, BorderLayout.PAGE_START);
 	}
 
