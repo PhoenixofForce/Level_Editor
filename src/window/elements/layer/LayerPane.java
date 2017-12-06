@@ -59,6 +59,10 @@ public class LayerPane extends JPanel {
 		this.add(lc, BorderLayout.PAGE_END);
 	}
 
+	public Layer selectedLayer() {
+		return layers.get(listModel.get(jList.getSelectedIndex()));
+	}
+
 	private void add(String name, boolean type) {
 		if(layers.keySet().contains(name)) {
 			add(name + "(" + 1 + ")", type, 1);
