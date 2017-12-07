@@ -78,7 +78,7 @@ public class Window extends JFrame{
 
 		new Thread(()->{
 			while (true) {
-				mapViewer.getDrawable().repaint();
+				mapViewer.repaint();
 				try {
 					Thread.sleep(1000/60);
 				} catch (InterruptedException e) {
