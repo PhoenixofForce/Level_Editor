@@ -1,5 +1,6 @@
 package window.elements.layer;
 
+import data.FreeLayer;
 import data.Layer;
 import data.TileLayer;
 
@@ -26,7 +27,7 @@ public class LayerPane extends JPanel {
 		this.setLayout(new BorderLayout());
 
 		listModel = new DefaultListModel();
-		jList = new JList(listModel);
+		jList = new JList<>(listModel);
 
 		jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jList.setLayoutOrientation(JList.VERTICAL);
@@ -68,7 +69,7 @@ public class LayerPane extends JPanel {
 			add(name + "(" + 1 + ")", type, 1);
 			return;
 		}
-		layers.put(name, type? null: new TileLayer(10, 10, 0));
+		layers.put(name, type? new FreeLayer(0): new TileLayer(10, 10, 0));
 		listModel.addElement(name);
 		jList.setSelectedIndex(listModel.indexOf(name));
 	}
@@ -78,9 +79,13 @@ public class LayerPane extends JPanel {
 			add(name.split("\\(")[0] + "(" + rek + ")", type, rek+1);
 			return;
 		}
-		layers.put(name, type? null: new TileLayer(10, 10, 0));
+		layers.put(name, type? new FreeLayer(0): new TileLayer(100, 100, 0));
 		listModel.addElement(name);
 		jList.setSelectedIndex(listModel.indexOf(name));
+	}
+
+	public Map<String, Layer> getLayers() {
+		return layers;
 	}
 
 	public void reSize(int width, int height) {

@@ -1,8 +1,5 @@
 package data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TileLayer implements Layer {
 
 	private float depth;
@@ -20,6 +17,10 @@ public class TileLayer implements Layer {
 		if(x >= 0 && y >= 0 && x < width() && y < height()) {
 			tileNames[x][y] = name;
 		}
+	}
+
+	public String[][] getTileNames() {
+		return tileNames;
 	}
 
 	public int height() {

@@ -2,7 +2,7 @@ package data;
 
 public class Loc {
 
-	float x, y;
+	public float x, y;
 
 	public Loc(float x, float y) {
 		this.x = x;

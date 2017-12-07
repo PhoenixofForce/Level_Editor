@@ -1,7 +1,6 @@
 package window.elements;
 
 import data.TextureHandler;
-import window.Window;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -9,14 +8,18 @@ import java.io.File;
 
 public class MainToolBar extends JToolBar{
 
-	private JButton newMap, saveMap, importRessource;
+	private JButton newMap, open, saveMap, importRessource;
 
 	public MainToolBar(ImageList il) {
 		this.setFloatable(false);
 		this.setRollover(true);
 
+		//TODO: New, Open, Save
 		newMap = new JButton("New");
 		this.add(newMap);
+
+		open = new JButton("Open");
+		this.add(open);
 
 		saveMap = new JButton("Save");
 		this.add(saveMap);
