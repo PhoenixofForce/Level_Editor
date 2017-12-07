@@ -77,10 +77,12 @@ public class Window extends JFrame{
 		this.pack();
 
 		new Thread(()->{
+			long lastTime;
 			while (true) {
+				lastTime = System.currentTimeMillis();
 				mapViewer.repaint();
 				try {
-					Thread.sleep(1000/60);
+					Thread.sleep(1000/60 - (System.currentTimeMillis()-lastTime));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
