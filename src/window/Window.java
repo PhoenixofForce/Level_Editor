@@ -61,6 +61,7 @@ public class Window extends JFrame{
 		});
 	}
 
+	//TODO: Draw by depth
 	private void draw() {
 		JPanel canvas = mapViewer.getDrawable();
 		Graphics g2 = canvas.getGraphics();
