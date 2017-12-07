@@ -1,6 +1,6 @@
 package data;
 
 public interface Layer {
-	String toMapFormat();
 	float depth();
+	void set(String name, float x, float y);
 }

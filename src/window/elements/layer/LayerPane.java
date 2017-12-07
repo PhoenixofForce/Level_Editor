@@ -75,7 +75,7 @@ public class LayerPane extends JPanel {
 
 	private void add(String name, boolean type, int rek) {
 		if(layers.keySet().contains(name)) {
-			add(name.split("\\(")[0] + "(" + 1 + ")", type, rek+1);
+			add(name.split("\\(")[0] + "(" + rek + ")", type, rek+1);
 			return;
 		}
 		layers.put(name, type? null: new TileLayer(10, 10, 0));
@@ -84,6 +84,7 @@ public class LayerPane extends JPanel {
 	}
 
 	public void reSize(int width, int height) {
+		height -= lc.getHeight();
 		Dimension d = new Dimension(width/6, height);
 		jList.setPreferredSize(d);
 		jList.setSize(d);
