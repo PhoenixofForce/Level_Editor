@@ -1,20 +1,21 @@
 package data;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FreeLayer implements Layer {
 
 	private float depth;
-	private Map<Loc, String> images;
+	private List<GO> images;
 
 	//TODO: Max width and height
 	public FreeLayer(float depth) {
 		this.depth = depth;
-		this.images = new HashMap<>();
+		this.images = new ArrayList<>();
 	}
 
-	public Map<Loc, String> getImages() {
+
+	public List<GO> getImages() {
 		return images;
 	}
 
@@ -25,6 +26,6 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public void set(String name, float x, float y) {
-		images.put(new Loc(x, y), name);
+		images.add(new GO(new Loc(x, y), name));
 	}
 }

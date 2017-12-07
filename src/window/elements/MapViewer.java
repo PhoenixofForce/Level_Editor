@@ -47,7 +47,7 @@ public class MapViewer extends JScrollPane{
 	private void event(int x, int y) {
 		Layer selectedLayer = lp.selectedLayer();
 		String selectedTexture = il.getSelectedImageName();
-		if(selectedLayer == null || selectedLayer == null) return;
+		if(selectedLayer == null || selectedTexture == null) return;
 
 		if(selectedLayer instanceof TileLayer) {
 			TileLayer l = (TileLayer) selectedLayer;

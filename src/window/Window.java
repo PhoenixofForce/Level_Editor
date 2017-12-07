@@ -6,7 +6,7 @@ import window.elements.MainToolBar;
 import window.elements.MapViewer;
 import window.elements.layer.LayerPane;
 
-import java.util.Map;
+import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +45,7 @@ public class Window extends JFrame{
 			while (true) {
 				draw();
 				try {
-					Thread.sleep(250);
+					Thread.sleep(1000/60);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -67,6 +67,9 @@ public class Window extends JFrame{
 		BufferedImage img = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics g = img.getGraphics();
 
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, 800, 800);
+
 		for(String s: layers.getLayers().keySet()) {
 			Layer l = layers.getLayers().get(s);
 
@@ -81,9 +84,10 @@ public class Window extends JFrame{
 				}
 			} else if(l instanceof FreeLayer) {
 				FreeLayer f = (FreeLayer) l;
-				Map<Loc, String> names = f.getImages();
-				for(Loc loc: names.keySet()) {
-					String name = names.get(loc);
+				List<GO> gos = f.getImages();
+				for(int i = 0; i < gos.size(); i++) {
+					Loc loc = gos.get(i).loc;
+					String name = gos.get(i).name;
 					g.drawImage(TextureHandler.getImagePng(name), (int)loc.x*8, (int)loc.y*8, null);
 				}
 			}

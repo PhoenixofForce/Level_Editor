@@ -69,7 +69,7 @@ public class LayerPane extends JPanel {
 			add(name + "(" + 1 + ")", type, 1);
 			return;
 		}
-		layers.put(name, type? new FreeLayer(0): new TileLayer(10, 10, 0));
+		layers.put(name, type? new FreeLayer(0): new TileLayer(100, 100, 0));
 		listModel.addElement(name);
 		jList.setSelectedIndex(listModel.indexOf(name));
 	}
