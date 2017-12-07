@@ -33,6 +33,9 @@ public class ImageList extends JPanel{
 		images.addListSelectionListener(e -> System.out.println(getSelectedImageName()));
 	}
 
+	/**
+	 * loads new images from the TextureHandler
+	 */
 	public void update() {
 		if(icons == null) {
 			icons = new HashMap<>();

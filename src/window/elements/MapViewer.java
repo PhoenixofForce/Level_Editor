@@ -44,10 +44,11 @@ public abstract class MapViewer extends JScrollPane{
 		});
 	}
 
-	public JPanel getDrawable() {
-		return drawable;
-	}
-
+	/**
+	 * Is called on MouseDrag and MouseClick
+	 * @param x
+	 * @param y
+	 */
 	private void event(int x, int y) {
 		x += this.getHorizontalScrollBar().getValue();
 		y += this.getVerticalScrollBar().getValue();
@@ -67,6 +68,12 @@ public abstract class MapViewer extends JScrollPane{
 		}
 	}
 
+	/**
+	 * Used to draw on the jpanel
+	 * @param g graphics from the panel
+	 * @param width width from the panel
+	 * @param heigth height from the panel
+	 */
 	public abstract void draw(Graphics g, int width, int heigth);
 
 }

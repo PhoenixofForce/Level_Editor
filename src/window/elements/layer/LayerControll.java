@@ -32,8 +32,9 @@ public abstract class LayerControll extends JToolBar {
 		this.remove.addActionListener(e -> onRemove());
 	}
 
-	public void onRemove() {
-
-	}
+	/**
+	 *	Is called when the user wants to remove a layer
+	 */
+	public abstract void onRemove();
 
 }

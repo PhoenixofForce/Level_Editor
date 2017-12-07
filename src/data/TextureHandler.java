@@ -23,6 +23,11 @@ public class TextureHandler {
 		textures_sprite_sheet_texture = new HashMap<>();
 	}
 
+	/**Loads an image
+	 *
+	 * @param textureName name with which the image can be called
+	 * @param fileName name of the file in which the image is located in
+	 */
 	public static void loadImagePng(String textureName, String fileName) {
 		try {
 			textures_png.put(textureName, ImageIO.read(new File(fileName)));
@@ -32,6 +37,12 @@ public class TextureHandler {
 		}
 	}
 
+	/**Loads an spritesheet from a .text-file
+	 * A .png with the same name has to be in the same folder
+	 *
+	 * @param spriteSheetName
+	 * @param fileName file that links to the .text file
+	 */
 	public static void loadImagePngSpriteSheet(String spriteSheetName, String fileName) {
 		if(textures_png.containsKey(spriteSheetName)) return;
 		try {
@@ -59,6 +70,11 @@ public class TextureHandler {
 		}
 	}
 
+	/**
+	 * Not used here (._.
+	 * @param name
+	 * @return
+	 */
 	public static int getCount(String name) {
 		int c = 0;
 		for(String s: textures_png.keySet()) {
@@ -71,6 +87,7 @@ public class TextureHandler {
 
 		return c;
 	}
+
 
 	public static Rectangle getSpriteSheetBounds(String textureName) {
 		return textures_sprite_sheet.get(textureName);
@@ -94,6 +111,10 @@ public class TextureHandler {
 		return textures_sprite_sheet_texture.keySet().stream().filter(s -> getSpriteSheetImage(s).equals(spriteSheetName)).collect(Collectors.toList());
 	}
 
+	/**
+	 *
+	 * @return Map of all image names, with their bound image as an image icon
+	 */
 	public static Map<String, ImageIcon> getAllImages() {
 		Map<String, ImageIcon> out = new HashMap<>();
 		for(String s: textures_sprite_sheet.keySet()) {

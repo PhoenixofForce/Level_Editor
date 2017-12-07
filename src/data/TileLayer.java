@@ -19,6 +19,10 @@ public class TileLayer implements Layer {
 		}
 	}
 
+	/**
+	 *
+	 * @return Map if textures
+	 */
 	public String[][] getTileNames() {
 		return tileNames;
 	}

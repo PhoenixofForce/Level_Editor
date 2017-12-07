@@ -4,6 +4,11 @@ public class Loc {
 
 	public float x, y;
 
+	/** Used to save a point
+	 *
+	 * @param x x-pos
+	 * @param y y-pos
+	 */
 	public Loc(float x, float y) {
 		this.x = x;
 		this.y = y;

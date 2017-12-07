@@ -56,13 +56,23 @@ public class LayerPane extends JPanel {
 		this.add(lc, BorderLayout.PAGE_END);
 	}
 
+	/**
+	 *
+	 * @return the selected layer
+	 */
 	public Layer selectedLayer() {
 		return layers.get(listModel.get(jList.getSelectedIndex()));
 	}
 
+	/**
+	 * Adds an layer
+	 * @param name name of the layer
+	 * @param type type of the layer (1 -> PixelLayer, 0-> TileLayer)
+	 * @param depth drawing priority of the layer
+	 */
 	public void add(String name, boolean type, float depth) {
 		if(layers.keySet().contains(name)) {
-			add(name + "(" + 1 + ")", type, 1);
+			add(name + "(" + 1 + ")", type, depth, 1);
 			return;
 		}
 		layers.put(name, type? new FreeLayer(depth): new TileLayer(100, 100, depth));
@@ -70,20 +80,35 @@ public class LayerPane extends JPanel {
 		jList.setSelectedIndex(listModel.indexOf(name));
 	}
 
-	private void add(String name, boolean type, int rek) {
+	/**
+	 * Adds an layer when the name already exists
+	 * @param name name of the layer
+	 * @param type type of the layer (1 -> PixelLayer, 0-> TileLayer)
+	 * @param depth drawing priority of the layer
+	 */
+	private void add(String name, boolean type, float depth, int rek) {
 		if(layers.keySet().contains(name)) {
-			add(name.split("\\(")[0] + "(" + rek + ")", type, rek+1);
+			add(name.split("\\(")[0] + "(" + rek + ")", type, depth, rek+1);
 			return;
 		}
-		layers.put(name, type? new FreeLayer(0): new TileLayer(100, 100, 0));
+		layers.put(name, type? new FreeLayer(depth): new TileLayer(100, 100, 0));
 		listModel.addElement(name);
 		jList.setSelectedIndex(listModel.indexOf(name));
 	}
 
+	/**
+	 *
+	 * @return all layers with their name
+	 */
 	public Map<String, Layer> getLayers() {
 		return layers;
 	}
 
+	/**
+	 * Called on resize
+	 * @param width width of the window
+	 * @param height height of the window
+	 */
 	public void reSize(int width, int height) {
 		height -= lc.getHeight();
 		Dimension d = new Dimension(width/6, height);

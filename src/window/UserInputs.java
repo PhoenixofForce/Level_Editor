@@ -9,6 +9,11 @@ import java.awt.event.WindowEvent;
 
 public class UserInputs {
 
+	/**
+	 * Called to let the user set the attribute for a new layer
+	 * @param w window, to deaktivate it
+	 * @param lp layerpane to add layer
+	 */
 	public static void createLayer(Window w, LayerPane lp) {
 		w.setEnabled(false);
 

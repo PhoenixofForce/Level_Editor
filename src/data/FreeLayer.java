@@ -14,7 +14,10 @@ public class FreeLayer implements Layer {
 		this.images = new ArrayList<>();
 	}
 
-
+	/**
+	 *
+	 * @return all GameObjects saved in this layer
+	 */
 	public List<GO> getImages() {
 		return images;
 	}
