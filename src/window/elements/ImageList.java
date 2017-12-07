@@ -28,7 +28,6 @@ public class ImageList extends JPanel{
 		images.setSelectedIndex(0);
 
 		imagePane = new JScrollPane(images);
-		imagePane.setPreferredSize(new Dimension(200, 400));			//TODO: Responsive
 		this.add(imagePane, BorderLayout.PAGE_END);
 
 		images.addListSelectionListener(e -> System.out.println(getSelectedImageName()));
@@ -58,6 +57,12 @@ public class ImageList extends JPanel{
 		}
 
 		return null;
+	}
+
+	public void reSize(int width, int height) {
+		Dimension d = new Dimension(width/4, height/2);
+		imagePane.setPreferredSize(d);
+		imagePane.setSize(d);
 	}
 
 }

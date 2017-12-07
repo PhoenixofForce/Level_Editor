@@ -7,6 +7,10 @@ import window.elements.layer.LayerPane;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 
 public class Window extends JFrame{
 
@@ -30,6 +34,17 @@ public class Window extends JFrame{
 		this.add(images, BorderLayout.LINE_END);
 		buttons = new MainToolBar(images);
 		this.add(buttons, BorderLayout.PAGE_START);
+
+		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
+		layers.reSize(getContentPane().getWidth(), getContentPane().getHeight());
+
+		this.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
+				layers.reSize(getContentPane().getWidth(), getContentPane().getHeight());
+			}
+		});
 	}
 
 }

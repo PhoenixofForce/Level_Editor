@@ -83,4 +83,10 @@ public class LayerPane extends JPanel {
 		jList.setSelectedIndex(listModel.indexOf(name));
 	}
 
+	public void reSize(int width, int height) {
+		Dimension d = new Dimension(width/6, height);
+		jList.setPreferredSize(d);
+		jList.setSize(d);
+	}
+
 }
