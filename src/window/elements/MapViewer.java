@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MapViewer extends JScrollPane{
+public abstract class MapViewer extends JScrollPane{
 
 	private ImageList il;
 	private LayerPane lp;
@@ -21,10 +21,14 @@ public class MapViewer extends JScrollPane{
 		this.lp = lp;
 		this.il = il;
 
-		drawable = new JPanel();
-		drawable.setSize(new Dimension(width, height));
+		drawable = new JPanel(){
+			@Override
+			public void paintComponent(Graphics g) {
+				draw(g, drawable.getWidth(), drawable.getHeight());
+			}
+		};
+		drawable.setPreferredSize(new Dimension(width, height));
 		this.setViewportView(drawable);
-
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -45,6 +49,9 @@ public class MapViewer extends JScrollPane{
 	}
 
 	private void event(int x, int y) {
+		x += this.getHorizontalScrollBar().getValue();
+		y += this.getVerticalScrollBar().getValue();
+
 		Layer selectedLayer = lp.selectedLayer();
 		String selectedTexture = il.getSelectedImageName();
 		if(selectedLayer == null || selectedTexture == null) return;
@@ -59,5 +66,7 @@ public class MapViewer extends JScrollPane{
 			f.set(selectedTexture, x/8.0f, y/8.0f);
 		}
 	}
+
+	public abstract void draw(Graphics g, int width, int heigth);
 
 }

@@ -26,6 +26,7 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public void set(String name, float x, float y) {
+		System.out.println(x + " " + y);
 		images.add(new GO(new Loc(x, y), name));
 	}
 }
