@@ -65,7 +65,7 @@ public class Window extends JFrame{
 						for(int i = 0; i < gos.size(); i++) {
 							Loc loc = gos.get(i).loc;
 							String name = gos.get(i).name;
-							g2.drawImage(TextureHandler.getImagePng(name), (int)loc.x*8, (int)loc.y*8, null);
+							g2.drawImage(TextureHandler.getImagePng(name), (int)(loc.x*8), (int)(loc.y*8), null);
 						}
 					}
 				}
