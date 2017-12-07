@@ -3,6 +3,7 @@ package window.elements.layer;
 import data.FreeLayer;
 import data.Layer;
 import data.TileLayer;
+import window.Window;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class LayerPane extends JPanel {
 
 	private Map<String, Layer> layers;
 
-	public LayerPane() {
+	public LayerPane(Window w) {
 		layers = new HashMap<>();
 
 		INSTANCE = this;
@@ -32,20 +33,15 @@ public class LayerPane extends JPanel {
 		jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jList.setLayoutOrientation(JList.VERTICAL);
 
-		add("Background", true);
-		add("Tile", false);
-		add("Object", true);
+		add("Background", true, 0.0f);
+		add("Tile", false, 0.5f);
+		add("Object", true, 1.0f);
 
 		jList.setSelectedIndex(0);
 
 		this.add(jList, BorderLayout.PAGE_START);
 
-		lc = new LayerControll() {
-			@Override
-			public void onAdd(String name, boolean type) {
-				INSTANCE.add(name, type);
-			}
-
+		lc = new LayerControll(w, this ) {
 			@Override
 			public void onRemove() {
 				if(jList.getSelectedIndex() < 0) return;
@@ -64,12 +60,12 @@ public class LayerPane extends JPanel {
 		return layers.get(listModel.get(jList.getSelectedIndex()));
 	}
 
-	private void add(String name, boolean type) {
+	public void add(String name, boolean type, float depth) {
 		if(layers.keySet().contains(name)) {
 			add(name + "(" + 1 + ")", type, 1);
 			return;
 		}
-		layers.put(name, type? new FreeLayer(0): new TileLayer(100, 100, 0));
+		layers.put(name, type? new FreeLayer(depth): new TileLayer(100, 100, depth));
 		listModel.addElement(name);
 		jList.setSelectedIndex(listModel.indexOf(name));
 	}

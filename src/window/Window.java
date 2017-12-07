@@ -28,7 +28,7 @@ public class Window extends JFrame{
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setVisible(true);
 
-		layers = new LayerPane();
+		layers = new LayerPane(this);
 		this.add(layers, BorderLayout.LINE_START);
 		images = new ImageList();
 		this.add(images, BorderLayout.LINE_END);
