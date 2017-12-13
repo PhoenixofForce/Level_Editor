@@ -1,14 +1,14 @@
 package window.elements;
 
-import data.FreeLayer;
 import data.Layer;
-import data.TileLayer;
+import data.Loc;
 import window.elements.layer.LayerPane;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 public abstract class MapViewer extends JScrollPane{
 
@@ -29,6 +29,14 @@ public abstract class MapViewer extends JScrollPane{
 		};
 		drawable.setPreferredSize(new Dimension(width, height));
 		this.setViewportView(drawable);
+
+		this.addMouseWheelListener(new MouseAdapter() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				System.out.println(e.getPreciseWheelRotation());
+			}
+		});
+
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -49,22 +57,19 @@ public abstract class MapViewer extends JScrollPane{
 	}
 
 	private void event(int x, int y) {
-		x += this.getHorizontalScrollBar().getValue();
-		y += this.getVerticalScrollBar().getValue();
-
 		Layer selectedLayer = lp.selectedLayer();
 		String selectedTexture = il.getSelectedImageName();
 		if(selectedLayer == null || selectedTexture == null) return;
 
-		if(selectedLayer instanceof TileLayer) {
-			TileLayer l = (TileLayer) selectedLayer;
-			l.set(selectedTexture, (int)Math.floor(x/8.0f), (int)Math.floor(y/8.0f));
-		}
+		Loc pos = getBlockLocation(x, y);
+		selectedLayer.event(selectedTexture, pos.x, pos.y);
+	}
 
-		else if(selectedLayer instanceof  FreeLayer) {
-			FreeLayer f = (FreeLayer) selectedLayer;
-			f.set(selectedTexture, x/8.0f, y/8.0f);
-		}
+	protected Loc getBlockLocation(int x, int y) {
+		float res_x = x + this.getHorizontalScrollBar().getValue();
+		float res_y = y + this.getVerticalScrollBar().getValue();
+
+		return new Loc(res_x/8.0f, res_y/8.0f);
 	}
 
 	public abstract void draw(Graphics g, int width, int heigth);

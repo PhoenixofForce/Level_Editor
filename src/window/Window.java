@@ -38,37 +38,18 @@ public class Window extends JFrame{
 		layers.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 		mapViewer = new MapViewer(images, layers, 800, 800){
 
-			//TODO: draw by depth
 			@Override
 			public void draw(Graphics g, int width, int height) {
 				BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-				Graphics g2 = img.getGraphics();
+				Graphics2D g2 = (Graphics2D) img.getGraphics();
 
 				g2.setColor(Color.WHITE);
-				g2.fillRect(0, 0, 800, 800);
+				g2.fillRect(0, 0, width, height);
 
-				for(String s: layers.getLayers().keySet()) {
-					Layer l = layers.getLayers().get(s);
+				layers.getLayers().values().stream()
+						.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
+						.forEach(l -> l.draw(g2));
 
-					if(l instanceof TileLayer) {
-						TileLayer t = (TileLayer) l;
-						String[][] names = t.getTileNames();
-						for(int x = 0; x < names[0].length; x++) {
-							for(int y = 0; y < names.length; y++) {
-								if(names[y][x] == null) continue;
-								g2.drawImage(TextureHandler.getImagePng(names[y][x]), x * 8, y * 8, null);
-							}
-						}
-					} else if(l instanceof FreeLayer) {
-						FreeLayer f = (FreeLayer) l;
-						List<GO> gos = f.getImages();
-						for(int i = 0; i < gos.size(); i++) {
-							Loc loc = gos.get(i).loc;
-							String name = gos.get(i).name;
-							g2.drawImage(TextureHandler.getImagePng(name), (int)(loc.x*8), (int)(loc.y*8), null);
-						}
-					}
-				}
 				g.drawImage(img, 0, 0, null);
 			}
 		};

@@ -11,9 +11,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class LayerPane extends JPanel {
-
-	private LayerPane INSTANCE;
-
 	private JList<String> jList;
 	private DefaultListModel listModel;
 	private LayerControll lc;
@@ -23,8 +20,6 @@ public class LayerPane extends JPanel {
 	public LayerPane(Window w) {
 		layers = new HashMap<>();
 
-		INSTANCE = this;
-
 		this.setLayout(new BorderLayout());
 
 		listModel = new DefaultListModel();
@@ -33,9 +28,9 @@ public class LayerPane extends JPanel {
 		jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jList.setLayoutOrientation(JList.VERTICAL);
 
-		add("Background", true, 0.0f);
+		add("Background", true, 1.0f);
 		add("Tile", false, 0.5f);
-		add("Object", true, 1.0f);
+		add("Object", true, 0.0f);
 
 		jList.setSelectedIndex(0);
 
