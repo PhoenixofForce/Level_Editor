@@ -12,14 +12,14 @@ import java.awt.event.MouseWheelEvent;
 
 public abstract class MapViewer extends JScrollPane{
 
-	private ImageList il;
-	private LayerPane lp;
+	private ImageList imageList;
+	private LayerPane layerPane;
 
 	private JPanel drawable;
 
-	public MapViewer(ImageList il, LayerPane lp, int width, int height) {
-		this.lp = lp;
-		this.il = il;
+	public MapViewer(ImageList imageList, LayerPane layerPane, int width, int height) {
+		this.layerPane = layerPane;
+		this.imageList = imageList;
 
 		drawable = new JPanel(){
 			@Override
@@ -57,8 +57,8 @@ public abstract class MapViewer extends JScrollPane{
 	}
 
 	private void event(int x, int y) {
-		Layer selectedLayer = lp.selectedLayer();
-		String selectedTexture = il.getSelectedImageName();
+		Layer selectedLayer = layerPane.getSelectedLayer();
+		String selectedTexture = imageList.getSelectedImageName();
 		if(selectedLayer == null || selectedTexture == null) return;
 
 		Loc pos = getBlockLocation(x, y);

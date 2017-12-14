@@ -9,8 +9,8 @@ import java.awt.event.WindowEvent;
 
 public class UserInputs {
 
-	public static void createLayer(Window w, LayerPane lp) {
-		w.setEnabled(false);
+	public static void createLayer(Window window, LayerPane layerPane) {
+		window.setEnabled(false);
 
 		JFrame frame = new JFrame("Adding layer");
 		JTextField nameInput = new JTextField("name");
@@ -40,15 +40,15 @@ public class UserInputs {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				frame.dispose();
-				w.setEnabled(true);
-				w.toFront();
+				window.setEnabled(true);
+				window.toFront();
 			}
 
 			@Override
 			public void windowClosed(WindowEvent e) {
 				frame.dispose();
-				w.setEnabled(true);
-				w.toFront();
+				window.setEnabled(true);
+				window.toFront();
 			}
 		});
 
@@ -78,10 +78,10 @@ public class UserInputs {
 		create.setBounds(5, 120, 100, 25);
 		create.addActionListener(e -> {
 			String name = nameInput.getText();
-			lp.add(name, layerType.getValue() == 1, Float.parseFloat(depthInput.getText()));
+			layerPane.addLayer(name, layerType.getValue() == 1, Float.parseFloat(depthInput.getText()));
 			frame.dispose();
-			w.setEnabled(true);
-			w.toFront();
+			window.setEnabled(true);
+			window.toFront();
 		});
 	}
 

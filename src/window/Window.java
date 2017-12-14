@@ -1,12 +1,9 @@
 package window;
 
-import data.*;
 import window.elements.ImageList;
 import window.elements.MainToolBar;
 import window.elements.MapViewer;
 import window.elements.layer.LayerPane;
-
-import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,7 +60,7 @@ public class Window extends JFrame{
 				lastTime = System.currentTimeMillis();
 				mapViewer.repaint();
 				try {
-					Thread.sleep(1000/60 - (System.currentTimeMillis()-lastTime));
+					Thread.sleep(Math.max(0,1000/60 - (System.currentTimeMillis()-lastTime)));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -77,6 +74,7 @@ public class Window extends JFrame{
 				layers.reSize(getContentPane().getWidth(), getContentPane().getHeight() - buttons.getHeight());
 			}
 		});
+		this.setSize(this.getWidth()+1, this.getHeight());
 	}
 
 }
