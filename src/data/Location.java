@@ -1,10 +1,10 @@
 package data;
 
-public class Loc {
+public class Location {
 
 	public float x, y;
 
-	public Loc(float x, float y) {
+	public Location(float x, float y) {
 		this.x = x;
 		this.y = y;
 	}

@@ -2,11 +2,11 @@ package data;
 
 public class GO {
 
-	public Loc loc;
+	public Location location;
 	public String name;
 
-	public GO(Loc loc, String name) {
-		this.loc = loc;
+	public GO(Location location, String name) {
+		this.location = location;
 		this.name = name;
 	}
 
