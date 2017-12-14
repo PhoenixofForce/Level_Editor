@@ -1,19 +1,9 @@
 package data;
 
-public interface Layer {
-	/**
-	 *	Drawing priority
-	 *
-	 * @return the depth of the layer
-	 */
-	float depth();
+import java.awt.*;
 
-	/**
-	 * Used to set an object on a layer
-	 *
-	 * @param name name of the texture
-	 * @param x x-position
-	 * @param y y-position
-	 */
-	void set(String name, float x, float y);
+public interface Layer {
+	float depth();
+	void event(String name, float x, float y);
+	void draw(Graphics g);
 }

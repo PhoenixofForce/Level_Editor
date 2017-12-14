@@ -5,7 +5,7 @@ import window.Window;
 
 import javax.swing.*;
 
-public abstract class LayerControll extends JToolBar {
+public class LayerControl extends JToolBar {
 
 	private JButton add, remove, options;
 
@@ -15,7 +15,7 @@ public abstract class LayerControll extends JToolBar {
 
 	 */
 
-	public LayerControll(Window w, LayerPane lp) {
+	public LayerControl(Window window, LayerPane layerPane) {
 		add = new JButton("+");
 		remove = new JButton("-");
 		//options = new JButton("Options");
@@ -27,14 +27,9 @@ public abstract class LayerControll extends JToolBar {
 		this.setRollover(true);
 
 		this.add.addActionListener(e-> {
-			UserInputs.createLayer(w, lp);
+			UserInputs.createLayer(window, layerPane);
 		});
-		this.remove.addActionListener(e -> onRemove());
+		this.remove.addActionListener(e -> layerPane.removeLayer());
 	}
-
-	/**
-	 *	Is called when the user wants to remove a layer
-	 */
-	public abstract void onRemove();
 
 }
