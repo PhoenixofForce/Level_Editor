@@ -31,15 +31,15 @@ public class FreeLayer implements Layer {
 	@Override
 	public void event(String name, float x, float y) {
 		System.out.println(x + " " + y);
-		images.add(new GO(new Loc(x, y), name));
+		images.add(new GO(new Location(x, y), name));
 	}
 
 	@Override
 	public void draw(Graphics g) {
 		for(int i = 0; i < images.size(); i++) {
-			Loc loc = images.get(i).loc;
+			Location location = images.get(i).location;
 			String name = images.get(i).name;
-			g.drawImage(TextureHandler.getImagePng(name), (int)(loc.x*8), (int)(loc.y*8), null);
+			g.drawImage(TextureHandler.getImagePng(name), (int)(location.x*8), (int)(location.y*8), null);
 		}
 	}
 }

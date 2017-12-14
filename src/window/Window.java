@@ -33,23 +33,8 @@ public class Window extends JFrame{
 		this.add(buttons, BorderLayout.PAGE_START);
 		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 		layers.reSize(getContentPane().getWidth(), getContentPane().getHeight());
-		mapViewer = new MapViewer(images, layers, 800, 800){
 
-			@Override
-			public void draw(Graphics g, int width, int height) {
-				BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g2 = (Graphics2D) img.getGraphics();
-
-				g2.setColor(Color.WHITE);
-				g2.fillRect(0, 0, width, height);
-
-				layers.getLayers().values().stream()
-						.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
-						.forEach(l -> l.draw(g2));
-
-				g.drawImage(img, 0, 0, null);
-			}
-		};
+		mapViewer = new MapViewer(images, layers, 800, 800);
 		this.add(mapViewer, BorderLayout.CENTER);
 
 		this.pack();

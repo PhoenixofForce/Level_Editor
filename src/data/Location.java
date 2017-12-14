@@ -1,15 +1,10 @@
 package data;
 
-public class Loc {
+public class Location {
 
 	public float x, y;
 
-	/** Used to save a point
-	 *
-	 * @param x x-pos
-	 * @param y y-pos
-	 */
-	public Loc(float x, float y) {
+	public Location(float x, float y) {
 		this.x = x;
 		this.y = y;
 	}
