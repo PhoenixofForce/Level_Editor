@@ -155,6 +155,8 @@ public class MapViewer extends JPanel {
 		g2.setColor(Color.LIGHT_GRAY);
 		g2.fillRect(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
 
+		//TODO: Draw thin lines "between" cells
+
 		map.getLayers().values().stream()
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
 				.forEach(l -> l.draw(g2));
