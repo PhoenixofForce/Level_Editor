@@ -13,7 +13,7 @@ public class TileLayer implements Layer {
 	}
 
 	@Override
-	public void event(String name, float x2, float y2) {
+	public void set(String name, float x2, float y2) {
 		int x = (int)x2;
 		int y = (int)y2;
 		if(x >= 0 && y >= 0 && x < width() && y < height()) {
@@ -21,10 +21,16 @@ public class TileLayer implements Layer {
 		}
 	}
 
-	/**
-	 *
-	 * @return Map if textures
-	 */
+	@Override
+	public void drag(float x, float y, float targetX, float targetY) {
+
+	}
+
+	@Override
+	public GO select(float x, float y) {
+		return null;
+	}
+
 	public String[][] getTileNames() {
 		return tileNames;
 	}
