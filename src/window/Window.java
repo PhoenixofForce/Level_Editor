@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.image.BufferedImage;
 
 public class Window extends JFrame{
 
@@ -17,6 +16,9 @@ public class Window extends JFrame{
 	private MainToolBar buttons;
 	private MapViewer mapViewer;
 	private ImageList images;
+
+	public static int TILE_SIZE = 8;
+	public static int MAP_SIZE = 100;
 
 	public Window() {
 		this.setTitle("POF - Level Editor");
@@ -34,7 +36,7 @@ public class Window extends JFrame{
 		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 		layers.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-		mapViewer = new MapViewer(images, layers, 100, 100, 8);
+		mapViewer = new MapViewer(images, layers, MAP_SIZE, MAP_SIZE, TILE_SIZE);
 		this.add(mapViewer, BorderLayout.CENTER);
 
 		this.pack();

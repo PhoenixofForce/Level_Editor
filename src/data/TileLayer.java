@@ -1,5 +1,6 @@
 package data;
 
+import window.Window;
 import java.awt.*;
 
 public class TileLayer implements Layer {
@@ -53,7 +54,7 @@ public class TileLayer implements Layer {
 		for(int x = 0; x < tileNames[0].length; x++) {
 			for(int y = 0; y < tileNames.length; y++) {
 				if(tileNames[y][x] == null) continue;
-				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), x * 8, y * 8, null);
+				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), x * Window.TILE_SIZE, y * Window.TILE_SIZE, null);
 			}
 		}
 	}

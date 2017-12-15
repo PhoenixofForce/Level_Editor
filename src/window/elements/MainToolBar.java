@@ -35,7 +35,7 @@ public class MainToolBar extends JToolBar{
 			chooser.setAcceptAllFileFilterUsed(false);
 			chooser.addChoosableFileFilter(new FileNameExtensionFilter(".text Files", "text"));
 
-			int returnVal = chooser.showDialog(new JFrame(), "Load Save");
+			int returnVal = chooser.showDialog(new JFrame(), "Load Texture");
 			if(returnVal == JFileChooser.APPROVE_OPTION){
 				File text = chooser.getSelectedFile();
 				File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length()-4) + "png");

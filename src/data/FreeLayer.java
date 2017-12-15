@@ -1,5 +1,7 @@
 package data;
 
+import window.Window;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -15,10 +17,6 @@ public class FreeLayer implements Layer {
 		this.images = new ArrayList<>();
 	}
 
-	/**
-	 *
-	 * @return all GameObjects saved in this layer
-	 */
 	public List<GO> getImages() {
 		return images;
 	}
@@ -31,10 +29,10 @@ public class FreeLayer implements Layer {
 	@Override
 	public void set(String name, float x, float y) {
 		BufferedImage image = TextureHandler.getImagePng(name);
-		float width = image.getWidth() / 8.0f;
-		float height = image.getHeight() / 8.0f;
+		float width = image.getWidth() / (float) Window.TILE_SIZE;
+		float height = image.getHeight() / (float) Window.TILE_SIZE;
 
-		if (x < 0 || x + width > 100 || y < 0 || y +height > 100) return;
+		if (x < 0 || x + width > Window.MAP_SIZE || y < 0 || y +height > Window.MAP_SIZE) return;
 		if (find(x, y) != null) return;
 
 		images.add(new GO(name, x, y, width, height));
@@ -45,7 +43,7 @@ public class FreeLayer implements Layer {
 		GO go = select(x, y);
 		if (go == null) return;
 		go.move(targetX-x, targetY-y);
-		if (go.x < 0 || go.x + go.width > 100 || go.y < 0 || go.y + go.height > 100) go.move(x-targetX, y-targetY);
+		if (go.x < 0 || go.x + go.width > Window.MAP_SIZE || go.y < 0 || go.y + go.height > Window.MAP_SIZE) go.move(x-targetX, y-targetY);
 	}
 
 	@Override
@@ -72,7 +70,7 @@ public class FreeLayer implements Layer {
 	public void draw(Graphics g) {
 		for(int i = 0; i < images.size(); i++) {
 			GO go = images.get(i);
-			g.drawImage(TextureHandler.getImagePng(go.name), (int)(go.x*8), (int)(go.y*8), null);
+			g.drawImage(TextureHandler.getImagePng(go.name), (int)(go.x*Window.TILE_SIZE), (int)(go.y*Window.TILE_SIZE), null);
 		}
 	}
 }

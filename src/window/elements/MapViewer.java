@@ -1,5 +1,6 @@
 package window.elements;
 
+import data.FreeLayer;
 import data.Layer;
 import data.Location;
 import window.elements.layer.LayerPane;
@@ -139,6 +140,7 @@ public class MapViewer extends JPanel {
 				.forEach(l -> l.draw(g2));
 
 		g.drawImage(img, 0, 0, null);
+
 	}
 
 }
