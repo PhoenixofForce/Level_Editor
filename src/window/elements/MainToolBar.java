@@ -14,7 +14,7 @@ import java.io.PrintWriter;
 public class MainToolBar extends JToolBar {
 
 	private JButton newMap, open, saveMap, export, importRessource;
-	private File lastExport;
+	private File lastExport, lastImport;
 
 	public MainToolBar(Window w, ImageList imageList) {
 		this.setFloatable(false);
@@ -86,21 +86,26 @@ public class MainToolBar extends JToolBar {
 		importRessource.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
 
+			if(lastImport != null) chooser.setCurrentDirectory(lastImport);
 			//chooser.setOpaque(true);
+			chooser.setMultiSelectionEnabled(true);
 
 			chooser.setAcceptAllFileFilterUsed(false);
 			chooser.addChoosableFileFilter(new FileNameExtensionFilter(".text Files", "text"));
 
 			int returnVal = chooser.showDialog(new JFrame(), "Load Texture");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File text = chooser.getSelectedFile();
-				File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length() - 4) + "png");
+				for(File text: chooser.getSelectedFiles()) {
+					File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length() - 4) + "png");
 
-				if (text.exists() && image.exists()) {
-					TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 5), text.getAbsolutePath());
-					imageList.update();
-				} else {
-					JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
+					if (text.exists() && image.exists()) {
+						TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 5), text.getAbsolutePath());
+						imageList.update();
+					} else {
+						JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
+					}
+
+					lastImport = text.getParentFile();
 				}
 			}
 		});
@@ -109,6 +114,7 @@ public class MainToolBar extends JToolBar {
 
 	public void reset() {
 		lastExport = null;
+		lastImport = null;
 	}
 
 }
