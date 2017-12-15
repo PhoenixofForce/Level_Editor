@@ -18,8 +18,8 @@ public class ImageList extends JPanel{
 
 		this.setLayout(new BorderLayout());
 
-		listModel = new DefaultListModel();
-		images = new JList(listModel);
+		listModel = new DefaultListModel<>();
+		images = new JList<>(listModel);
 
 		images.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		images.setLayoutOrientation(JList.HORIZONTAL_WRAP);

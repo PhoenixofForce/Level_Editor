@@ -1,6 +1,5 @@
 package data;
 
-import window.Window;
 import java.awt.*;
 
 public class TileLayer implements Layer {
@@ -8,16 +7,22 @@ public class TileLayer implements Layer {
 	private float depth;
 	private String[][] tileNames;
 
-	public TileLayer(int width, int height, float depth) {
-		tileNames = new String[width][height];
+	private int width, height, tileSize;
+
+	public TileLayer(float depth, int width, int height, int tileSize) {
+		tileNames = new String[height][width];
 		this.depth = depth;
+
+		this.width = width;
+		this.height = height;
+		this.tileSize = tileSize;
 	}
 
 	@Override
 	public void set(String name, float x2, float y2) {
-		int x = (int)x2;
-		int y = (int)y2;
-		if(x >= 0 && y >= 0 && x < width() && y < height()) {
+		int x = (int) x2;
+		int y = (int) y2;
+		if (x >= 0 && y >= 0 && x < width && y < height) {
 			tileNames[y][x] = name;
 		}
 	}
@@ -36,14 +41,6 @@ public class TileLayer implements Layer {
 		return tileNames;
 	}
 
-	public int height() {
-		return tileNames.length;
-	}
-
-	public int width() {
-		return tileNames[0].length;
-	}
-
 	@Override
 	public float depth() {
 		return depth;
@@ -51,10 +48,10 @@ public class TileLayer implements Layer {
 
 	@Override
 	public void draw(Graphics g) {
-		for(int x = 0; x < tileNames[0].length; x++) {
-			for(int y = 0; y < tileNames.length; y++) {
-				if(tileNames[y][x] == null) continue;
-				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), x * Window.TILE_SIZE, y * Window.TILE_SIZE, null);
+		for (int x = 0; x < tileNames[0].length; x++) {
+			for (int y = 0; y < tileNames.length; y++) {
+				if (tileNames[y][x] == null) continue;
+				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), x * tileSize, y * tileSize, null);
 			}
 		}
 	}

@@ -1,7 +1,5 @@
 package data;
 
-import window.Window;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -12,9 +10,15 @@ public class FreeLayer implements Layer {
 	private float depth;
 	private List<GO> images;
 
-	public FreeLayer(float depth) {
+	private int width, height, tileSize;
+
+	public FreeLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
 		this.images = new ArrayList<>();
+
+		this.width = width;
+		this.height = height;
+		this.tileSize = tileSize;
 	}
 
 	public List<GO> getImages() {
@@ -29,10 +33,10 @@ public class FreeLayer implements Layer {
 	@Override
 	public void set(String name, float x, float y) {
 		BufferedImage image = TextureHandler.getImagePng(name);
-		float width = image.getWidth() / (float) Window.TILE_SIZE;
-		float height = image.getHeight() / (float) Window.TILE_SIZE;
+		float width = image.getWidth() / (float) tileSize;
+		float height = image.getHeight() / (float) tileSize;
 
-		if (x < 0 || x + width > Window.MAP_SIZE || y < 0 || y +height > Window.MAP_SIZE) return;
+		if (x < 0 || x + width > this.width || y < 0 || y + height > this.height) return;
 		if (find(x, y) != null) return;
 
 		images.add(new GO(name, x, y, width, height));
@@ -42,8 +46,9 @@ public class FreeLayer implements Layer {
 	public void drag(float x, float y, float targetX, float targetY) {
 		GO go = select(x, y);
 		if (go == null) return;
-		go.move(targetX-x, targetY-y);
-		if (go.x < 0 || go.x + go.width > Window.MAP_SIZE || go.y < 0 || go.y + go.height > Window.MAP_SIZE) go.move(x-targetX, y-targetY);
+		go.move(targetX - x, targetY - y);
+		if (go.x < 0 || go.x + go.width > this.width || go.y < 0 || go.y + go.height > this.height)
+			go.move(x - targetX, y - targetY);
 	}
 
 	@Override
@@ -57,9 +62,9 @@ public class FreeLayer implements Layer {
 	}
 
 	private GO find(float x, float y) {
-		for (int i = images.size()-1; i >= 0; i--) {
+		for (int i = images.size() - 1; i >= 0; i--) {
 			GO go = images.get(i);
-			if (go.x <= x && go.y <= y && go.x+go.width >= x && go.y + go.height >= y) {
+			if (go.x <= x && go.y <= y && go.x + go.width >= x && go.y + go.height >= y) {
 				return go;
 			}
 		}
@@ -68,9 +73,9 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public void draw(Graphics g) {
-		for(int i = 0; i < images.size(); i++) {
+		for (int i = 0; i < images.size(); i++) {
 			GO go = images.get(i);
-			g.drawImage(TextureHandler.getImagePng(go.name), (int)(go.x*Window.TILE_SIZE), (int)(go.y*Window.TILE_SIZE), null);
+			g.drawImage(TextureHandler.getImagePng(go.name), (int) (go.x * tileSize), (int) (go.y * tileSize), null);
 		}
 	}
 }

@@ -1,30 +1,32 @@
 package window.elements;
 
+import data.GameMap;
 import data.Layer;
 import data.Location;
 import window.elements.layer.LayerPane;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
 
 	private ImageList imageList;
 	private LayerPane layerPane;
-	private int width, height, pixel_per_tile;
 
 	private float dx, dy, zoom;
 
 	private int last_x, last_y;
 
-	public MapViewer(ImageList imageList, LayerPane layerPane, int width, int height, int pixel_per_tile) {
+	private GameMap map;
+
+	public MapViewer(ImageList imageList, LayerPane layerPane, GameMap map) {
 		this.layerPane = layerPane;
 		this.imageList = imageList;
-		this.width = width;
-		this.height = height;
-		this.pixel_per_tile = pixel_per_tile;
+		this.map = map;
 
 		centerCamera();
 
@@ -69,16 +71,21 @@ public class MapViewer extends JPanel {
 		});
 	}
 
+	public void setGameMap(GameMap map) {
+		this.map = map;
+		centerCamera();
+	}
+
 	private void centerCamera() {
-		this.dx = -width*pixel_per_tile/2;
-		this.dy = -height*pixel_per_tile/2;
+		this.dx = -map.getWidth() * map.getTileSize() / 2;
+		this.dy = -map.getHeight() * map.getTileSize() / 2;
 		this.zoom = 0.5f;
 	}
 
 	private void set(int x, int y) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if(selectedLayer == null || selectedTexture == null) return;
+		if (selectedLayer == null || selectedTexture == null) return;
 
 		Location pos = getBlockLocation(x, y);
 		selectedLayer.set(selectedTexture, pos.x, pos.y);
@@ -87,7 +94,7 @@ public class MapViewer extends JPanel {
 	private void select(int x, int y) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if(selectedLayer == null || selectedTexture == null) return;
+		if (selectedLayer == null || selectedTexture == null) return;
 
 		Location pos = getBlockLocation(x, y);
 		selectedLayer.select(pos.x, pos.y);
@@ -96,7 +103,7 @@ public class MapViewer extends JPanel {
 	private void drag(int x, int y, int targetX, int targetY) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if(selectedLayer == null || selectedTexture == null) return;
+		if (selectedLayer == null || selectedTexture == null) return;
 
 		Location pos1 = getBlockLocation(x, y);
 		Location pos2 = getBlockLocation(targetX, targetY);
@@ -105,16 +112,16 @@ public class MapViewer extends JPanel {
 
 	private Location getBlockLocation(int xPos, int yPos) {
 		float x = xPos, y = yPos;
-		x -= this.getWidth()/2.0;
-		y -= this.getHeight()/2.0;
+		x -= this.getWidth() / 2.0;
+		y -= this.getHeight() / 2.0;
 		x /= zoom;
 		y /= zoom;
 		x -= dx;
 		y -= dy;
 		x = (float) Math.floor(x);
 		y = (float) Math.floor(y);
-		x /= pixel_per_tile;
-		y /= pixel_per_tile;
+		x /= map.getTileSize();
+		y /= map.getTileSize();
 
 		return new Location(x, y);
 	}
@@ -124,17 +131,17 @@ public class MapViewer extends JPanel {
 		BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2 = (Graphics2D) img.getGraphics();
 
-		g2.setColor(new Color(240,248,255));
-		g2.fillRect(0,0, img.getWidth(), img.getHeight());
+		g2.setColor(new Color(240, 248, 255));
+		g2.fillRect(0, 0, img.getWidth(), img.getHeight());
 
-		g2.translate(this.getWidth()/2.0, this.getHeight()/2.0);
+		g2.translate(this.getWidth() / 2.0, this.getHeight() / 2.0);
 		g2.scale(zoom, zoom);
 		g2.translate(dx, dy);
 
 		g2.setColor(Color.LIGHT_GRAY);
-		g2.fillRect(0, 0, width*pixel_per_tile, height*pixel_per_tile);
+		g2.fillRect(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
 
-		layerPane.getLayers().values().stream()
+		map.getLayers().values().stream()
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
 				.forEach(l -> l.draw(g2));
 

@@ -1,12 +1,11 @@
 package window.elements.layer;
 
 import data.FreeLayer;
+import data.GameMap;
 import data.Layer;
 import data.TileLayer;
 import window.Window;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.*;
 import java.awt.*;
 
@@ -15,10 +14,10 @@ public class LayerPane extends JPanel {
 	private DefaultListModel<String> listModel;
 	private LayerControl layerControl;
 
-	private Map<String, Layer> layers;
+	private GameMap map;
 
-	public LayerPane(Window window) {
-		layers = new HashMap<>();
+	public LayerPane(Window window, GameMap map) {
+		this.map = map;
 
 		this.setLayout(new BorderLayout());
 
@@ -27,70 +26,66 @@ public class LayerPane extends JPanel {
 		jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jList.setLayoutOrientation(JList.VERTICAL);
 
-		addLayer("Background", true, 1.0f);
-		addLayer("Tile", false, 0.5f);
-		addLayer("Object", true, 0.0f);
-		jList.setSelectedIndex(0);
-
-		layerControl = new LayerControl(window, this );
+		layerControl = new LayerControl(window, this);
 
 		this.add(jList, BorderLayout.PAGE_START);
 		this.add(layerControl, BorderLayout.PAGE_END);
+
+		updateGameMap(map);
 	}
 
 	public Layer getSelectedLayer() {
 		if (jList.getSelectedIndex() < 0) return null;
-		return layers.get(listModel.get(jList.getSelectedIndex()));
+		return map.getLayer(listModel.get(jList.getSelectedIndex()));
 	}
 
 	public void addLayer(String name, boolean type, float depth) {
 		int i = 1;
-		while(layers.keySet().contains(name)) {
+		while (map.getLayers().keySet().contains(name)) {
 			String newName = String.format("%s(%d)", name, i);
-			if (layers.keySet().contains(newName)) {
+			if (map.getLayers().keySet().contains(newName)) {
 				i++;
 			} else {
 				name = newName;
 			}
 		}
-		Layer layer = type? new FreeLayer(depth): new TileLayer(Window.MAP_SIZE, Window.MAP_SIZE, depth);
-		layers.put(name, layer);
+		Layer layer = type ? new FreeLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize()) : new TileLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+		map.addLayer(name, layer);
 		int index = 0;
-		while (index < listModel.size() && layers.get(listModel.get(index)).depth() > layer.depth()) index++;
+		while (index < listModel.size() && map.getLayer(listModel.get(index)).depth() > layer.depth()) index++;
 		listModel.add(index, name);
 		jList.setSelectedIndex(index);
 	}
 
 	public void removeLayer() {
-		if(jList.getSelectedIndex() < 0) return;
+		if (jList.getSelectedIndex() < 0) return;
 		int sel = jList.getSelectedIndex();
 		String name = listModel.get(sel);
-		layers.remove(name);
+		map.removeLayer(name);
 		listModel.remove(sel);
-		if(sel == 0) jList.setSelectedIndex(0);
-		else jList.setSelectedIndex(sel-1);
+		if (sel == 0) jList.setSelectedIndex(0);
+		else jList.setSelectedIndex(sel - 1);
 	}
 
-	public Map<String, Layer> getLayers() {
-		return layers;
+	public void updateGameMap(GameMap map) {
+		this.map = map;
+
+		listModel.clear();
+		for (String name : map.getLayers().keySet()) {
+			Layer layer = map.getLayer(name);
+
+			int index = 0;
+			while (index < listModel.size() && map.getLayer(listModel.get(index)).depth() > layer.depth()) index++;
+			listModel.add(index, name);
+		}
+
+		jList.setSelectedIndex(0);
 	}
 
 	public void reSize(int width, int height) {
 		height -= layerControl.getHeight();
-		Dimension d = new Dimension(width/6, height);
+		Dimension d = new Dimension(width / 6, height);
 		jList.setPreferredSize(d);
 		jList.setSize(d);
-	}
-
-	@Override
-	public void disable() {
-		layerControl.disable();
-		jList.setEnabled(false);
-	}
-
-	@Override
-	public void enable() {
-		layerControl.enable();
-		jList.setEnabled(true);
 	}
 }

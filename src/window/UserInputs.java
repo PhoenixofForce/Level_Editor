@@ -1,5 +1,6 @@
 package window;
 
+import data.GameMap;
 import window.elements.layer.LayerPane;
 
 import javax.swing.*;
@@ -91,8 +92,10 @@ public class UserInputs {
 		JFrame frame = new JFrame("New...");
 		JTextField tileSizeIn = new JTextField("Tile size");
 		JButton create = new JButton("Create");
-		JTextField mapSizeIn = new JTextField("Map size");
-		mapSizeIn.setInputVerifier(new InputVerifier() {
+		JTextField mapWidthIn = new JTextField("Map width");
+		JTextField mapHeightIn = new JTextField("Map height");
+
+		InputVerifier inputVerifier = new InputVerifier() {
 
 			@Override
 			public boolean verify(JComponent input) {
@@ -108,25 +111,10 @@ public class UserInputs {
 				}
 
 			}
-		});
-
-		tileSizeIn.setInputVerifier(new InputVerifier() {
-
-			@Override
-			public boolean verify(JComponent input) {
-				JTextField textField = ((JTextField) input);
-				try {
-
-					Integer.parseInt(textField.getText());
-					textField.setBackground(Color.WHITE);
-					return true;
-				} catch (NumberFormatException e) {
-					textField.setBackground(new Color(255, 150, 150));
-					return false;
-				}
-
-			}
-		});
+		};
+		mapWidthIn.setInputVerifier(inputVerifier);
+		mapHeightIn.setInputVerifier(inputVerifier);
+		tileSizeIn.setInputVerifier(inputVerifier);
 
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -148,19 +136,22 @@ public class UserInputs {
 		frame.setLayout(null);
 		frame.setVisible(true);
 		Insets i = frame.getInsets();
-		frame.setSize(250 + i.left + i.right, 95 + i.top + i.bottom);
+		frame.setSize(250 + i.left + i.right, 125 + i.top + i.bottom);
 		frame.setAlwaysOnTop(true);
 
 		frame.add(tileSizeIn);
 		tileSizeIn.setBounds(5, 5, 100, 25);
 
-		frame.add(mapSizeIn);
-		mapSizeIn.setBounds(5, 35, 100, 25);
+		frame.add(mapWidthIn);
+		mapWidthIn.setBounds(5, 35, 100, 25);
+
+		frame.add(mapHeightIn);
+		mapHeightIn.setBounds(5, 65, 100, 25);
 
 		frame.add(create);
-		create.setBounds(5, 65, 100, 25);
+		create.setBounds(5, 95, 100, 25);
 		create.addActionListener(e -> {
-			window.addMapView(Integer.parseInt(mapSizeIn.getText()), Integer.parseInt(tileSizeIn.getText()));
+			window.setMap(new GameMap(Integer.parseInt(mapWidthIn.getText()), Integer.valueOf(mapHeightIn.getText()), Integer.parseInt(tileSizeIn.getText())));
 
 			frame.dispose();
 			window.setEnabled(true);
