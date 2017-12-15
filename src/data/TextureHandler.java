@@ -118,8 +118,16 @@ public class TextureHandler {
 	public static Map<String, ImageIcon> getAllImages() {
 		Map<String, ImageIcon> out = new HashMap<>();
 		for(String s: textures_sprite_sheet.keySet()) {
-			out.put(s, new ImageIcon(getImagePng(s)));
+			BufferedImage img = getImagePng(s);
+			while(img.getWidth() < 32 || img.getHeight() < 32) img = scale(img);
+			out.put(s, new ImageIcon(img));
 		}
+		return out;
+	}
+
+	private static BufferedImage scale(BufferedImage in) {
+		BufferedImage out = new BufferedImage(in.getWidth() * 2, in.getHeight() * 2, BufferedImage.TYPE_INT_ARGB);
+		out.getGraphics().drawImage(in, 0, 0, out.getWidth(), out.getHeight(), null);
 		return out;
 	}
 }

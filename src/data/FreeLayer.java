@@ -80,11 +80,11 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public String toMapFormat() {
+	public String toMapFormat(List<String> names) {
 		String out = "";
 
 		for(GO g: getImages()) {
-			out += "[put; " + g.name + "; " + g.x + "; " + g.y + "]\n";
+			out += "[put; " + names.indexOf(g.name) + "; " + g.x + "; " + g.y + "]\n";
 		}
 
 		return out;

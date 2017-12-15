@@ -1,6 +1,7 @@
 package data;
 
 import java.awt.*;
+import java.util.List;
 
 public interface Layer {
 	float depth();
@@ -9,5 +10,5 @@ public interface Layer {
 	void drag(float x, float y, float targetX, float targetY);
 	void draw(Graphics g);
 
-	String toMapFormat();
+	String toMapFormat(List<String> names);
 }

@@ -2,6 +2,8 @@ package data;
 
 import java.awt.*;
 
+import java.util.List;
+
 public class TileLayer implements Layer {
 
 	private float depth;
@@ -57,12 +59,12 @@ public class TileLayer implements Layer {
 	}
 
 	@Override
-	public String toMapFormat() {
+	public String toMapFormat(List<String> names) {
 		String out = "[layer; " + width + "; " + height + "; ";
 
 		for (int x = 0; x < tileNames[0].length; x++) {
 			for (int y = 0; y < tileNames.length; y++) {
-				out += tileNames[y][x] + (y < tileNames.length-1? ", ": "");
+				out += names.indexOf(tileNames[y][x]) + (y < tileNames.length-1? ", ": "");
 			}
 
 			if(x < tileNames[0].length-1) out += "; ";

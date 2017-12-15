@@ -81,15 +81,15 @@ public class GameMap {
 			}
 		}
 
-		for(TileLayer l: tiles) out += l.toMapFormat();
-		for(FreeLayer l: frees) out += l.toMapFormat();
+		for(TileLayer l: tiles) out += l.toMapFormat(names);
+		for(FreeLayer l: frees) out += l.toMapFormat(names);
 
 		String repl = "";
 		for(int i = 0; i < names.size(); i++) {
 			out = out.replaceAll(names.get(i), (i+1) + "");
 			repl += "#" + (i+1) + " - " + names.get(i) + "\n";
 		}
-		out = out.replaceAll("null", "0");
+		out = out.replaceAll("null", "0").replaceAll("-1", "0");
 
 
 		return repl + out;
