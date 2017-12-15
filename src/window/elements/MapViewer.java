@@ -1,6 +1,5 @@
 package window.elements;
 
-import data.FreeLayer;
 import data.Layer;
 import data.Location;
 import window.elements.layer.LayerPane;

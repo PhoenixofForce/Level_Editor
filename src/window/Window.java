@@ -27,17 +27,16 @@ public class Window extends JFrame{
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setVisible(true);
 
-		layers = new LayerPane(this);
-		this.add(layers, BorderLayout.LINE_START);
 		images = new ImageList();
 		this.add(images, BorderLayout.LINE_END);
 		buttons = new MainToolBar(images);
 		this.add(buttons, BorderLayout.PAGE_START);
 		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
+		layers = new LayerPane(this);
+		this.add(layers, BorderLayout.LINE_START);
 		layers.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-		mapViewer = new MapViewer(images, layers, MAP_SIZE, MAP_SIZE, TILE_SIZE);
-		this.add(mapViewer, BorderLayout.CENTER);
+		layers.disable();
 
 		this.pack();
 
@@ -45,7 +44,7 @@ public class Window extends JFrame{
 			long lastTime;
 			while (true) {
 				lastTime = System.currentTimeMillis();
-				mapViewer.repaint();
+				if(mapViewer != null) mapViewer.repaint();
 				try {
 					Thread.sleep(Math.max(0,1000/60 - (System.currentTimeMillis()-lastTime)));
 				} catch (InterruptedException e) {
@@ -62,6 +61,15 @@ public class Window extends JFrame{
 			}
 		});
 		this.setSize(this.getWidth()+1, this.getHeight());
+	}
+
+	public void addMapView(int map, int tile) {
+		TILE_SIZE = tile;
+		MAP_SIZE = map;
+		mapViewer = new MapViewer(images, layers, MAP_SIZE, MAP_SIZE, TILE_SIZE);
+		this.add(mapViewer, BorderLayout.CENTER);
+
+		layers.enable();
 	}
 
 }

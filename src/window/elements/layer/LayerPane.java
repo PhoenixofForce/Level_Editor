@@ -82,4 +82,15 @@ public class LayerPane extends JPanel {
 		jList.setSize(d);
 	}
 
+	@Override
+	public void disable() {
+		layerControl.setEnabled(false);
+		jList.setEnabled(false);
+	}
+
+	@Override
+	public void enable() {
+		layerControl.setEnabled(true);
+		jList.setEnabled(true);
+	}
 }
