@@ -69,7 +69,7 @@ public class Window extends JFrame {
 
 	public void setMap(GameMap map) {
 		this.map = map;
-		buttons.reset();
+		if(buttons != null) buttons.reset();
 
 		if (mapViewer != null) mapViewer.setGameMap(map);
 		if (layerPane != null) layerPane.updateGameMap(map);
