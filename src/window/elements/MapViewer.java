@@ -1,8 +1,6 @@
 package window.elements;
 
-import data.GameMap;
-import data.Layer;
-import data.Location;
+import data.*;
 import window.elements.layer.LayerPane;
 
 import javax.swing.*;
@@ -14,6 +12,8 @@ import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
 
+	private static final boolean TILE_HIGHLIGHT = false;
+
 	private ImageList imageList;
 	private LayerPane layerPane;
 
@@ -21,12 +21,16 @@ public class MapViewer extends JPanel {
 
 	private int last_x, last_y;
 
+	private boolean mouseEntered;
+
 	private GameMap map;
 
 	public MapViewer(ImageList imageList, LayerPane layerPane, GameMap map) {
 		this.layerPane = layerPane;
 		this.imageList = imageList;
 		this.map = map;
+
+		mouseEntered = false;
 
 		centerCamera();
 
@@ -62,6 +66,16 @@ public class MapViewer extends JPanel {
 		});
 
 		this.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				mouseEntered = true;
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				mouseEntered = false;
+			}
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (SwingUtilities.isLeftMouseButton(e)) select(e.getX(), e.getY());
@@ -144,6 +158,18 @@ public class MapViewer extends JPanel {
 		map.getLayers().values().stream()
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
 				.forEach(l -> l.draw(g2));
+
+		if(mouseEntered && TILE_HIGHLIGHT) {
+			Location l = getBlockLocation(last_x, last_y);
+			g2.setColor(Color.RED);
+			if (imageList.getSelectedImageName() != null) {
+				BufferedImage tex = TextureHandler.getImagePng(imageList.getSelectedImageName());
+				if (layerPane.getSelectedLayer() instanceof FreeLayer)
+					g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), tex.getWidth(), tex.getHeight());
+				else
+					g2.drawRect((int) (l.x) * map.getTileSize(), (int) (l.y) * map.getTileSize(), tex.getWidth(), tex.getHeight());
+			}
+		}
 
 		g.drawImage(img, 0, 0, null);
 

@@ -58,7 +58,7 @@ public class Window extends JFrame {
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				if (images != null && buttons != null)
+				if (images != null)
 					images.reSize(getContentPane().getWidth(), getContentPane().getHeight() - buttons.getHeight());
 				if (images != null && buttons != null)
 					layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight() - buttons.getHeight());

@@ -55,6 +55,7 @@ public class ImageList extends JPanel{
 	}
 
 	public String getSelectedImageName() {
+		if(images.getSelectedIndex() < 0) return null;
 		for(String s: icons.keySet()) {
 			if(icons.get(s).equals(getSelectedIcon())) return s;
 		}
