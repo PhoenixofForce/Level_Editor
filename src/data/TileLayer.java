@@ -64,7 +64,7 @@ public class TileLayer implements Layer {
 
 		for (int x = 0; x < tileNames[0].length; x++) {
 			for (int y = 0; y < tileNames.length; y++) {
-				out += names.indexOf(tileNames[y][x]) + (y < tileNames.length-1? ", ": "");
+				out += (names.indexOf(tileNames[y][x])+1) + (y < tileNames.length-1? ", ": "");
 			}
 
 			if(x < tileNames[0].length-1) out += "; ";

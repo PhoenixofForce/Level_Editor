@@ -89,7 +89,6 @@ public class GameMap {
 			out = out.replaceAll(names.get(i), (i+1) + "");
 			repl += "#" + (i+1) + " - " + names.get(i) + "\n";
 		}
-		out = out.replaceAll("null", "0").replaceAll("-1", "0");
 
 
 		return repl + out;

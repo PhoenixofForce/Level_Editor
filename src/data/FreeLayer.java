@@ -84,7 +84,7 @@ public class FreeLayer implements Layer {
 		String out = "";
 
 		for(GO g: getImages()) {
-			out += "[put; " + names.indexOf(g.name) + "; " + g.x + "; " + g.y + "]\n";
+			out += "[put; " + (names.indexOf(g.name)+1) + "; " + g.x + "; " + g.y + "]\n";
 		}
 
 		return out;
