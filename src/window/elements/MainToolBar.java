@@ -26,6 +26,9 @@ public class MainToolBar extends JToolBar {
 
 		saveMap = new JButton("Save");
 		this.add(saveMap);
+		saveMap.addActionListener(e -> {
+			System.out.println(w.getMap().toMapFormat());
+		});
 
 		this.addSeparator();
 

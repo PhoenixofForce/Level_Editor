@@ -78,4 +78,15 @@ public class FreeLayer implements Layer {
 			g.drawImage(TextureHandler.getImagePng(go.name), (int) (go.x * tileSize), (int) (go.y * tileSize), null);
 		}
 	}
+
+	@Override
+	public String toMapFormat() {
+		String out = "";
+
+		for(GO g: getImages()) {
+			out += "[put; " + g.name + "; " + g.x + "; " + g.y + "]\n";
+		}
+
+		return out;
+	}
 }

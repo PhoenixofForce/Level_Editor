@@ -8,4 +8,6 @@ public interface Layer {
 	GO select(float x, float y);
 	void drag(float x, float y, float targetX, float targetY);
 	void draw(Graphics g);
+
+	String toMapFormat();
 }

@@ -74,4 +74,8 @@ public class Window extends JFrame {
 		if (layerPane != null) layerPane.updateGameMap(map);
 	}
 
+	public GameMap getMap() {
+		return map;
+	}
+
 }

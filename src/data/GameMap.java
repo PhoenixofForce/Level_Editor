@@ -1,7 +1,9 @@
 package data;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameMap {
@@ -46,5 +48,50 @@ public class GameMap {
 
 	public int getTileSize() {
 		return tileSize;
+	}
+
+	public String toMapFormat() {
+		String out = "";
+
+		List<TileLayer> tiles = new ArrayList<>();
+		List<FreeLayer> frees = new ArrayList<>();
+
+		List<String> names = new ArrayList<>();
+
+
+		for(String s: layers.keySet()) {
+			Layer l = layers.get(s);
+			if(l instanceof TileLayer) {
+				TileLayer t = (TileLayer) l;
+				tiles.add(t);
+
+				String[][] layerNames = t.getTileNames();
+				for(String[] sa: layerNames) {
+					for(String st: sa) if(st != null && !names.contains(st)) names.add(st);
+				}
+			}
+			else {
+				FreeLayer f = (FreeLayer) l;
+				frees.add(f);
+
+				for(GO go: f.getImages()) {
+					String st = go.name;
+					if(st != null && !names.contains(st)) names.add(st);
+				}
+			}
+		}
+
+		for(TileLayer l: tiles) out += l.toMapFormat();
+		for(FreeLayer l: frees) out += l.toMapFormat();
+
+		String repl = "";
+		for(int i = 0; i < names.size(); i++) {
+			out = out.replaceAll(names.get(i), (i+1) + "");
+			repl += "#" + (i+1) + " - " + names.get(i) + "\n";
+		}
+		out = out.replaceAll("null", "0");
+
+
+		return repl + out;
 	}
 }
