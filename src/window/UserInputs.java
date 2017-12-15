@@ -17,7 +17,7 @@ public class UserInputs {
 		JSlider layerType = new JSlider(JSlider.HORIZONTAL, 0, 1, 1);
 		JLabel layerText = new JLabel("Tile - Pixel");
 		JButton create = new JButton("Create");
-		JTextField depthInput = new JTextField("");
+		JTextField depthInput = new JTextField("depth");
 		depthInput.setInputVerifier(new InputVerifier() {
 
 			@Override
@@ -25,7 +25,7 @@ public class UserInputs {
 				JTextField textField = ((JTextField) input);
 				try {
 
-					Float isFloat = Float.parseFloat(textField.getText());
+					Float.parseFloat(textField.getText());
 					textField.setBackground(Color.WHITE);
 					return true;
 				} catch (NumberFormatException e) {
@@ -79,6 +79,89 @@ public class UserInputs {
 		create.addActionListener(e -> {
 			String name = nameInput.getText();
 			layerPane.addLayer(name, layerType.getValue() == 1, Float.parseFloat(depthInput.getText()));
+			frame.dispose();
+			window.setEnabled(true);
+			window.toFront();
+		});
+	}
+
+	public static void newMap(Window window) {
+		window.setEnabled(false);
+
+		JFrame frame = new JFrame("New...");
+		JTextField tileSizeIn = new JTextField("Tile size");
+		JButton create = new JButton("Create");
+		JTextField mapSizeIn = new JTextField("Map size");
+		mapSizeIn.setInputVerifier(new InputVerifier() {
+
+			@Override
+			public boolean verify(JComponent input) {
+				JTextField textField = ((JTextField) input);
+				try {
+
+					Integer.parseInt(textField.getText());
+					textField.setBackground(Color.WHITE);
+					return true;
+				} catch (NumberFormatException e) {
+					textField.setBackground(new Color(255, 150, 150));
+					return false;
+				}
+
+			}
+		});
+
+		tileSizeIn.setInputVerifier(new InputVerifier() {
+
+			@Override
+			public boolean verify(JComponent input) {
+				JTextField textField = ((JTextField) input);
+				try {
+
+					Integer.parseInt(textField.getText());
+					textField.setBackground(Color.WHITE);
+					return true;
+				} catch (NumberFormatException e) {
+					textField.setBackground(new Color(255, 150, 150));
+					return false;
+				}
+
+			}
+		});
+
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				frame.dispose();
+				window.setEnabled(true);
+				window.toFront();
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				frame.dispose();
+				window.setEnabled(true);
+				window.toFront();
+			}
+		});
+
+		frame.setResizable(false);
+		frame.setLayout(null);
+		frame.setVisible(true);
+		Insets i = frame.getInsets();
+		frame.setSize(250 + i.left + i.right, 95 + i.top + i.bottom);
+		frame.setAlwaysOnTop(true);
+
+		frame.add(tileSizeIn);
+		tileSizeIn.setBounds(5, 5, 100, 25);
+
+		frame.add(mapSizeIn);
+		mapSizeIn.setBounds(5, 35, 100, 25);
+
+		frame.add(create);
+		create.setBounds(5, 65, 100, 25);
+		create.addActionListener(e -> {
+			window.addMapView(Integer.parseInt(mapSizeIn.getText()), Integer.parseInt(tileSizeIn.getText()));
+
 			frame.dispose();
 			window.setEnabled(true);
 			window.toFront();

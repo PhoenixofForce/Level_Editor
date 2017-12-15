@@ -29,7 +29,7 @@ public class Window extends JFrame{
 
 		images = new ImageList();
 		this.add(images, BorderLayout.LINE_END);
-		buttons = new MainToolBar(images);
+		buttons = new MainToolBar(this, images);
 		this.add(buttons, BorderLayout.PAGE_START);
 		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 		layers = new LayerPane(this);
@@ -38,7 +38,7 @@ public class Window extends JFrame{
 
 		layers.disable();
 
-		this.pack();
+		addMapView(100, 16);
 
 		new Thread(()->{
 			long lastTime;
@@ -68,6 +68,9 @@ public class Window extends JFrame{
 		MAP_SIZE = map;
 		mapViewer = new MapViewer(images, layers, MAP_SIZE, MAP_SIZE, TILE_SIZE);
 		this.add(mapViewer, BorderLayout.CENTER);
+
+		mapViewer.repaint();
+		this.pack();
 
 		layers.enable();
 	}

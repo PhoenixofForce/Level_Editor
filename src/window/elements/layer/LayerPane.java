@@ -53,7 +53,7 @@ public class LayerPane extends JPanel {
 				name = newName;
 			}
 		}
-		Layer layer = type? new FreeLayer(depth): new TileLayer(100, 100, depth);
+		Layer layer = type? new FreeLayer(depth): new TileLayer(Window.MAP_SIZE, Window.MAP_SIZE, depth);
 		layers.put(name, layer);
 		int index = 0;
 		while (index < listModel.size() && layers.get(listModel.get(index)).depth() > layer.depth()) index++;
@@ -84,13 +84,13 @@ public class LayerPane extends JPanel {
 
 	@Override
 	public void disable() {
-		layerControl.setEnabled(false);
+		layerControl.disable();
 		jList.setEnabled(false);
 	}
 
 	@Override
 	public void enable() {
-		layerControl.setEnabled(true);
+		layerControl.enable();
 		jList.setEnabled(true);
 	}
 }
