@@ -5,12 +5,16 @@ import window.UserInputs;
 import window.Window;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 public class MainToolBar extends JToolBar {
 
-	private JButton newMap, open, saveMap, importRessource;
+	private JButton newMap, open, saveMap, export, importRessource;
+	private File lastExport;
 
 	public MainToolBar(Window w, ImageList imageList) {
 		this.setFloatable(false);
@@ -24,10 +28,56 @@ public class MainToolBar extends JToolBar {
 		open = new JButton("Open");
 		this.add(open);
 
+		this.addSeparator();
+
 		saveMap = new JButton("Save");
 		this.add(saveMap);
-		saveMap.addActionListener(e -> {
-			System.out.println(w.getMap().toMapFormat());
+
+		export = new JButton("Export");
+		this.add(export);
+		export.addActionListener(e -> {
+			JFileChooser chooser = new JFileChooser(){
+				public void approveSelection() {
+					File f = getSelectedFile();
+					if(!f.getName().endsWith(".map")) setSelectedFile( new File(f.getAbsolutePath() + ".map"));
+					f = getSelectedFile();
+
+					if(f.exists()) {
+						int n = JOptionPane.showOptionDialog(this, "The file already exists, should it be replaced?", "File exists", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Yes", "No"}, "No");
+						if(n == 0) super.approveSelection();
+					} else super.approveSelection();
+				}
+			};
+			if(lastExport != null) chooser.setSelectedFile(lastExport);
+
+			chooser.setOpaque(true);
+
+			chooser.setAcceptAllFileFilterUsed(false);
+			chooser.addChoosableFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					return f.isDirectory();
+				}
+
+				@Override
+				public String getDescription() {
+					return ".map files";
+				}
+			});
+
+			int returnVal = chooser.showDialog(new JButton("Ch"), "Save File");
+			if(returnVal == JFileChooser.APPROVE_OPTION){
+				File f = chooser.getSelectedFile();
+				lastExport = f;
+				try {
+					PrintWriter wr = new PrintWriter(f);
+					wr.write(w.getMap().toMapFormat());
+					wr.close();
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
+
+			}
 		});
 
 		this.addSeparator();
@@ -55,7 +105,10 @@ public class MainToolBar extends JToolBar {
 			}
 		});
 		this.add(importRessource);
+	}
 
+	public void reset() {
+		lastExport = null;
 	}
 
 }
