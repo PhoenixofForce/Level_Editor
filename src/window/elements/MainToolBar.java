@@ -29,7 +29,10 @@ public class MainToolBar extends JToolBar {
 		//TODO: Open, Save
 		newMap = new JButton("New");
 		this.add(newMap);
-		newMap.addActionListener(e -> UserInputs.newMap(w));
+		newMap.addActionListener(e -> {
+			UserInputs.newMap(w);
+			lastSave = null;
+		});
 
 		open = new JButton("Open");
 		this.add(open);
@@ -87,7 +90,7 @@ public class MainToolBar extends JToolBar {
 								String row = data.split(";")[y];
 
 								for(int x = 0; x < row.split(",").length; x++) {
-									names[y-4][x] = row.split(",")[x].trim().startsWith("null")? null: row.split(",")[x].trim();
+									names[x][y-4] = row.split(",")[x].trim().startsWith("null")? null: row.split(",")[x].trim();
 								}
 							}
 
