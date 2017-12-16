@@ -125,6 +125,7 @@ public class MainToolBar extends JToolBar {
 						line = r.readLine();
 					}
 
+					w.setMap(map);
 					r.close();
 				} catch (Exception e1) {
 					e1.printStackTrace();
