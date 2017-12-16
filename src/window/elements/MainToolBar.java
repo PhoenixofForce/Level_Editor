@@ -18,6 +18,8 @@ public class MainToolBar extends JToolBar {
 
 	private List<File> inports;
 
+	// TODO: Many Errors can occure when TagActions uses []
+
 	public MainToolBar(Window w, ImageList imageList) {
 		this.setFloatable(false);
 		this.setRollover(true);
@@ -99,12 +101,11 @@ public class MainToolBar extends JToolBar {
 
 							FreeLayer l = new FreeLayer(depth, width, height, tileSize);
 
-							for(int i = 1; i < line.split(" \\[put; ").length; i++) {
-								String s = line.split(" \\[put; ")[i];
+							for(int i = 1; i < line.split("\\[put; ").length; i++) {
+								String s = line.split("\\[put; ")[i];
 
 								String gName = s.split(";")[0].trim().startsWith("null")? null: s.split(";")[0].trim();
 
-								System.out.println(s);
 								float gX = Float.parseFloat(s.split(";")[1]);
 								float gY = Float.parseFloat(s.split(";")[2].split("]")[0]);
 
