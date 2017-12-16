@@ -84,7 +84,12 @@ public class FreeLayer implements Layer {
 		String out = "";
 
 		for(GO g: getImages()) {
-			out += "[put; " + (names.indexOf(g.name)+1) + "; " + g.x + "; " + g.y + "]\n";
+			String tags = "";
+			for(int i = 0; i < g.getTags().size(); i++) {
+				Tag t = g.getTags().get(i);
+				tags += t.toMapFormat() + (i < g.getTags().size()-1? "; ": "");
+			}
+			out += "[put; " + (names.indexOf(g.name)+1) + "; " + g.x + "; " + g.y + "; " + tags + "]\n";
 		}
 
 		return out;
