@@ -26,7 +26,6 @@ public class MainToolBar extends JToolBar {
 
 		inports = new ArrayList<>();
 
-		//TODO: Open, Save
 		newMap = new JButton("New");
 		this.add(newMap);
 		newMap.addActionListener(e -> {

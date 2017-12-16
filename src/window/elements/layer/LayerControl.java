@@ -9,12 +9,6 @@ public class LayerControl extends JToolBar {
 
 	private JButton add, remove, options;
 
-	/*	TODO:
-		-turn layers on and off
-
-
-	 */
-
 	public LayerControl(Window window, LayerPane layerPane) {
 		add = new JButton("+");
 		remove = new JButton("-");
