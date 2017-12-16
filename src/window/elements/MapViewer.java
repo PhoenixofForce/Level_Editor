@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
 
-	private static final boolean TILE_HIGHLIGHT = false;
+	private static final boolean TILE_HIGHLIGHT = true;
 
 	private ImageList imageList;
 	private LayerPane layerPane;
@@ -155,7 +155,15 @@ public class MapViewer extends JPanel {
 		g2.setColor(Color.LIGHT_GRAY);
 		g2.fillRect(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
 
-		//TODO: Draw thin lines "between" cells
+		g2.setColor(Color.LIGHT_GRAY.darker());
+		g2.setStroke(new BasicStroke(1/zoom));
+
+		for(int x = 0; x < map.getWidth(); x++) {
+			for(int y = 0; y < map.getHeight(); y++) {
+				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), map.getWidth() * map.getTileSize(), y * map.getTileSize());
+				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), x * map.getTileSize(), map.getHeight() * map.getTileSize());
+			}
+		}
 
 		map.getLayers().values().stream()
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
