@@ -8,6 +8,8 @@ import java.util.*;
 
 public class ImageList extends JPanel{
 
+	private Modifier mod;
+
 	private JScrollPane imagePane;
 	private JList<ImageIcon> images;
 	private DefaultListModel<ImageIcon> listModel;
@@ -30,7 +32,10 @@ public class ImageList extends JPanel{
 		imagePane = new JScrollPane(images);
 		this.add(imagePane, BorderLayout.PAGE_END);
 
-		images.addListSelectionListener(e -> System.out.println(getSelectedImageName()));
+		//images.addListSelectionListener(e -> System.out.println(getSelectedImageName()));
+
+		mod = new Modifier();
+		this.add(mod, BorderLayout.PAGE_START);
 	}
 
 	/**
