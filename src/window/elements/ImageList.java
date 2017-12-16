@@ -1,6 +1,7 @@
 package window.elements;
 
 import data.TextureHandler;
+import window.Window;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +17,7 @@ public class ImageList extends JPanel{
 
 	private Map<String, ImageIcon> icons;
 
-	public ImageList() {
+	public ImageList(Window w) {
 
 		this.setLayout(new BorderLayout());
 
@@ -34,7 +35,7 @@ public class ImageList extends JPanel{
 
 		//images.addListSelectionListener(e -> System.out.println(getSelectedImageName()));
 
-		mod = new Modifier();
+		mod = new Modifier(w);
 		this.add(mod, BorderLayout.PAGE_START);
 	}
 
@@ -66,6 +67,10 @@ public class ImageList extends JPanel{
 		}
 
 		return null;
+	}
+
+	public Modifier getModifier() {
+		return mod;
 	}
 
 	public void reSize(int width, int height) {

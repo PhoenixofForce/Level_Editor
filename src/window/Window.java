@@ -28,7 +28,7 @@ public class Window extends JFrame {
 
 		setMap(new GameMap(100,100,8));
 
-		images = new ImageList();
+		images = new ImageList(this);
 		this.add(images, BorderLayout.LINE_END);
 		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 

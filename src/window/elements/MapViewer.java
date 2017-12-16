@@ -111,7 +111,9 @@ public class MapViewer extends JPanel {
 		if (selectedLayer == null || selectedTexture == null) return;
 
 		Location pos = getBlockLocation(x, y);
-		selectedLayer.select(pos.x, pos.y);
+		GO obj = selectedLayer.select(pos.x, pos.y);
+
+		imageList.getModifier().setGO(obj);
 	}
 
 	private void drag(int x, int y, int targetX, int targetY) {

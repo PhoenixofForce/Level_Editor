@@ -1,6 +1,10 @@
 package window.elements;
 
 import data.GO;
+import data.Tag;
+
+import window.UserInputs;
+import window.Window;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,10 +16,59 @@ public class Modifier extends JPanel{
 	private JButton add, remove;
 
 	private JTextField input;
-	private JComboBox attChooser;
+	private JComboBox<String> attChooser;
 
-	public Modifier() {
+	public Modifier(Window w) {
 
+		this.setLayout(new BorderLayout());
+
+		goStats = new JLabel();
+		this.add(goStats, BorderLayout.PAGE_START);
+
+		input = new JTextField();
+		this.add(input, BorderLayout.PAGE_END);
+		input.addActionListener(e -> {
+			object.getTag((String) attChooser.getSelectedItem()).setAction(input.getText());
+		});
+
+		attChooser = new JComboBox();
+		this.add(attChooser, BorderLayout.CENTER);
+		attChooser.addActionListener(e -> {
+			Tag t = object.getTag((String) attChooser.getSelectedItem());
+			if(t != null) {
+				input.setText(t.getAction());
+			}
+		});
+
+		add = new JButton("+");
+		this.add(add, BorderLayout.LINE_START);
+		add.addActionListener(e -> {
+			UserInputs.tagName(w, this);
+		});
+
+		remove = new JButton("-");
+		this.add(remove, BorderLayout.LINE_END);
+		remove.addActionListener(e -> {
+			attChooser.removeItem(attChooser.getSelectedItem());
+			object.removeTag((String) attChooser.getSelectedItem());
+		});
+
+		setGO(null);
+	}
+
+	public void add(String name) {
+		if(attChooser.getSelectedItem() == null) {
+			input.setEnabled(true);
+		}
+		object.addTag(new Tag(name));
+
+		attChooser.addItem(name);
+		attChooser.setSelectedItem(name);
+
+		Tag t = object.getTag((String) attChooser.getSelectedItem());
+		if (t != null) {
+			input.setText(t.getAction());
+		}
 	}
 
 	public void setGO(GO obj) {
@@ -23,10 +76,28 @@ public class Modifier extends JPanel{
 		remove.setEnabled(obj != null);
 		input.setEnabled(obj != null);
 		attChooser.setEnabled(obj != null);
+		attChooser.removeAllItems();
+		goStats.setText("");
+		input.setText(null);
 		if(obj == null) return;
 
 		this.object = obj;
-		goStats.setText(obj.name + " (" + obj.x + " | " + obj.y);
+
+		int c = 0;
+		for(Tag t: obj.getTags()) {
+			attChooser.addItem(t.getName());
+			c++;
+		}
+
+		if(c > 0) attChooser.setSelectedIndex(0);
+		if(attChooser.getSelectedItem() != null) {
+			Tag t = object.getTag((String) attChooser.getSelectedItem());
+			if (t != null) {
+				input.setText(t.getAction());
+			}
+		} else input.setEnabled(false);
+
+		goStats.setText(obj.name + " (" + obj.x + " | " + obj.y + ")");
 	}
 
 

@@ -1,6 +1,7 @@
 package window;
 
 import data.GameMap;
+import window.elements.Modifier;
 import window.elements.layer.LayerPane;
 
 import javax.swing.*;
@@ -85,6 +86,50 @@ public class UserInputs {
 			window.toFront();
 		});
 	}
+	public static void tagName(Window window, Modifier mod) {
+		window.setEnabled(false);
+
+		JFrame frame = new JFrame("New...");
+		JTextField nameIN = new JTextField("Name");
+		JButton create = new JButton("Create");
+
+
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				frame.dispose();
+				window.setEnabled(true);
+				window.toFront();
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				frame.dispose();
+				window.setEnabled(true);
+				window.toFront();
+			}
+		});
+
+		frame.setResizable(false);
+		frame.setLayout(null);
+		frame.setVisible(true);
+		Insets i = frame.getInsets();
+		frame.setSize(250 + i.left + i.right, 65 + i.top + i.bottom);
+		frame.setAlwaysOnTop(true);
+
+		frame.add(nameIN);
+		nameIN.setBounds(5, 5, 100, 25);
+
+
+		frame.add(create);
+		create.setBounds(5, 35, 100, 25);
+		create.addActionListener(e -> {
+			mod.add(nameIN.getText());
+			frame.dispose();
+			window.setEnabled(true);
+			window.toFront();
+		});
+	}
 
 	public static void newMap(Window window) {
 		window.setEnabled(false);
@@ -158,5 +203,6 @@ public class UserInputs {
 			window.toFront();
 		});
 	}
+
 
 }
