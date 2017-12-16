@@ -13,8 +13,8 @@ import java.util.List;
 
 public class MainToolBar extends JToolBar {
 
-	private JButton newMap, open, saveMap, export, importRessource;
-	private File lastExport, lastImport;
+	private JButton newMap, open, saveMap, saveAsMap, export, importRessource;
+	private File lastExport, lastImport, lastSave, lastOpen;
 
 	private List<File> inports;
 
@@ -34,7 +34,7 @@ public class MainToolBar extends JToolBar {
 		open.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
 
-			if(lastImport != null) chooser.setCurrentDirectory(lastImport);
+			if(lastOpen != null) chooser.setCurrentDirectory(lastOpen);
 			//chooser.setOpaque(true);
 
 			chooser.setAcceptAllFileFilterUsed(false);
@@ -43,6 +43,8 @@ public class MainToolBar extends JToolBar {
 			int returnVal = chooser.showDialog(new JFrame(), "Open Map");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File f = chooser.getSelectedFile();
+				lastSave = f;
+				lastOpen = f;
 
 				try {
 					BufferedReader r = new BufferedReader(new FileReader(f));
@@ -73,18 +75,17 @@ public class MainToolBar extends JToolBar {
 						else if(line.startsWith("w: ")) width = Integer.parseInt(line.split(" ")[1]);
 						else if(line.startsWith("t: ")) tileSize = Integer.parseInt(line.split(" ")[1]);
 
-						else if(line.startsWith("l_")) {
+						else if(line.startsWith("t_")) {
 							float depth = Float.parseFloat(line.split(" ")[1]);
 							String[][] names = new String[height][width];
-							String name = line.split(" ")[0].split("_")[1];
+							String name = line.split(" ")[0].split("_")[1].trim();
 
 							String data = line.split("\\[")[1];
-
 							for(int y = 4; y < data.split(";").length; y++) {
 								String row = data.split(";")[y];
 
 								for(int x = 0; x < row.split(",").length; x++) {
-									names[y][x] = row.split(",")[x];
+									names[y-4][x] = row.split(",")[x].trim().startsWith("null")? null: row.split(",")[x].trim();
 								}
 							}
 
@@ -94,15 +95,16 @@ public class MainToolBar extends JToolBar {
 
 						else if(line.startsWith("f_")) {
 							float depth = Float.parseFloat(line.split(" ")[1]);
-							String name = line.split(" ")[0].split("_")[1];
+							String name = line.split(" ")[0].split("_")[1].trim();
 
 							FreeLayer l = new FreeLayer(depth, width, height, tileSize);
 
 							for(int i = 1; i < line.split(" \\[put; ").length; i++) {
 								String s = line.split(" \\[put; ")[i];
 
-								String gName = s.split(";")[0];
+								String gName = s.split(";")[0].trim().startsWith("null")? null: s.split(";")[0].trim();
 
+								System.out.println(s);
 								float gX = Float.parseFloat(s.split(";")[1]);
 								float gY = Float.parseFloat(s.split(";")[2].split("]")[0]);
 
@@ -111,15 +113,15 @@ public class MainToolBar extends JToolBar {
 
 								for(int j = 3; j < s.split("\\[").length; j++) {
 									String data = s.split("\\[")[j];
-									go.addTag(new Tag(data.split(";")[0], data.split(";")[1]));
+									go.addTag(new Tag(data.split(";")[0], data.split(";")[1].split("]")[0]));	//TODO:
 								}
 							}
 
 							if(map != null) map.addLayer(name, l);
 						}
 
-						if(width > 0 && height > 0 && tileSize > 0) {
-							map = new GameMap(width, height, tileSize);
+						if(width > 0 && height > 0 && tileSize > 0 && map == null) {
+							map = new GameMap(width, height, tileSize, false);
 						}
 
 						line = r.readLine();
@@ -128,6 +130,7 @@ public class MainToolBar extends JToolBar {
 					w.setMap(map);
 					r.close();
 				} catch (Exception e1) {
+					lastSave = null;
 					e1.printStackTrace();
 				}
 			}
@@ -138,62 +141,18 @@ public class MainToolBar extends JToolBar {
 		saveMap = new JButton("Save");
 		this.add(saveMap);
 		saveMap.addActionListener(e -> {
-			JFileChooser chooser = new JFileChooser(){
-				public void approveSelection() {
-					File f = getSelectedFile();
-					if(!f.getName().endsWith(".map")) setSelectedFile( new File(f.getAbsolutePath() + ".umap"));
-					f = getSelectedFile();
 
-					if(f.exists()) {
-						int n = JOptionPane.showOptionDialog(this, "The file already exists, should it be replaced?", "File exists", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Yes", "No"}, "No");
-						if(n == 0) super.approveSelection();
-					} else super.approveSelection();
-				}
-			};
-			if(lastExport != null) chooser.setSelectedFile(lastExport);
-
-			chooser.setOpaque(true);
-
-			chooser.setAcceptAllFileFilterUsed(false);
-			chooser.addChoosableFileFilter(new FileFilter() {
-				@Override
-				public boolean accept(File f) {
-					return f.isDirectory();
-				}
-
-				@Override
-				public String getDescription() {
-					return ".umap files";
-				}
-			});
-
-			int returnVal = chooser.showDialog(new JButton(""), "Save File");
-			if(returnVal == JFileChooser.APPROVE_OPTION){
-				File f = chooser.getSelectedFile();
-				//lastExport = f;
-				try {
-					PrintWriter wr = new PrintWriter(f);
-
-					for(File i: inports) {
-						wr.write("i: " + i.getAbsolutePath() + "\n");
-					}
-
-					GameMap map = w.getMap();
-					wr.write("w: " + map.getWidth() + "\n");
-					wr.write("h: " + map.getHeight() + "\n");
-					wr.write("t: " + map.getTileSize() + "\n");
-
-					for(String s: map.getLayers().keySet()) {
-						Layer l = map.getLayer(s);
-						wr.write((l instanceof FreeLayer? "f_": "t_") + s + " " + l.depth() + " " + l.toMapFormat(null).replaceAll("\n", "") + "\n");
-					}
-
-					wr.close();
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				}
-
+			if(lastSave == null) {
+				saveAs(w);
+			} else {
+				writeToFile(w, lastSave);
 			}
+		});
+
+		saveAsMap = new JButton("Save As");
+		this.add(saveAsMap);
+		saveAsMap.addActionListener(e -> {
+			saveAs(w);
 		});
 
 		export = new JButton("Export");
@@ -275,6 +234,69 @@ public class MainToolBar extends JToolBar {
 			}
 		});
 		this.add(importRessource);
+	}
+
+	private void saveAs(Window w) {
+		JFileChooser chooser = new JFileChooser(){
+			public void approveSelection() {
+				File f = getSelectedFile();
+				if(!f.getName().endsWith(".map")) setSelectedFile( new File(f.getAbsolutePath() + ".umap"));
+				f = getSelectedFile();
+				lastSave = f;
+
+				if(f.exists()) {
+					int n = JOptionPane.showOptionDialog(this, "The file already exists, should it be replaced?", "File exists", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Yes", "No"}, "No");
+					if(n == 0) super.approveSelection();
+				} else super.approveSelection();
+			}
+		};
+		if(lastExport != null) chooser.setSelectedFile(lastExport);
+
+		chooser.setOpaque(true);
+
+		chooser.setAcceptAllFileFilterUsed(false);
+		chooser.addChoosableFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory();
+			}
+
+			@Override
+			public String getDescription() {
+				return ".umap files";
+			}
+		});
+
+		int returnVal = chooser.showDialog(new JButton(""), "Save File");
+		if(returnVal == JFileChooser.APPROVE_OPTION){
+			File f = chooser.getSelectedFile();
+			lastExport = f;
+			writeToFile(w, f);
+		}
+	}
+
+	private void writeToFile(Window w, File f) {
+		try {
+			PrintWriter wr = new PrintWriter(f);
+
+			for(File i: inports) {
+				wr.write("i: " + i.getAbsolutePath() + "\n");
+			}
+
+			GameMap map = w.getMap();
+			wr.write("w: " + map.getWidth() + "\n");
+			wr.write("h: " + map.getHeight() + "\n");
+			wr.write("t: " + map.getTileSize() + "\n");
+
+			for(String s: map.getLayers().keySet()) {
+				Layer l = map.getLayer(s);
+				wr.write((l instanceof FreeLayer? "f_": "t_") + s + " " + l.depth() + " " + l.toMapFormat(null).replaceAll("\n", "") + "\n");
+			}
+
+			wr.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	public void reset() {

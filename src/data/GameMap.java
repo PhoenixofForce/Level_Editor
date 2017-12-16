@@ -16,10 +16,22 @@ public class GameMap {
 		this.height = height;
 		this.tileSize = tileSize;
 
-
 		addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
 		addLayer("Tile", new TileLayer(0.5f, width, height, tileSize));
 		addLayer("Object", new FreeLayer(0.0f, width, height, tileSize));
+	}
+
+	public GameMap(int width, int height, int tileSize, boolean b) {
+		layers = new HashMap<>();
+		this.width = width;
+		this.height = height;
+		this.tileSize = tileSize;
+
+		if(b) {
+			addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
+			addLayer("Tile", new TileLayer(0.5f, width, height, tileSize));
+			addLayer("Object", new FreeLayer(0.0f, width, height, tileSize));
+		}
 	}
 
 	public Layer getLayer(String name) {

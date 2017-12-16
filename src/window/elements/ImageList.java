@@ -78,5 +78,4 @@ public class ImageList extends JPanel{
 		imagePane.setPreferredSize(d);
 		imagePane.setSize(d);
 	}
-
 }
