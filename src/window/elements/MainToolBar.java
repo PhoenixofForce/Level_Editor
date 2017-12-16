@@ -1,37 +1,199 @@
 package window.elements;
 
-import data.TextureHandler;
+import data.*;
 import window.UserInputs;
 import window.Window;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainToolBar extends JToolBar {
 
 	private JButton newMap, open, saveMap, export, importRessource;
 	private File lastExport, lastImport;
 
+	private List<File> inports;
+
 	public MainToolBar(Window w, ImageList imageList) {
 		this.setFloatable(false);
 		this.setRollover(true);
 
-		//TODO: New, Open, Save
+		inports = new ArrayList<>();
+
+		//TODO: Open, Save
 		newMap = new JButton("New");
 		this.add(newMap);
 		newMap.addActionListener(e -> UserInputs.newMap(w));
 
 		open = new JButton("Open");
 		this.add(open);
+		open.addActionListener(e -> {
+			JFileChooser chooser = new JFileChooser();
+
+			if(lastImport != null) chooser.setCurrentDirectory(lastImport);
+			//chooser.setOpaque(true);
+
+			chooser.setAcceptAllFileFilterUsed(false);
+			chooser.addChoosableFileFilter(new FileNameExtensionFilter(".umap Files", "umap"));
+
+			int returnVal = chooser.showDialog(new JFrame(), "Open Map");
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File f = chooser.getSelectedFile();
+
+				try {
+					BufferedReader r = new BufferedReader(new FileReader(f));
+
+					GameMap map = null;
+					int width = -1, height = -1, tileSize = -1;
+
+					String line = r.readLine();
+					while(line != null) {
+
+						if(line.startsWith("i: ")) {
+							File text = new File(line.split(" ")[1]);
+							File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length() - 4) + "png");
+
+							inports.add(text);
+
+							if (text.exists() && image.exists()) {
+								TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 5), text.getAbsolutePath());
+								imageList.update();
+							} else {
+								JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
+							}
+
+							lastImport = text.getParentFile();
+						}
+
+						else if(line.startsWith("h: ")) height = Integer.parseInt(line.split(" ")[1]);
+						else if(line.startsWith("w: ")) width = Integer.parseInt(line.split(" ")[1]);
+						else if(line.startsWith("t: ")) tileSize = Integer.parseInt(line.split(" ")[1]);
+
+						else if(line.startsWith("l_")) {
+							float depth = Float.parseFloat(line.split(" ")[1]);
+							String[][] names = new String[height][width];
+							String name = line.split(" ")[0].split("_")[1];
+
+							String data = line.split("\\[")[1];
+
+							for(int y = 4; y < data.split(";").length; y++) {
+								String row = data.split(";")[y];
+
+								for(int x = 0; x < row.split(",").length; x++) {
+									names[y][x] = row.split(",")[x];
+								}
+							}
+
+							TileLayer l = new TileLayer(depth, names, tileSize);
+							if(map != null) map.addLayer(name, l);
+						}
+
+						else if(line.startsWith("f_")) {
+							float depth = Float.parseFloat(line.split(" ")[1]);
+							String name = line.split(" ")[0].split("_")[1];
+
+							FreeLayer l = new FreeLayer(depth, width, height, tileSize);
+
+							for(int i = 1; i < line.split(" \\[put; ").length; i++) {
+								String s = line.split(" \\[put; ")[i];
+
+								String gName = s.split(";")[0];
+
+								float gX = Float.parseFloat(s.split(";")[1]);
+								float gY = Float.parseFloat(s.split(";")[2].split("]")[0]);
+
+								l.set(gName, gX, gY);
+								GO go = l.select(gX, gY);
+
+								for(int j = 3; j < s.split("\\[").length; j++) {
+									String data = s.split("\\[")[j];
+									go.addTag(new Tag(data.split(";")[0], data.split(";")[1]));
+								}
+							}
+
+							if(map != null) map.addLayer(name, l);
+						}
+
+						if(width > 0 && height > 0 && tileSize > 0) {
+							map = new GameMap(width, height, tileSize);
+						}
+
+						line = r.readLine();
+					}
+
+					r.close();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 
 		this.addSeparator();
 
 		saveMap = new JButton("Save");
 		this.add(saveMap);
+		saveMap.addActionListener(e -> {
+			JFileChooser chooser = new JFileChooser(){
+				public void approveSelection() {
+					File f = getSelectedFile();
+					if(!f.getName().endsWith(".map")) setSelectedFile( new File(f.getAbsolutePath() + ".umap"));
+					f = getSelectedFile();
+
+					if(f.exists()) {
+						int n = JOptionPane.showOptionDialog(this, "The file already exists, should it be replaced?", "File exists", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Yes", "No"}, "No");
+						if(n == 0) super.approveSelection();
+					} else super.approveSelection();
+				}
+			};
+			if(lastExport != null) chooser.setSelectedFile(lastExport);
+
+			chooser.setOpaque(true);
+
+			chooser.setAcceptAllFileFilterUsed(false);
+			chooser.addChoosableFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					return f.isDirectory();
+				}
+
+				@Override
+				public String getDescription() {
+					return ".umap files";
+				}
+			});
+
+			int returnVal = chooser.showDialog(new JButton(""), "Save File");
+			if(returnVal == JFileChooser.APPROVE_OPTION){
+				File f = chooser.getSelectedFile();
+				//lastExport = f;
+				try {
+					PrintWriter wr = new PrintWriter(f);
+
+					for(File i: inports) {
+						wr.write("i: " + i.getAbsolutePath() + "\n");
+					}
+
+					GameMap map = w.getMap();
+					wr.write("w: " + map.getWidth() + "\n");
+					wr.write("h: " + map.getHeight() + "\n");
+					wr.write("t: " + map.getTileSize() + "\n");
+
+					for(String s: map.getLayers().keySet()) {
+						Layer l = map.getLayer(s);
+						wr.write((l instanceof FreeLayer? "f_": "t_") + s + " " + l.depth() + " " + l.toMapFormat(null).replaceAll("\n", "") + "\n");
+					}
+
+					wr.close();
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
+
+			}
+		});
 
 		export = new JButton("Export");
 		this.add(export);
@@ -65,7 +227,7 @@ public class MainToolBar extends JToolBar {
 				}
 			});
 
-			int returnVal = chooser.showDialog(new JButton("Ch"), "Save File");
+			int returnVal = chooser.showDialog(new JButton(""), "Export File");
 			if(returnVal == JFileChooser.APPROVE_OPTION){
 				File f = chooser.getSelectedFile();
 				lastExport = f;
@@ -97,6 +259,8 @@ public class MainToolBar extends JToolBar {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				for(File text: chooser.getSelectedFiles()) {
 					File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length() - 4) + "png");
+
+					inports.add(text);
 
 					if (text.exists() && image.exists()) {
 						TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 5), text.getAbsolutePath());

@@ -89,7 +89,7 @@ public class FreeLayer implements Layer {
 				Tag t = g.getTags().get(i);
 				tags += t.toMapFormat() + (i < g.getTags().size()-1? "; ": "");
 			}
-			out += "[put; " + (names.indexOf(g.name)+1) + "; " + g.x + "; " + g.y + "; " + tags + "]\n";
+			out += "[put; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + g.x + "; " + g.y + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
 		}
 
 		return out;

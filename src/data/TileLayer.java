@@ -11,6 +11,14 @@ public class TileLayer implements Layer {
 
 	private int width, height, tileSize;
 
+	public TileLayer(float depth, String[][] tiles, int tileSize) {
+		this.depth = depth;
+		this.tileNames = tiles;
+		this.tileSize = tileSize;
+		this.width = tiles[0].length;
+		this.height = tiles.length;
+	}
+
 	public TileLayer(float depth, int width, int height, int tileSize) {
 		tileNames = new String[height][width];
 		this.depth = depth;
@@ -60,11 +68,11 @@ public class TileLayer implements Layer {
 
 	@Override
 	public String toMapFormat(List<String> names) {
-		String out = "[layer; " + width + "; " + height + "; ";
+		String out = "[layer; " + depth + "; " + width + "; " + height + "; ";
 
 		for (int x = 0; x < tileNames[0].length; x++) {
 			for (int y = 0; y < tileNames.length; y++) {
-				out += (names.indexOf(tileNames[y][x])+1) + (y < tileNames.length-1? ", ": "");
+				out += (names != null? names.indexOf(tileNames[y][x])+1: tileNames[y][x]) + (y < tileNames.length-1? ", ": "");
 			}
 
 			if(x < tileNames[0].length-1) out += "; ";
