@@ -114,7 +114,7 @@ public class MainToolBar extends JToolBar {
 								l.set(gName, gX, gY);
 								GO go = l.select(gX, gY);
 
-								for(int j = 3; j < s.split("\\[").length; j++) {
+								for(int j = 1; j < s.split("\\[").length; j++) {
 									String data = s.split("\\[")[j];
 									go.addTag(new Tag(data.split(";")[0], data.split(";")[1].split("]")[0]));	//TODO:
 								}

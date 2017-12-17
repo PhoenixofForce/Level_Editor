@@ -37,7 +37,7 @@ public class FreeLayer implements Layer {
 		float height = image.getHeight() / (float) tileSize;
 
 		if (x < 0 || x + width > this.width || y < 0 || y + height > this.height) return;
-		if (find(x, y) != null) return;
+		//if (find(x, y) != null) return;
 
 		images.add(new GO(name, x, y, width, height));
 	}
