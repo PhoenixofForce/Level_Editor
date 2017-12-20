@@ -123,7 +123,7 @@ public class MainToolBar extends JToolBar {
 									last = s.indexOf("; [tag", last)+1;
 
 									if(data.length() == 0) continue;
-									go.addTag(new Tag(data.split(";")[1].trim(), data.substring(data.indexOf(";")+5, data.indexOf("; [tag") == -1? data.length(): data.indexOf("; [tag")).trim()));	//TODO:
+									go.addTag(new Tag(data.split(";")[1].trim(), data.substring(data.indexOf(";",data.indexOf(";")+1), data.indexOf("; [tag") == -1? data.length(): data.indexOf("; [tag")).trim().substring(2)));
 								}
 							}
 
