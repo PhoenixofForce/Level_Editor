@@ -6,9 +6,7 @@ public class Main {
 		/*	TODO:
 			-eraser
 			-settings (?)
-			-no drag-draw on free layer
 			-view used ressources (?)
-			-toggle layer
 			-copy paste
 			-selection => much later (maybe)
 		 */

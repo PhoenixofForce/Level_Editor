@@ -62,6 +62,7 @@ public class UserInputs {
 		Insets i = frame.getInsets();
 		frame.setSize(250 + i.left + i.right, 150 + i.top + i.bottom);
 		frame.setAlwaysOnTop(true);
+		frame.setLocationRelativeTo(window);
 
 		frame.add(nameInput);
 		nameInput.setBounds(5, 5, 100, 25);
@@ -118,6 +119,7 @@ public class UserInputs {
 		Insets i = frame.getInsets();
 		frame.setSize(250 + i.left + i.right, 65 + i.top + i.bottom);
 		frame.setAlwaysOnTop(true);
+		frame.setLocationRelativeTo(window);
 
 		frame.add(nameIN);
 		nameIN.setBounds(5, 5, 100, 25);
@@ -185,6 +187,7 @@ public class UserInputs {
 		Insets i = frame.getInsets();
 		frame.setSize(250 + i.left + i.right, 125 + i.top + i.bottom);
 		frame.setAlwaysOnTop(true);
+		frame.setLocationRelativeTo(window);
 
 		frame.add(tileSizeIn);
 		tileSizeIn.setBounds(5, 5, 100, 25);
