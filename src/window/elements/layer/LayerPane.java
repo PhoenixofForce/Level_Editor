@@ -40,6 +40,8 @@ public class LayerPane extends JPanel {
 				String layerName = (String) value;
 				boolean hidden = isHidden(map.getLayer(layerName));
 
+				if (hidden) setForeground(Color.RED);
+
 				setText((hidden ? "✕" : "✓") + getText());
 
 				return c;
