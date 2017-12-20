@@ -105,18 +105,25 @@ public class MainToolBar extends JToolBar {
 
 							for(int i = 1; i < line.split("\\[put; ").length; i++) {
 								String s = line.split("\\[put; ")[i];
+								s = s.substring(0, s.length()-1);
 
 								String gName = s.split(";")[0].trim().startsWith("null")? null: s.split(";")[0].trim();
 
 								float gX = Float.parseFloat(s.split(";")[1]);
-								float gY = Float.parseFloat(s.split(";")[2].split("]")[0]);
+								float gY = Float.parseFloat(s.split(";")[2]);
 
 								l.set(gName, gX, gY);
 								GO go = l.select(gX, gY);
 
-								for(int j = 1; j < s.split("\\[").length; j++) {
-									String data = s.split("\\[")[j];
-									go.addTag(new Tag(data.split(";")[0], data.split(";")[1].split("]")[0]));	//TODO:
+								int last = 0;
+								for(int j = 1; j < s.split("; \\[tag").length; j++) {
+
+									String data = s.substring(s.indexOf("; [tag", last));
+									data = data.substring(3, data.length()-1);
+									last = s.indexOf("; [tag", last)+1;
+
+									if(data.length() == 0) continue;
+									go.addTag(new Tag(data.split(";")[1].trim(), data.substring(data.indexOf(";")+5, data.indexOf("; [tag") == -1? data.length(): data.indexOf("; [tag")).trim()));	//TODO:
 								}
 							}
 

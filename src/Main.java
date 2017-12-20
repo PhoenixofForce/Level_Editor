@@ -5,7 +5,6 @@ public class Main {
 	public static void main(String[] args) {
 		/*	TODO:
 			-eraser
-			-[] in tags
 			-settings (?)
 			-no drag-draw on free layer
 			-view used ressources (?)

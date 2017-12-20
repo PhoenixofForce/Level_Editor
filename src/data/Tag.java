@@ -19,7 +19,7 @@ public class Tag {
 	}
 
 	public String toMapFormat() {
-		return String.format("[%s; %s]", name, action);
+		return String.format("[tag; %s; %s]", name, action);
 	}
 
 	public String getAction() {
