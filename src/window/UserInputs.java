@@ -6,6 +6,8 @@ import window.elements.layer.LayerPane;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -41,16 +43,16 @@ public class UserInputs {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				frame.dispose();
 				window.setEnabled(true);
 				window.toFront();
+				frame.dispose();
 			}
 
 			@Override
 			public void windowClosed(WindowEvent e) {
-				frame.dispose();
 				window.setEnabled(true);
 				window.toFront();
+				frame.dispose();
 			}
 		});
 
@@ -81,9 +83,9 @@ public class UserInputs {
 		create.addActionListener(e -> {
 			String name = nameInput.getText();
 			layerPane.addLayer(name, layerType.getValue() == 1, Float.parseFloat(depthInput.getText()));
-			frame.dispose();
 			window.setEnabled(true);
 			window.toFront();
+			frame.dispose();
 		});
 	}
 	public static void tagName(Window window, Modifier mod) {
@@ -97,16 +99,16 @@ public class UserInputs {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				frame.dispose();
 				window.setEnabled(true);
 				window.toFront();
+				frame.dispose();
 			}
 
 			@Override
 			public void windowClosed(WindowEvent e) {
-				frame.dispose();
 				window.setEnabled(true);
 				window.toFront();
+				frame.dispose();
 			}
 		});
 
@@ -125,9 +127,9 @@ public class UserInputs {
 		create.setBounds(5, 35, 100, 25);
 		create.addActionListener(e -> {
 			mod.add(nameIN.getText());
-			frame.dispose();
 			window.setEnabled(true);
 			window.toFront();
+			frame.dispose();
 		});
 	}
 
@@ -164,16 +166,16 @@ public class UserInputs {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				frame.dispose();
 				window.setEnabled(true);
 				window.toFront();
+				frame.dispose();
 			}
 
 			@Override
 			public void windowClosed(WindowEvent e) {
-				frame.dispose();
 				window.setEnabled(true);
 				window.toFront();
+				frame.dispose();
 			}
 		});
 
@@ -198,11 +200,66 @@ public class UserInputs {
 		create.addActionListener(e -> {
 			window.setMap(new GameMap(Integer.parseInt(mapWidthIn.getText()), Integer.valueOf(mapHeightIn.getText()), Integer.parseInt(tileSizeIn.getText())));
 
-			frame.dispose();
 			window.setEnabled(true);
 			window.toFront();
+			frame.dispose();
 		});
 	}
 
+	public static void confirm(Window window, String message, ActionListener actionListener) {
+		window.setEnabled(false);
+		JFrame frame = new JFrame("Confirm");
+
+		JButton confirm = new JButton("Confirm");
+		JButton cancel = new JButton("Cancel");
+		JLabel text = new JLabel(message);
+
+		frame.setResizable(false);
+		frame.setLayout(null);
+		frame.setVisible(true);
+		Insets i = frame.getInsets();
+		frame.setSize(250 + i.left + i.right, 95 + i.top + i.bottom);
+		frame.setAlwaysOnTop(true);
+		frame.setLocationRelativeTo(window);
+
+		frame.add(cancel);
+		cancel.setBounds(5, 65, 240, 25);
+
+		frame.add(confirm);
+		confirm.setBounds(5, 35, 240, 25);
+
+		frame.add(text);
+		text.setBounds(5, 5, 240, 25);
+
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				window.setEnabled(true);
+				window.toFront();
+				frame.dispose();
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				window.setEnabled(true);
+				window.toFront();
+				frame.dispose();
+			}
+		});
+
+		cancel.addActionListener(e -> {
+			window.setEnabled(true);
+			window.toFront();
+			frame.dispose();
+		});
+
+		confirm.addActionListener(e -> {
+			window.setEnabled(true);
+			window.toFront();
+			frame.dispose();
+
+			actionListener.actionPerformed(new ActionEvent(window, 0, null));
+		});
+	}
 
 }

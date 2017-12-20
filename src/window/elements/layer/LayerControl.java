@@ -25,7 +25,9 @@ public class LayerControl extends JToolBar {
 		this.add.addActionListener(e-> {
 			UserInputs.createLayer(window, layerPane);
 		});
-		this.remove.addActionListener(e -> layerPane.removeLayer());
+		this.remove.addActionListener(e -> {
+			UserInputs.confirm(window, "Do you really want to delete this layer?", e2 -> layerPane.removeLayer());
+		});
 
 		this.toggleHidden.addActionListener(e -> layerPane.toggleHidden());
 	}
