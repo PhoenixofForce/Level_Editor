@@ -8,6 +8,8 @@ import window.Window;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LayerPane extends JPanel {
 	private JList<String> jList;
@@ -15,16 +17,34 @@ public class LayerPane extends JPanel {
 	private LayerControl layerControl;
 
 	private GameMap map;
+	private Map<Layer, Boolean> hidden;
 
 	public LayerPane(Window window, GameMap map) {
 		this.map = map;
 
 		this.setLayout(new BorderLayout());
 
+		hidden = new HashMap<>();
+
 		listModel = new DefaultListModel<>();
 		jList = new JList<>(listModel);
 		jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jList.setLayoutOrientation(JList.VERTICAL);
+
+		jList.setCellRenderer(new DefaultListCellRenderer() {
+
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+				Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+				String layerName = (String) value;
+				boolean hidden = isHidden(map.getLayer(layerName));
+
+				setText((hidden ? "✕" : "✓") + getText());
+
+				return c;
+			}
+		});
 
 		layerControl = new LayerControl(window, this);
 
@@ -87,5 +107,20 @@ public class LayerPane extends JPanel {
 		Dimension d = new Dimension(width / 6, height);
 		jList.setPreferredSize(d);
 		jList.setSize(d);
+	}
+
+	public boolean isHidden(Layer layer) {
+		if (hidden.containsKey(layer)) return hidden.get(layer);
+		return false;
+	}
+
+	public void toggleHidden() {
+		if (map == null || jList.getSelectedIndex() < 0) return;
+
+		Layer layer = map.getLayer(listModel.get(jList.getSelectedIndex()));
+
+		hidden.put(layer, !isHidden(layer));
+
+		jList.updateUI();
 	}
 }

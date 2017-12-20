@@ -112,7 +112,7 @@ public class MainToolBar extends JToolBar {
 								float gX = Float.parseFloat(s.split(";")[1]);
 								float gY = Float.parseFloat(s.split(";")[2]);
 
-								l.set(gName, gX, gY);
+								l.set(gName, gX, gY, false);
 								GO go = l.select(gX, gY);
 
 								int last = 0;

@@ -31,7 +31,8 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public void set(String name, float x, float y) {
+	public void set(String name, float x, float y, boolean drag) {
+		if (drag) return;
 		BufferedImage image = TextureHandler.getImagePng(name);
 		float width = image.getWidth() / (float) tileSize;
 		float height = image.getHeight() / (float) tileSize;

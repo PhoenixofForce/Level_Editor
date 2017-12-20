@@ -29,7 +29,7 @@ public class TileLayer implements Layer {
 	}
 
 	@Override
-	public void set(String name, float x2, float y2) {
+	public void set(String name, float x2, float y2, boolean drag) {
 		int x = (int) x2;
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {

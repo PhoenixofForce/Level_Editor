@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface Layer {
 	float depth();
-	void set(String name, float x, float y);
+	void set(String name, float x, float y, boolean drag);
 	GO select(float x, float y);
 	void drag(float x, float y, float targetX, float targetY);
 	void draw(Graphics g);

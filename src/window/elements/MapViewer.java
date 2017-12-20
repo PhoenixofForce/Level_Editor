@@ -11,13 +11,12 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
-
 	private static final boolean TILE_HIGHLIGHT = true;
 
 	private ImageList imageList;
 	private LayerPane layerPane;
 
-	private float dx, dy, zoom;
+	private Camera camera;
 
 	private int last_x, last_y;
 
@@ -32,12 +31,13 @@ public class MapViewer extends JPanel {
 
 		mouseEntered = false;
 
+		camera = new Camera();
 		centerCamera();
 
 		this.addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				zoom *= Math.pow(1.2, -e.getPreciseWheelRotation());
+				camera.setZoom(camera.zoom * (float) Math.pow(1.2, -e.getPreciseWheelRotation()));
 			}
 		});
 
@@ -52,12 +52,11 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				if (SwingUtilities.isMiddleMouseButton(e)) {
-					dx += (e.getX() - last_x) / zoom;
-					dy += (e.getY() - last_y) / zoom;
+					camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
 				} else if (SwingUtilities.isLeftMouseButton(e)) {
 					drag(last_x, last_y, e.getX(), e.getY());
 				} else if (SwingUtilities.isRightMouseButton(e)) {
-					set(e.getX(), e.getY());
+					set(e.getX(), e.getY(), true);
 				}
 
 				last_x = e.getX();
@@ -79,7 +78,7 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (SwingUtilities.isLeftMouseButton(e)) select(e.getX(), e.getY());
-				else if (SwingUtilities.isRightMouseButton(e)) set(e.getX(), e.getY());
+				else if (SwingUtilities.isRightMouseButton(e)) set(e.getX(), e.getY(), false);
 				else if (e.getButton() == 4) centerCamera();
 			}
 		});
@@ -91,24 +90,29 @@ public class MapViewer extends JPanel {
 	}
 
 	private void centerCamera() {
-		this.dx = -map.getWidth() * map.getTileSize() / 2;
-		this.dy = -map.getHeight() * map.getTileSize() / 2;
-		this.zoom = 0.5f;
+		camera.setPosition(-map.getWidth() * map.getTileSize() / 2, -map.getHeight() * map.getTileSize() / 2);
+		camera.setZoom(0.5f);
 	}
 
-	private void set(int x, int y) {
+	private void set(int x, int y, boolean drag) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || selectedTexture == null) return;
+		if (selectedLayer == null || selectedTexture == null || layerPane.isHidden(selectedLayer)) {
+			sendErrorMessage();
+			return;
+		}
 
 		Location pos = getBlockLocation(x, y);
-		selectedLayer.set(selectedTexture, pos.x, pos.y);
+		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
 	}
 
 	private void select(int x, int y) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || selectedTexture == null) return;
+		if (selectedLayer == null || selectedTexture == null || layerPane.isHidden(selectedLayer)) {
+			sendErrorMessage();
+			return;
+		}
 
 		Location pos = getBlockLocation(x, y);
 		GO obj = selectedLayer.select(pos.x, pos.y);
@@ -119,7 +123,10 @@ public class MapViewer extends JPanel {
 	private void drag(int x, int y, int targetX, int targetY) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || selectedTexture == null) return;
+		if (selectedLayer == null || selectedTexture == null || layerPane.isHidden(selectedLayer)) {
+			sendErrorMessage();
+			return;
+		}
 
 		Location pos1 = getBlockLocation(x, y);
 		Location pos2 = getBlockLocation(targetX, targetY);
@@ -130,10 +137,10 @@ public class MapViewer extends JPanel {
 		float x = xPos, y = yPos;
 		x -= this.getWidth() / 2.0;
 		y -= this.getHeight() / 2.0;
-		x /= zoom;
-		y /= zoom;
-		x -= dx;
-		y -= dy;
+		x /= camera.zoom;
+		y /= camera.zoom;
+		x -= camera.x;
+		y -= camera.y;
 		x = (float) Math.floor(x);
 		y = (float) Math.floor(y);
 		x /= map.getTileSize();
@@ -144,6 +151,8 @@ public class MapViewer extends JPanel {
 
 	@Override
 	protected void paintComponent(Graphics g) {
+		camera.update();
+
 		BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2 = (Graphics2D) img.getGraphics();
 
@@ -151,27 +160,28 @@ public class MapViewer extends JPanel {
 		g2.fillRect(0, 0, img.getWidth(), img.getHeight());
 
 		g2.translate(this.getWidth() / 2.0, this.getHeight() / 2.0);
-		g2.scale(zoom, zoom);
-		g2.translate(dx, dy);
+		g2.scale(camera.zoom, camera.zoom);
+		g2.translate(camera.x, camera.y);
 
 		g2.setColor(Color.LIGHT_GRAY);
 		g2.fillRect(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
 
 		g2.setColor(Color.LIGHT_GRAY.darker());
-		g2.setStroke(new BasicStroke(1/zoom));
+		g2.setStroke(new BasicStroke(1 / camera.zoom));
 
-		for(int x = 0; x < map.getWidth(); x++) {
-			for(int y = 0; y < map.getHeight(); y++) {
+		for (int x = 0; x < map.getWidth(); x++) {
+			for (int y = 0; y < map.getHeight(); y++) {
 				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), map.getWidth() * map.getTileSize(), y * map.getTileSize());
 				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), x * map.getTileSize(), map.getHeight() * map.getTileSize());
 			}
 		}
 
 		map.getLayers().values().stream()
+				.filter(l -> !layerPane.isHidden(l))
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
 				.forEach(l -> l.draw(g2));
 
-		if(mouseEntered && TILE_HIGHLIGHT) {
+		if (mouseEntered && TILE_HIGHLIGHT) {
 			Location l = getBlockLocation(last_x, last_y);
 			g2.setColor(Color.RED);
 			if (imageList.getSelectedImageName() != null) {
@@ -184,5 +194,9 @@ public class MapViewer extends JPanel {
 		}
 
 		g.drawImage(img, 0, 0, null);
+	}
+
+	private void sendErrorMessage() {
+		camera.addScreenshake(10f);
 	}
 }
