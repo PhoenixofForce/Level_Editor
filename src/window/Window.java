@@ -41,7 +41,7 @@ public class Window extends JFrame {
 		this.add(layerPane, BorderLayout.LINE_START);
 		layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-		mapViewer = new MapViewer(this, images, layerPane, map);
+		mapViewer = new MapViewer(images, layerPane, map);
 		this.add(mapViewer, BorderLayout.CENTER);
 
 		new Thread(() -> {

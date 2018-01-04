@@ -23,7 +23,7 @@ public class MapViewer extends JPanel {
 
 	private GameMap map;
 
-	public MapViewer(Window w, ImageList imageList, LayerPane layerPane, GameMap map) {
+	public MapViewer(ImageList imageList, LayerPane layerPane, GameMap map) {
 		this.layerPane = layerPane;
 		this.imageList = imageList;
 		this.map = map;
