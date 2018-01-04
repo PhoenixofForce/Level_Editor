@@ -6,7 +6,6 @@ public class Main {
 		/*	TODO:
 			More Important:
 			-settings (?)
-			-Search Bar for sprites
 			-STRG+Z
 
 			Less Important
