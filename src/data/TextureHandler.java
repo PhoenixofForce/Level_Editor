@@ -119,7 +119,7 @@ public class TextureHandler {
 		Map<String, ImageIcon> out = new HashMap<>();
 		for(String s: textures_sprite_sheet.keySet()) {
 			BufferedImage img = getImagePng(s);
-			while(img.getWidth() < 32 || img.getHeight() < 32) img = scale(img);
+			while(img.getWidth() < 32 && img.getHeight() < 32) img = scale(img);
 			out.put(s, new ImageIcon(img));
 		}
 		return out;

@@ -2,7 +2,6 @@ package window.elements;
 
 import data.*;
 import window.elements.layer.LayerPane;
-import window.Window;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +16,7 @@ public class MapViewer extends JPanel {
 
 	private Camera camera;
 
-	private int last_x, last_y;
+	private int last_x, last_y, midX, midY;
 
 	private boolean mouseEntered, drawMode;
 
@@ -76,7 +75,15 @@ public class MapViewer extends JPanel {
 				if (SwingUtilities.isRightMouseButton(e)) select(e.getX(), e.getY());
 				else if (SwingUtilities.isLeftMouseButton(e) && drawMode) set(e.getX(), e.getY(), false);
 				else if (SwingUtilities.isLeftMouseButton(e) && !drawMode) remove(e.getX(), e.getY());
-				else if (SwingUtilities.isMiddleMouseButton(e)) drawMode = !drawMode;
+				else if (SwingUtilities.isMiddleMouseButton(e)) {
+					midX = e.getX();
+					midY = e.getY();
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (SwingUtilities.isMiddleMouseButton(e) && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) drawMode = !drawMode;
 			}
 		});
 	}
