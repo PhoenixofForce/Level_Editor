@@ -8,14 +8,13 @@ import java.util.List;
 public class FreeLayer implements Layer {
 
 	private float depth;
-	private List<GO> images, toRemove;
+	private final List<GO> images;
 
 	private int width, height, tileSize;
 
 	public FreeLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
 		this.images = new ArrayList<>();
-		this.toRemove = new ArrayList<>();
 
 		this.width = width;
 		this.height = height;
@@ -41,7 +40,9 @@ public class FreeLayer implements Layer {
 		if (x < 0 || x + width > this.width || y < 0 || y + height > this.height) return;
 		//if (find(x, y) != null) return;
 
-		images.add(new GO(name, x, y, width, height));
+		synchronized (images) {
+			images.add(new GO(name, x, y, width, height));
+		}
 	}
 
 	@Override
@@ -58,7 +59,9 @@ public class FreeLayer implements Layer {
 		GO go = find(x, y);
 		if(go == null) return false;
 
-		toRemove.add(go);
+		synchronized (images) {
+			images.remove(go);
+		}
 
 		return true;
 	}
@@ -67,8 +70,10 @@ public class FreeLayer implements Layer {
 	public GO select(float x, float y) {
 		GO go = find(x, y);
 		if (go != null) {
-			images.remove(go);
-			images.add(go);
+			synchronized (images) {
+				images.remove(go);
+				images.add(go);
+			}
 		}
 		return go;
 	}
@@ -76,7 +81,7 @@ public class FreeLayer implements Layer {
 	private GO find(float x, float y) {
 		for (int i = images.size() - 1; i >= 0; i--) {
 			GO go = images.get(i);
-			if (go.x <= x && go.y <= y && go.x + go.width >= x && go.y + go.height >= y) {
+			if (go.x <= x && go.y <= y && go.x + go.width > x && go.y + go.height > y) {
 				return go;
 			}
 		}
@@ -85,17 +90,10 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public void draw(Graphics g) {
-		int size = toRemove.size();
-		for(int i = 0; i < size; i++) {
-			GO go = toRemove.get(0);
-			toRemove.remove(go);
-			images.remove(go);
-		}
-
-		for (int i = 0; i < images.size(); i++) {
-			GO go = images.get(i);
-			if(toRemove.contains(go)) continue;
-			g.drawImage(TextureHandler.getImagePng(go.name), (int) (go.x * tileSize), (int) (go.y * tileSize), null);
+		synchronized (images) {
+			for (GO go: images) {
+				g.drawImage(TextureHandler.getImagePng(go.name), (int) (go.x * tileSize), (int) (go.y * tileSize), null);
+			}
 		}
 	}
 
@@ -103,13 +101,15 @@ public class FreeLayer implements Layer {
 	public String toMapFormat(List<String> names) {
 		String out = "";
 
-		for(GO g: getImages()) {
-			String tags = "";
-			for(int i = 0; i < g.getTags().size(); i++) {
-				Tag t = g.getTags().get(i);
-				tags += t.toMapFormat() + (i < g.getTags().size()-1? "; ": "");
+		synchronized (images) {
+			for(GO g: getImages()) {
+				String tags = "";
+				for(int i = 0; i < g.getTags().size(); i++) {
+					Tag t = g.getTags().get(i);
+					tags += t.toMapFormat() + (i < g.getTags().size()-1? "; ": "");
+				}
+				out += "[put; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + g.x + "; " + g.y + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
 			}
-			out += "[put; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + g.x + "; " + g.y + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
 		}
 
 		return out;
