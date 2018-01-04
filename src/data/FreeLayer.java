@@ -8,13 +8,14 @@ import java.util.List;
 public class FreeLayer implements Layer {
 
 	private float depth;
-	private List<GO> images;
+	private List<GO> images, toRemove;
 
 	private int width, height, tileSize;
 
 	public FreeLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
 		this.images = new ArrayList<>();
+		this.toRemove = new ArrayList<>();
 
 		this.width = width;
 		this.height = height;
@@ -53,6 +54,16 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
+	public boolean remove(float x, float y) {
+		GO go = find(x, y);
+		if(go == null) return false;
+
+		toRemove.add(go);
+
+		return true;
+	}
+
+	@Override
 	public GO select(float x, float y) {
 		GO go = find(x, y);
 		if (go != null) {
@@ -74,8 +85,16 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public void draw(Graphics g) {
+		int size = toRemove.size();
+		for(int i = 0; i < size; i++) {
+			GO go = toRemove.get(0);
+			toRemove.remove(go);
+			images.remove(go);
+		}
+
 		for (int i = 0; i < images.size(); i++) {
 			GO go = images.get(i);
+			if(toRemove.contains(go)) continue;
 			g.drawImage(TextureHandler.getImagePng(go.name), (int) (go.x * tileSize), (int) (go.y * tileSize), null);
 		}
 	}

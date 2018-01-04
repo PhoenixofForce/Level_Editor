@@ -43,6 +43,17 @@ public class TileLayer implements Layer {
 	}
 
 	@Override
+	public boolean remove(float x2, float y2) {
+		int x = (int) x2;
+		int y = (int) y2;
+		if (x >= 0 && y >= 0 && x < width && y < height) {
+			tileNames[y][x] = null;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public GO select(float x, float y) {
 		return null;
 	}

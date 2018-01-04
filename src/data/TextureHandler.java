@@ -45,6 +45,7 @@ public class TextureHandler {
 	 */
 	public static void loadImagePngSpriteSheet(String spriteSheetName, String fileName) {
 		if(textures_png.containsKey(spriteSheetName)) return;
+		System.out.println(spriteSheetName + " " + fileName);
 		try {
 			loadImagePng(spriteSheetName, fileName.substring(0, fileName.length()-4)+"png");
 			Scanner s = new Scanner(new File(fileName));
@@ -53,6 +54,8 @@ public class TextureHandler {
 
 			for (int i = 0; i < amount; i++) {
 				String[] line = s.nextLine().split(" ");
+
+				System.out.println(Arrays.toString(line));
 
 				String texture = line[0];
 				int x = Integer.valueOf(line[1]);

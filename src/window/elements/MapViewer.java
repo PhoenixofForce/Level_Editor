@@ -2,12 +2,11 @@ package window.elements;
 
 import data.*;
 import window.elements.layer.LayerPane;
+import window.Window;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
@@ -20,15 +19,16 @@ public class MapViewer extends JPanel {
 
 	private int last_x, last_y;
 
-	private boolean mouseEntered;
+	private boolean mouseEntered, drawMode;
 
 	private GameMap map;
 
-	public MapViewer(ImageList imageList, LayerPane layerPane, GameMap map) {
+	public MapViewer(Window w, ImageList imageList, LayerPane layerPane, GameMap map) {
 		this.layerPane = layerPane;
 		this.imageList = imageList;
 		this.map = map;
 
+		drawMode = true;
 		mouseEntered = false;
 
 		camera = new Camera();
@@ -42,7 +42,6 @@ public class MapViewer extends JPanel {
 		});
 
 		this.addMouseMotionListener(new MouseAdapter() {
-
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				last_x = e.getX();
@@ -51,13 +50,10 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if (SwingUtilities.isMiddleMouseButton(e)) {
-					camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
-				} else if (SwingUtilities.isLeftMouseButton(e)) {
-					drag(last_x, last_y, e.getX(), e.getY());
-				} else if (SwingUtilities.isRightMouseButton(e)) {
-					set(e.getX(), e.getY(), true);
-				}
+				if (SwingUtilities.isMiddleMouseButton(e)) camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
+				else if (SwingUtilities.isRightMouseButton(e)) drag(last_x, last_y, e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e) && drawMode) set(e.getX(), e.getY(), true);
+				else if (SwingUtilities.isLeftMouseButton(e) && !drawMode) remove(e.getX(), e.getY());
 
 				last_x = e.getX();
 				last_y = e.getY();
@@ -77,9 +73,10 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (SwingUtilities.isLeftMouseButton(e)) select(e.getX(), e.getY());
-				else if (SwingUtilities.isRightMouseButton(e)) set(e.getX(), e.getY(), false);
-				else if (e.getButton() == 4) centerCamera();
+				if (SwingUtilities.isRightMouseButton(e)) select(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e) && drawMode) set(e.getX(), e.getY(), false);
+				else if (SwingUtilities.isLeftMouseButton(e) && !drawMode) remove(e.getX(), e.getY());
+				else if (SwingUtilities.isMiddleMouseButton(e)) drawMode = !drawMode;
 			}
 		});
 	}
@@ -104,6 +101,17 @@ public class MapViewer extends JPanel {
 
 		Location pos = getBlockLocation(x, y);
 		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
+	}
+
+	private void remove(int x, int y) {
+		Layer selectedLayer = layerPane.getSelectedLayer();
+		if (selectedLayer == null  || layerPane.isHidden(selectedLayer)) {
+			sendErrorMessage();
+			return;
+		}
+
+		Location pos = getBlockLocation(x, y);
+		selectedLayer.remove(pos.x, pos.y);
 	}
 
 	private void select(int x, int y) {
@@ -183,7 +191,7 @@ public class MapViewer extends JPanel {
 
 		if (mouseEntered && TILE_HIGHLIGHT) {
 			Location l = getBlockLocation(last_x, last_y);
-			g2.setColor(Color.RED);
+			g2.setColor(drawMode? Color.GREEN: Color.RED);
 			if (imageList.getSelectedImageName() != null) {
 				BufferedImage tex = TextureHandler.getImagePng(imageList.getSelectedImageName());
 				if (layerPane.getSelectedLayer() instanceof FreeLayer)

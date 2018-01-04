@@ -10,6 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class Window extends JFrame {
 
@@ -39,7 +41,7 @@ public class Window extends JFrame {
 		this.add(layerPane, BorderLayout.LINE_START);
 		layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-		mapViewer = new MapViewer(images, layerPane, map);
+		mapViewer = new MapViewer(this, images, layerPane, map);
 		this.add(mapViewer, BorderLayout.CENTER);
 
 		new Thread(() -> {
