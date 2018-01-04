@@ -4,8 +4,12 @@ public class Main {
 
 	public static void main(String[] args) {
 		/*	TODO:
-			-eraser
+			More Important:
 			-settings (?)
+			-Search Bar for sprites
+			-STRG+Z
+
+			Less Important
 			-view used ressources (?)
 			-copy paste
 			-selection => much later (maybe)

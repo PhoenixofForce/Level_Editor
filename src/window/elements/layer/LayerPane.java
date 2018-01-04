@@ -43,6 +43,7 @@ public class LayerPane extends JPanel {
 				if (hidden) setForeground(Color.RED);
 
 				setText((hidden ? "✕" : "✓") + getText());
+				setText(getText() + " " + "(" + map.getLayer(layerName).depth() + ")");
 
 				return c;
 			}
