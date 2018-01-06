@@ -130,9 +130,9 @@ public class MapViewer extends JPanel {
 		}
 
 		Location pos = getBlockLocation(x, y);
-		GO obj = selectedLayer.select(pos.x, pos.y);
+		TagObject obj = selectedLayer.select(pos.x, pos.y);
 
-		imageList.getModifier().setGO(obj);
+		imageList.getModifier().setTagObject(obj);
 	}
 
 	private void drag(int x, int y, int targetX, int targetY) {

@@ -3,6 +3,7 @@ package window.elements;
 import data.GO;
 import data.Tag;
 
+import data.TagObject;
 import window.UserInputs;
 import window.Window;
 
@@ -11,7 +12,7 @@ import java.awt.*;
 
 public class Modifier extends JPanel{
 
-	private GO object;
+	private TagObject object;
 	private JLabel goStats;
 	private JButton add, remove;
 
@@ -53,7 +54,7 @@ public class Modifier extends JPanel{
 			object.removeTag((String) attChooser.getSelectedItem());
 		});
 
-		setGO(null);
+		setTagObject(null);
 	}
 
 	public void add(String name) {
@@ -71,7 +72,7 @@ public class Modifier extends JPanel{
 		}
 	}
 
-	public void setGO(GO obj) {
+	public void setTagObject(TagObject obj) {
 		add.setEnabled(obj != null);
 		remove.setEnabled(obj != null);
 		input.setEnabled(obj != null);
@@ -97,7 +98,7 @@ public class Modifier extends JPanel{
 			}
 		} else input.setEnabled(false);
 
-		goStats.setText(obj.name + " (" + obj.x + " | " + obj.y + ")");
+		goStats.setText(obj.getText());
 	}
 
 

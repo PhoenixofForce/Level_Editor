@@ -75,7 +75,7 @@ public class Window extends JFrame {
 		if(buttons != null) buttons.reset();
 
 		if (mapViewer != null) mapViewer.setGameMap(map);
-		if (images != null)    images.getModifier().setGO(null);
+		if (images != null)    images.getModifier().setTagObject(null);
 		if (layerPane != null) layerPane.updateGameMap(map);
 	}
 
