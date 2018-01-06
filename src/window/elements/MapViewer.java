@@ -101,7 +101,7 @@ public class MapViewer extends JPanel {
 	private void set(int x, int y, boolean drag) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || selectedTexture == null || layerPane.isHidden(selectedLayer)) {
+		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
 			sendErrorMessage();
 			return;
 		}
@@ -124,7 +124,7 @@ public class MapViewer extends JPanel {
 	private void select(int x, int y) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || selectedTexture == null || layerPane.isHidden(selectedLayer)) {
+		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
 			sendErrorMessage();
 			return;
 		}
@@ -138,7 +138,7 @@ public class MapViewer extends JPanel {
 	private void drag(int x, int y, int targetX, int targetY) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || selectedTexture == null || layerPane.isHidden(selectedLayer)) {
+		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
 			sendErrorMessage();
 			return;
 		}
@@ -201,7 +201,7 @@ public class MapViewer extends JPanel {
 			g2.setColor(drawMode? Color.GREEN: Color.RED);
 			if (imageList.getSelectedImageName() != null) {
 				BufferedImage tex = TextureHandler.getImagePng(imageList.getSelectedImageName());
-				if (layerPane.getSelectedLayer() instanceof FreeLayer)
+				if (!(layerPane.getSelectedLayer() instanceof TileLayer))
 					g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), tex.getWidth(), tex.getHeight());
 				else
 					g2.drawRect((int) (l.x) * map.getTileSize(), (int) (l.y) * map.getTileSize(), tex.getWidth(), tex.getHeight());

@@ -19,7 +19,7 @@ public class GameMap {
 		addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
 		addLayer("Tile", new TileLayer(0.5f, width, height, tileSize));
 		addLayer("Object", new FreeLayer(0.0f, width, height, tileSize));
-		addLayer("Camera", new AreaLayer(-1.0f, tileSize));
+		addLayer("Camera", new AreaLayer(-1.0f, width, height, tileSize));
 	}
 
 	public GameMap(int width, int height, int tileSize, boolean b) {
@@ -32,7 +32,7 @@ public class GameMap {
 			addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
 			addLayer("Tile", new TileLayer(0.5f, width, height, tileSize));
 			addLayer("Object", new FreeLayer(0.0f, width, height, tileSize));
-			addLayer("Camera", new AreaLayer(-1.0f, tileSize));
+			addLayer("Camera", new AreaLayer(-1.0f, width, height, tileSize));
 		}
 	}
 

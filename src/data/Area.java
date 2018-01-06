@@ -6,7 +6,6 @@ public class Area extends TagObject {
 	private float x1, y1;
 	private float x2, y2;
 	private Color color;
-	private float zoom;
 
 	public Area(float x1, float y1, float x2, float y2, Color color) {
 		this.x1 = x1;
@@ -15,8 +14,6 @@ public class Area extends TagObject {
 		this.y2 = y2;
 
 		this.color = color;
-
-		this.zoom = 1;
 	}
 
 	public boolean equalsFirstPoint(float x, float y) {
@@ -65,14 +62,6 @@ public class Area extends TagObject {
 
 	public void setColor(Color color) {
 		this.color = color;
-	}
-
-	public float getZoom() {
-		return zoom;
-	}
-
-	public void setZoom(float zoom) {
-		this.zoom = zoom;
 	}
 
 	@Override

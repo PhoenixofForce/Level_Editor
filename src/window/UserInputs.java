@@ -18,8 +18,8 @@ public class UserInputs {
 
 		JFrame frame = new JFrame("Adding layer");
 		JTextField nameInput = new JTextField("name");
-		JSlider layerType = new JSlider(JSlider.HORIZONTAL, 0, 1, 1);
-		JLabel layerText = new JLabel("Tile - Pixel");
+		JSlider layerType = new JSlider(JSlider.HORIZONTAL, 0, 2, 2);
+		JLabel layerText = new JLabel("Tile - Area - Pixel");
 		JButton create = new JButton("Create");
 		JTextField depthInput = new JTextField("depth");
 		depthInput.setInputVerifier(new InputVerifier() {
@@ -70,7 +70,7 @@ public class UserInputs {
 		frame.add(layerType);
 		layerType.setBounds(5, 35, 100, 25);
 		layerType.setMinimum(0);
-		layerType.setMaximum(1);
+		layerType.setMaximum(2);
 		layerType.setMajorTickSpacing(1);
 
 		frame.add(layerText);
@@ -83,7 +83,7 @@ public class UserInputs {
 		create.setBounds(5, 120, 100, 25);
 		create.addActionListener(e -> {
 			String name = nameInput.getText();
-			layerPane.addLayer(name, layerType.getValue() == 1, Float.parseFloat(depthInput.getText()));
+			layerPane.addLayer(name, layerType.getValue(), Float.parseFloat(depthInput.getText()));
 			window.setEnabled(true);
 			window.toFront();
 			frame.dispose();

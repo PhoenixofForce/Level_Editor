@@ -8,12 +8,14 @@ public class AreaLayer implements Layer {
 	private float depth;
 
 	private List<Area> areas;
-	private int tileSize;
+	private int width, height, tileSize;
 
 	private Area selected;
 
-	public AreaLayer(float depth, int tileSize) {
+	public AreaLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
+		this.width = width;
+		this.height = height;
 		this.tileSize = tileSize;
 
 		areas = new ArrayList<>();
@@ -42,6 +44,8 @@ public class AreaLayer implements Layer {
 
 	@Override
 	public void set(String name, float x, float y, boolean drag) {
+		if (x < 0 || y < 0 || x >= width || y >= height) return;
+
 		if (drag) return;
 		areas.add(new Area(x, y, x, y, new Color((float) Math.random(), (float) Math.random(), (float) Math.random(), 0.5f)));
 	}
@@ -61,6 +65,7 @@ public class AreaLayer implements Layer {
 
 	@Override
 	public void drag(float x, float y, float targetX, float targetY) {
+		if (targetX < 0 || targetY < 0 || targetX >= width || targetY >= height) return;
 		Area area = selected;
 
 		if (area != null) {
@@ -71,6 +76,9 @@ public class AreaLayer implements Layer {
 				area.setX1(targetX);
 				area.setY1(targetY);
 			} else {
+				if (area.getX1() + (targetX-x) < 0 || area.getY1() + (targetY-y) < 0 || area.getX1() + (targetX-x) >= width || area.getY1() + (targetY-y) >= height) return;
+				if (area.getX2() + (targetX-x) < 0 || area.getY2() + (targetY-y) < 0 || area.getX2() + (targetX-x) >= width || area.getY2() + (targetY-y) >= height) return;
+
 				area.setX1(area.getX1() + (targetX-x));
 				area.setX2(area.getX2() + (targetX-x));
 				area.setY1(area.getY1() + (targetY-y));
@@ -103,6 +111,10 @@ public class AreaLayer implements Layer {
 
 	@Override
 	public String toMapFormat(List<String> names) {
-		return null;
+		String out = "";
+
+		//TODO: Export AreaLayer
+
+		return out;
 	}
 }

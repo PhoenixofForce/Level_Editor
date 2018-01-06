@@ -1,9 +1,6 @@
 package window.elements.layer;
 
-import data.FreeLayer;
-import data.GameMap;
-import data.Layer;
-import data.TileLayer;
+import data.*;
 import window.Window;
 
 import javax.swing.*;
@@ -62,7 +59,7 @@ public class LayerPane extends JPanel {
 		return map.getLayer(listModel.get(jList.getSelectedIndex()));
 	}
 
-	public void addLayer(String name, boolean type, float depth) {
+	public void addLayer(String name, int type, float depth) {
 		int i = 1;
 		while (map.getLayers().keySet().contains(name)) {
 			String newName = String.format("%s(%d)", name, i);
@@ -72,7 +69,22 @@ public class LayerPane extends JPanel {
 				name = newName;
 			}
 		}
-		Layer layer = type ? new FreeLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize()) : new TileLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+
+		Layer layer;
+		switch (type) {
+			case 0:
+				layer = new FreeLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+				break;
+			case 1:
+				layer = new AreaLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+				break;
+			case 2:
+				layer = new TileLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+				break;
+			default:
+				return;
+		}
+
 		map.addLayer(name, layer);
 		int index = 0;
 		while (index < listModel.size() && map.getLayer(listModel.get(index)).depth() > layer.depth()) index++;
