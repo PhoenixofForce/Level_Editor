@@ -10,6 +10,8 @@ public class AreaLayer implements Layer {
 	private List<Area> areas;
 	private int tileSize;
 
+	private Area selected;
+
 	public AreaLayer(float depth, int tileSize) {
 		this.depth = depth;
 		this.tileSize = tileSize;
@@ -22,13 +24,19 @@ public class AreaLayer implements Layer {
 		return depth;
 	}
 
-	private Area find(float x, float y) {
+	private Area find(float x, float y, boolean extended) {
 		for (int i = areas.size()-1; i >= 0; i--) {
 			Area area = areas.get(i);
 			if (area.equalsFirstPoint(x, y)) return area;
 			if (area.equalsSecondPoint(x, y)) return area;
 		}
 
+		if(!extended) return null;
+
+		for (int i = areas.size()-1; i >= 0; i--) {
+			Area area = areas.get(i);
+			if (Math.min(area.getX1(), area.getX2()) <= x && Math.max(area.getX1(), area.getX2()) >= x && Math.min(area.getY1(), area.getY2()) <= y && Math.max(area.getY1(), area.getY2()) >= y) return  area;
+		}
 		return null;
 	}
 
@@ -40,11 +48,12 @@ public class AreaLayer implements Layer {
 
 	@Override
 	public Area select(float x, float y) {
-		Area area = find(x, y);
+		Area area = find(x, y, true);
 
 		if (area != null) {
 			areas.remove(area);
 			areas.add(area);
+			selected = area;
 		}
 
 		return area;
@@ -52,23 +61,27 @@ public class AreaLayer implements Layer {
 
 	@Override
 	public void drag(float x, float y, float targetX, float targetY) {
-		Area area = find(x, y);
+		Area area = selected;
 
 		if (area != null) {
 			if (area.equalsSecondPoint(x, y)) {
 				area.setX2(targetX);
 				area.setY2(targetY);
-			} else {
+			} else if(area.equalsFirstPoint(x, y)){
 				area.setX1(targetX);
 				area.setY1(targetY);
+			} else {
+				area.setX1(area.getX1() + (targetX-x));
+				area.setX2(area.getX2() + (targetX-x));
+				area.setY1(area.getY1() + (targetY-y));
+				area.setY2(area.getY2() + (targetY-y));
 			}
-			area.update();
 		}
 	}
 
 	@Override
 	public boolean remove(float x, float y) {
-		Area area = find(x, y);
+		Area area = find(x, y, true);
 
 		if (area != null) {
 			areas.remove(area);
@@ -82,7 +95,7 @@ public class AreaLayer implements Layer {
 	public void draw(Graphics g) {
 		for (Area a: areas) {
 			g.setColor(a.getColor());
-			g.fillRect((int) (a.getX1() * tileSize), (int) (a.getY1() * tileSize), (int) ((a.getX2()-a.getX1())*tileSize) + 1, (int) ((a.getY2() - a.getY1())*tileSize) + 1);
+			g.fillRect((int) (Math.min(a.getX1(), a.getX2()) * tileSize), (int) (Math.min(a.getY1(), a.getY2()) * tileSize), (int) ((Math.max(a.getX2(), a.getX1())-Math.min(a.getX2(), a.getX1()))*tileSize) + 1, (int) ((Math.max(a.getY2(), a.getY1()) - Math.min(a.getY2(), a.getY1()))*tileSize) + 1);
 			g.fillRect((int) (a.getX1() * tileSize), (int) (a.getY1() * tileSize), 1, 1);
 			g.fillRect((int) (a.getX2() * tileSize), (int) (a.getY2() * tileSize), 1, 1);
 		}

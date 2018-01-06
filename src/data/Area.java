@@ -19,18 +19,6 @@ public class Area extends TagObject {
 		this.zoom = 1;
 	}
 
-	public void update() {
-		if (x1 > x2) {
-			float c = x1;
-			x1 = x2;
-			x2 = c;
-		} else if (y1 > y2) {
-			float c = y1;
-			y1 = y2;
-			y2 = c;
-		}
-	}
-
 	public boolean equalsFirstPoint(float x, float y) {
 		return x == x1 && y == y1;
 	}

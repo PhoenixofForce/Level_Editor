@@ -54,6 +54,8 @@ public class TextureHandler {
 			for (int i = 0; i < amount; i++) {
 				String[] line = s.nextLine().split(" ");
 
+				System.out.println(Arrays.toString(line));
+
 				String texture = line[0];
 				int x = Integer.valueOf(line[1]);
 				int y = Integer.valueOf(line[2]);
