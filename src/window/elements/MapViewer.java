@@ -199,10 +199,11 @@ public class MapViewer extends JPanel {
 		if (mouseEntered && TILE_HIGHLIGHT) {
 			Location l = getBlockLocation(last_x, last_y);
 			g2.setColor(drawMode? Color.GREEN: Color.RED);
-			if (imageList.getSelectedImageName() != null) {
-				BufferedImage tex = TextureHandler.getImagePng(imageList.getSelectedImageName());
+			boolean isAreaLayer = layerPane.getSelectedLayer() instanceof AreaLayer;
+			if (imageList.getSelectedImageName() != null || isAreaLayer) {
+				BufferedImage tex = imageList.getSelectedImageName() == null? null: TextureHandler.getImagePng(imageList.getSelectedImageName());
 				if (!(layerPane.getSelectedLayer() instanceof TileLayer))
-					g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), tex.getWidth(), tex.getHeight());
+					g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), isAreaLayer? 1: tex.getWidth(), isAreaLayer? 1: tex.getHeight());
 				else
 					g2.drawRect((int) (l.x) * map.getTileSize(), (int) (l.y) * map.getTileSize(), tex.getWidth(), tex.getHeight());
 			}
