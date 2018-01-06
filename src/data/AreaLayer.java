@@ -53,9 +53,9 @@ public class AreaLayer implements Layer {
 		if (area != null) {
 			areas.remove(area);
 			areas.add(area);
-			selected = area;
 		}
 
+		selected = area;
 		return area;
 	}
 
