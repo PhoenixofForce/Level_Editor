@@ -17,8 +17,8 @@ public class LayerPane extends JPanel {
 	private GameMap map;
 	private Map<Layer, Boolean> hidden;
 
-	public LayerPane(Window window, GameMap map) {
-		this.map = map;
+	public LayerPane(Window window, GameMap newMap) {
+		this.map = newMap;
 
 		this.setLayout(new BorderLayout());
 
@@ -52,7 +52,7 @@ public class LayerPane extends JPanel {
 		this.add(jList, BorderLayout.PAGE_START);
 		this.add(layerControl, BorderLayout.PAGE_END);
 
-		updateGameMap(map);
+		updateGameMap(newMap);
 	}
 
 	public Layer getSelectedLayer() {
@@ -73,13 +73,13 @@ public class LayerPane extends JPanel {
 
 		Layer layer;
 		switch (type) {
-			case 0:
+			case 2:
 				layer = new FreeLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
 				break;
 			case 1:
 				layer = new AreaLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
 				break;
-			case 2:
+			case 0:
 				layer = new TileLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
 				break;
 			default:
@@ -106,7 +106,7 @@ public class LayerPane extends JPanel {
 	public void updateGameMap(GameMap map) {
 		this.map = map;
 
-		listModel.clear();
+		listModel = new DefaultListModel<>();
 		for (String name : map.getLayers().keySet()) {
 			Layer layer = map.getLayer(name);
 
@@ -115,6 +115,7 @@ public class LayerPane extends JPanel {
 			listModel.add(index, name);
 		}
 
+		jList.setModel(listModel);
 		jList.setSelectedIndex(0);
 	}
 
