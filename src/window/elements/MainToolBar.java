@@ -87,9 +87,11 @@ public class MainToolBar extends JToolBar {
 							String data = line.split("\\[")[1];
 							for(int y = 4; y < data.split(";").length; y++) {
 								String row = data.split(";")[y];
+								if(y == data.split(";").length-1) row = row.substring(0, row.length()-1);
 
 								for(int x = 0; x < row.split(",").length; x++) {
-									names[x][y-4] = row.split(",")[x].trim().startsWith("null")? null: row.split(",")[x].trim();
+									String tname = row.split(",")[x].trim();
+									names[x][y-4] = tname.startsWith("null")? null: tname;
 								}
 							}
 
