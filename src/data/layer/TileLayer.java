@@ -1,6 +1,9 @@
-package data;
+package data.layer;
 
-import java.awt.*;
+import data.layer.layerobjects.GO;
+import data.TextureHandler;
+
+import java.awt.Graphics;
 
 import java.util.List;
 

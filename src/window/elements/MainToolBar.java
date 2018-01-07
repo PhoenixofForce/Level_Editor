@@ -1,6 +1,8 @@
 package window.elements;
 
 import data.*;
+import data.layer.*;
+import data.layer.layerobjects.*;
 import window.UserInputs;
 import window.Window;
 
@@ -17,8 +19,6 @@ public class MainToolBar extends JToolBar {
 	private File lastExport, lastImport, lastSave, lastOpen;
 
 	private List<File> inports;
-
-	// TODO: Many Errors can occure when TagActions uses []
 
 	public MainToolBar(Window w, ImageList imageList) {
 		this.setFloatable(false);
@@ -66,7 +66,7 @@ public class MainToolBar extends JToolBar {
 							inports.add(text);
 
 							if (text.exists() && image.exists()) {
-								TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 5), text.getAbsolutePath());
+								TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 4), text.getAbsolutePath());
 								imageList.update();
 							} else {
 								JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
@@ -107,10 +107,10 @@ public class MainToolBar extends JToolBar {
 								String s = line.split("\\[put; ")[i];
 								s = s.substring(0, s.length()-1);
 
-								String gName = s.split(";")[0].trim().startsWith("null")? null: s.split(";")[0].trim();
+								String gName = s.split(";")[1].trim().startsWith("null")? null: s.split(";")[1].trim();
 
-								float gX = Float.parseFloat(s.split(";")[1]);
-								float gY = Float.parseFloat(s.split(";")[2]);
+								float gX = Float.parseFloat(s.split(";")[2]);
+								float gY = Float.parseFloat(s.split(";")[3]);
 
 								l.set(gName, gX, gY, false);
 								GO go = l.select(gX, gY);
@@ -124,6 +124,43 @@ public class MainToolBar extends JToolBar {
 
 									if(data.length() == 0) continue;
 									go.addTag(new Tag(data.split(";")[1].trim(), data.substring(data.indexOf(";",data.indexOf(";")+1), data.indexOf("; [tag") == -1? data.length(): data.indexOf("; [tag")).trim().substring(2)));
+								}
+							}
+
+							if(map != null) map.addLayer(name, l);
+						}
+
+						else if(line.startsWith("a_")) {
+							float depth = Float.parseFloat(line.split(" ")[1]);
+							String name = line.split(" ")[0].split("_")[1].trim();
+
+							AreaLayer l = new AreaLayer(depth, width, height, tileSize);
+
+							for(int i = 1; i < line.split("\\[area; ").length; i++) {
+								String s = line.split("\\[area; ")[i];
+								s = s.substring(0, s.length()-1);
+
+								float x1 = Float.parseFloat(s.split(";")[0]);
+								float y1 = Float.parseFloat(s.split(";")[1]);
+								float x2 = Float.parseFloat(s.split(";")[2]);
+								float y2 = Float.parseFloat(s.split(";")[3]);
+
+								l.set("", x1, y1, false);
+								Area a = l.select(x1, y1);
+								a.setX1(x1);
+								a.setX2(x2);
+								a.setY1(y1);
+								a.setY2(y2);
+
+								int last = 0;
+								for(int j = 1; j < s.split("; \\[tag").length; j++) {
+
+									String data = s.substring(s.indexOf("; [tag", last));
+									data = data.substring(3, data.length()-1);
+									last = s.indexOf("; [tag", last)+1;
+
+									if(data.length() == 0) continue;
+									a.addTag(new Tag(data.split(";")[1].trim(), data.substring(data.indexOf(";",data.indexOf(";")+1), data.indexOf("; [tag") == -1? data.length(): data.indexOf("; [tag")).trim().substring(2)));
 								}
 							}
 
@@ -181,6 +218,7 @@ public class MainToolBar extends JToolBar {
 				}
 			};
 			if(lastExport != null) chooser.setSelectedFile(lastExport);
+			else if(lastSave != null) chooser.setSelectedFile(new File(lastSave.getAbsolutePath().substring(0, lastSave.getAbsolutePath().length()-4) + "map"));
 
 			chooser.setOpaque(true);
 
@@ -250,7 +288,7 @@ public class MainToolBar extends JToolBar {
 		JFileChooser chooser = new JFileChooser(){
 			public void approveSelection() {
 				File f = getSelectedFile();
-				if(!f.getName().endsWith(".map")) setSelectedFile( new File(f.getAbsolutePath() + ".umap"));
+				if(!f.getName().endsWith(".umap")) setSelectedFile( new File(f.getAbsolutePath() + ".umap"));
 				f = getSelectedFile();
 				lastSave = f;
 
@@ -260,7 +298,7 @@ public class MainToolBar extends JToolBar {
 				} else super.approveSelection();
 			}
 		};
-		if(lastExport != null) chooser.setSelectedFile(lastExport);
+		if(lastSave != null) chooser.setSelectedFile(lastSave);
 
 		chooser.setOpaque(true);
 
@@ -280,7 +318,7 @@ public class MainToolBar extends JToolBar {
 		int returnVal = chooser.showDialog(new JButton(""), "Save File");
 		if(returnVal == JFileChooser.APPROVE_OPTION){
 			File f = chooser.getSelectedFile();
-			lastExport = f;
+			lastSave = f;
 			writeToFile(w, f);
 		}
 	}
@@ -300,7 +338,7 @@ public class MainToolBar extends JToolBar {
 
 			for(String s: map.getLayers().keySet()) {
 				Layer l = map.getLayer(s);
-				wr.write((l instanceof FreeLayer? "f_": "t_") + s + " " + l.depth() + " " + l.toMapFormat(null).replaceAll("\n", "") + "\n");
+				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + l.toMapFormat(null).replaceAll("\n", "") + "\n");
 			}
 
 			wr.close();

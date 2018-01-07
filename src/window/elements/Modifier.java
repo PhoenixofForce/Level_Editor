@@ -1,9 +1,8 @@
 package window.elements;
 
-import data.GO;
-import data.Tag;
+import data.layer.layerobjects.Tag;
 
-import data.TagObject;
+import data.layer.layerobjects.TagObject;
 import window.UserInputs;
 import window.Window;
 
@@ -100,6 +99,4 @@ public class Modifier extends JPanel{
 
 		goStats.setText(obj.getText());
 	}
-
-
 }

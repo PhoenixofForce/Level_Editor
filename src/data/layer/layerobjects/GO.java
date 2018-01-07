@@ -1,13 +1,9 @@
-package data;
-
-import java.util.ArrayList;
-import java.util.List;
+package data.layer.layerobjects;
 
 public class GO extends TagObject {
 
 	public float x, y, width, height;
 	public String name;
-
 
 	public GO(String name, float x, float y, float width, float height) {
 		this.x = x;

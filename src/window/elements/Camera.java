@@ -1,6 +1,5 @@
 package window.elements;
 
-
 import java.util.LinkedList;
 import java.util.List;
 

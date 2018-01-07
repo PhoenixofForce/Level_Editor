@@ -1,6 +1,7 @@
 package window.elements.layer;
 
 import data.*;
+import data.layer.*;
 import window.Window;
 
 import javax.swing.*;

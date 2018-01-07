@@ -1,6 +1,10 @@
-package data;
+package data.layer;
 
-import java.awt.*;
+import data.layer.layerobjects.Area;
+import data.layer.layerobjects.Tag;
+
+import java.awt.Graphics;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +41,7 @@ public class AreaLayer implements Layer {
 
 		for (int i = areas.size()-1; i >= 0; i--) {
 			Area area = areas.get(i);
-			if (Math.min(area.getX1(), area.getX2()) <= x && Math.max(area.getX1(), area.getX2()) >= x && Math.min(area.getY1(), area.getY2()) <= y && Math.max(area.getY1(), area.getY2()) >= y) return  area;
+			if (area.getSmallerX() <= x && area.getBiggerX() >= x && area.getSmallerY() <= y && area.getBiggerY() >= y) return  area;
 		}
 		return null;
 	}
@@ -103,7 +107,7 @@ public class AreaLayer implements Layer {
 	public void draw(Graphics g) {
 		for (Area a: areas) {
 			g.setColor(a.getColor());
-			g.fillRect((int) (Math.min(a.getX1(), a.getX2()) * tileSize), (int) (Math.min(a.getY1(), a.getY2()) * tileSize), (int) ((Math.max(a.getX2(), a.getX1())-Math.min(a.getX2(), a.getX1()))*tileSize) + 1, (int) ((Math.max(a.getY2(), a.getY1()) - Math.min(a.getY2(), a.getY1()))*tileSize) + 1);
+			g.fillRect((int) (a.getSmallerX() * tileSize), (int) (a.getSmallerY() * tileSize), (int) ((a.getBiggerX()-a.getSmallerX())*tileSize) + 1, (int) ((a.getBiggerY() - a.getSmallerY())*tileSize) + 1);
 			g.fillRect((int) (a.getX1() * tileSize), (int) (a.getY1() * tileSize), 1, 1);
 			g.fillRect((int) (a.getX2() * tileSize), (int) (a.getY2() * tileSize), 1, 1);
 		}
@@ -113,7 +117,14 @@ public class AreaLayer implements Layer {
 	public String toMapFormat(List<String> names) {
 		String out = "";
 
-		//TODO: Export AreaLayer
+		for(Area a: areas) {
+			String tags = "";
+			for(int i = 0; i < a.getTags().size(); i++) {
+				Tag t = a.getTags().get(i);
+				tags += t.toMapFormat() + (i < a.getTags().size()-1? "; ": "");
+			}
+			out += "[area; " + a.getSmallerX() + "; " + a.getSmallerY() + "; " + a.getBiggerX() + "; " + a.getBiggerY() + (a.getTags().size() > 0? "; " + tags: "") + "]\n";
+		}
 
 		return out;
 	}

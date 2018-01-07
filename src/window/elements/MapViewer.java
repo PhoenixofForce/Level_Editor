@@ -1,6 +1,8 @@
 package window.elements;
 
 import data.*;
+import data.layer.*;
+import data.layer.layerobjects.TagObject;
 import window.elements.layer.LayerPane;
 
 import javax.swing.*;

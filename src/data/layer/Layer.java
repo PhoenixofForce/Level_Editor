@@ -1,6 +1,8 @@
-package data;
+package data.layer;
 
-import java.awt.*;
+import data.layer.layerobjects.TagObject;
+
+import java.awt.Graphics;
 import java.util.List;
 
 public interface Layer {

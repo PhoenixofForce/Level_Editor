@@ -264,5 +264,4 @@ public class UserInputs {
 			actionListener.actionPerformed(new ActionEvent(window, 0, null));
 		});
 	}
-
 }

@@ -1,6 +1,6 @@
-package data;
+package data.layer.layerobjects;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class Area extends TagObject {
 	private float x1, y1;
@@ -14,6 +14,22 @@ public class Area extends TagObject {
 		this.y2 = y2;
 
 		this.color = color;
+	}
+
+	public float getSmallerX() {
+		return Math.min(x1, x2);
+	}
+
+	public float getBiggerX() {
+		return Math.max(x1, x2);
+	}
+
+	public float getSmallerY() {
+		return Math.min(y1, y2);
+	}
+
+	public float getBiggerY() {
+		return Math.max(y1, y2);
 	}
 
 	public boolean equalsFirstPoint(float x, float y) {

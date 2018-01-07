@@ -1,5 +1,7 @@
 package data;
 
+import data.layer.*;
+import data.layer.layerobjects.GO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,6 +71,7 @@ public class GameMap {
 
 		List<TileLayer> tiles = new ArrayList<>();
 		List<FreeLayer> frees = new ArrayList<>();
+		List<AreaLayer> areas = new ArrayList<>();
 
 		List<String> names = new ArrayList<>();
 
@@ -84,7 +87,7 @@ public class GameMap {
 					for(String st: sa) if(st != null && !names.contains(st)) names.add(st);
 				}
 			}
-			else {
+			else if(l instanceof FreeLayer) {
 				FreeLayer f = (FreeLayer) l;
 				frees.add(f);
 
@@ -93,10 +96,16 @@ public class GameMap {
 					if(st != null && !names.contains(st)) names.add(st);
 				}
 			}
+			else if(l instanceof AreaLayer) {
+				AreaLayer a = (AreaLayer) l;
+				areas.add(a);
+
+			}
 		}
 
 		for(TileLayer l: tiles) out += l.toMapFormat(names);
 		for(FreeLayer l: frees) out += l.toMapFormat(names);
+		for(AreaLayer a: areas) out += a.toMapFormat(names);
 
 		String repl = "";
 		for(int i = 0; i < names.size(); i++) {

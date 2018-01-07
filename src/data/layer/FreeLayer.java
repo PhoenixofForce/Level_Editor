@@ -1,6 +1,10 @@
-package data;
+package data.layer;
 
-import java.awt.*;
+import data.layer.layerobjects.GO;
+import data.layer.layerobjects.Tag;
+import data.TextureHandler;
+
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +112,7 @@ public class FreeLayer implements Layer {
 					Tag t = g.getTags().get(i);
 					tags += t.toMapFormat() + (i < g.getTags().size()-1? "; ": "");
 				}
-				out += "[put; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + g.x + "; " + g.y + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
+				out += "[put; " + depth + "; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + g.x + "; " + g.y + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
 			}
 		}
 
