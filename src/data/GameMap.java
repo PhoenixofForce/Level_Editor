@@ -107,7 +107,7 @@ public class GameMap {
 		for(FreeLayer l: frees) out += l.toMapFormat(names);
 		for(AreaLayer a: areas) out += a.toMapFormat(names);
 
-		String repl = "";
+		String repl = tileSize + "\n";
 		for(int i = 0; i < names.size(); i++) {
 			out = out.replaceAll(names.get(i), (i+1) + "");
 			repl += "#" + (i+1) + " - " + names.get(i) + "\n";

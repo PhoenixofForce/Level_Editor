@@ -123,7 +123,7 @@ public class AreaLayer implements Layer {
 				Tag t = a.getTags().get(i);
 				tags += t.toMapFormat() + (i < a.getTags().size()-1? "; ": "");
 			}
-			out += "[area; " + a.getSmallerX() + "; " + a.getSmallerY() + "; " + a.getBiggerX() + "; " + a.getBiggerY() + (a.getTags().size() > 0? "; " + tags: "") + "]\n";
+			out += "[area; " + a.getSmallerX() + "; " + a.getSmallerY() + "; " + (a.getBiggerX() + 1.0f/tileSize) + "; " + (a.getBiggerY() + 1.0f/tileSize) + (a.getTags().size() > 0? "; " + tags: "") + "]\n";
 		}
 
 		return out;
