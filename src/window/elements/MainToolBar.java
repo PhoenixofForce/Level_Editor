@@ -243,7 +243,7 @@ public class MainToolBar extends JToolBar {
 				lastExport = f;
 				try {
 					PrintWriter wr = new PrintWriter(f);
-					wr.write(w.getMap().toMapFormat());
+					wr.write(w.getMap().toMapFormat(true));
 					wr.close();
 				} catch (FileNotFoundException e1) {
 					e1.printStackTrace();
@@ -340,7 +340,7 @@ public class MainToolBar extends JToolBar {
 
 			for(String s: map.getLayers().keySet()) {
 				Layer l = map.getLayer(s);
-				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + l.toMapFormat(null).replaceAll("\n", "") + "\n");
+				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + l.toMapFormat(null, -1, -1, -1, -1).replaceAll("\n", "") + "\n");
 			}
 
 			wr.close();

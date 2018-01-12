@@ -7,6 +7,7 @@ public class Main {
 			More Important:
 			-settings (?)
 			-STRG+Z
+			-Improved Save-Directory
 
 			Less Important
 			-view used ressources (?)

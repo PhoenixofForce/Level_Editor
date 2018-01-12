@@ -66,7 +66,7 @@ public class GameMap {
 		return tileSize;
 	}
 
-	public String toMapFormat() {
+	public String toMapFormat(boolean expo) {
 		String out = "";
 
 		List<TileLayer> tiles = new ArrayList<>();
@@ -103,9 +103,39 @@ public class GameMap {
 			}
 		}
 
-		for(TileLayer l: tiles) out += l.toMapFormat(names);
-		for(FreeLayer l: frees) out += l.toMapFormat(names);
-		for(AreaLayer a: areas) out += a.toMapFormat(names);
+		float sx = -1, sy = -1, bx = -1, by = -1;
+		if(expo) {
+			sx = Integer.MAX_VALUE;
+			sy = Integer.MAX_VALUE;
+			bx = Integer.MIN_VALUE;
+			by = Integer.MIN_VALUE;
+
+			for(TileLayer l: tiles) {
+				float csx = l.smallestX(), csy = l.smallestY(), cbx = l.biggestX(), cby = l.biggestY();
+				if(csx < sx) sx = csx;
+				if(csy < sy) sy = csy;
+				if(cbx > bx) bx = cbx;
+				if(cby > by) by = cby;
+			}
+			for(FreeLayer l: frees) {
+				float csx = l.smallestX(), csy = l.smallestY(), cbx = l.biggestX(), cby = l.biggestY();
+				if(csx < sx) sx = csx;
+				if(csy < sy) sy = csy;
+				if(cbx > bx) bx = cbx;
+				if(cby > by) by = cby;
+			}
+			for(AreaLayer l: areas) {
+				float csx = l.smallestX(), csy = l.smallestY(), cbx = l.biggestX(), cby = l.biggestY();
+				if(csx < sx) sx = csx;
+				if(csy < sy) sy = csy;
+				if(cbx > bx) bx = cbx;
+				if(cby > by) by = cby;
+			}
+		}
+
+		for(TileLayer l: tiles) out += l.toMapFormat(names,  sx,  sy,  bx,  by);
+		for(FreeLayer l: frees) out += l.toMapFormat(names,  sx,  sy,  bx,  by);
+		for(AreaLayer a: areas) out += a.toMapFormat(names,  sx,  sy,  bx,  by);
 
 		String repl = tileSize + "\n";
 		for(int i = 0; i < names.size(); i++) {

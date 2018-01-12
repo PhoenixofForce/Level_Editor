@@ -114,7 +114,35 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public String toMapFormat(List<String> names) {
+	public float smallestX() {
+		float smallestX = Integer.MAX_VALUE;
+		for(Area a: areas) if(a.getSmallerX() < smallestX) smallestX = a.getSmallerX();
+		return smallestX == Integer.MAX_VALUE? -1: smallestX;
+	}
+
+	@Override
+	public float smallestY() {
+		float smallestY = Integer.MAX_VALUE;
+		for(Area a: areas) if(a.getSmallerY() < smallestY) smallestY = a.getSmallerX();
+		return smallestY == Integer.MAX_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public float biggestX() {
+		float smallestX = Integer.MIN_VALUE;
+		for(Area a: areas) if(a.getBiggerX() > smallestX) smallestX = a.getBiggerX();
+		return smallestX == Integer.MIN_VALUE? -1: smallestX;
+	}
+
+	@Override
+	public float biggestY() {
+		float smallestY = Integer.MIN_VALUE;
+		for(Area a: areas) if(a.getBiggerY() > smallestY) smallestY = a.getBiggerX();
+		return smallestY == Integer.MIN_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
 		String out = "";
 
 		for(Area a: areas) {
@@ -123,7 +151,7 @@ public class AreaLayer implements Layer {
 				Tag t = a.getTags().get(i);
 				tags += t.toMapFormat() + (i < a.getTags().size()-1? "; ": "");
 			}
-			out += "[area; " + a.getSmallerX() + "; " + a.getSmallerY() + "; " + (a.getBiggerX() + 1.0f/tileSize) + "; " + (a.getBiggerY() + 1.0f/tileSize) + (a.getTags().size() > 0? "; " + tags: "") + "]\n";
+			out += "[area; " + (a.getSmallerX() - (sx==-1? 0: sx)) + "; " + (a.getSmallerY() - (sy==-1? 0: sy)) + "; " + ((a.getBiggerX() + 1.0f/tileSize) - (sx==-1? 0: sx)) + "; " + ((a.getBiggerY() + 1.0f/tileSize) - (sy==-1? 0: sy)) + (a.getTags().size() > 0? "; " + tags: "") + "]\n";
 		}
 
 		return out;

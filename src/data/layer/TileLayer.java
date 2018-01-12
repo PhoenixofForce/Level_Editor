@@ -81,11 +81,67 @@ public class TileLayer implements Layer {
 	}
 
 	@Override
-	public String toMapFormat(List<String> names) {
-		String out = "[layer; " + depth + "; " + width + "; " + height + "; ";
-
+	public float smallestX() {
+		int smallestX = Integer.MAX_VALUE;
 		for (int x = 0; x < tileNames[0].length; x++) {
 			for (int y = 0; y < tileNames.length; y++) {
+				if (tileNames[y][x] == null) continue;
+				if(x < smallestX) smallestX = x;
+			}
+		}
+		return smallestX == Integer.MAX_VALUE? -1: smallestX;
+	}
+
+	@Override
+	public float smallestY() {
+		int smallestY = Integer.MAX_VALUE;
+		for (int x = 0; x < tileNames[0].length; x++) {
+			for (int y = 0; y < tileNames.length; y++) {
+				if (tileNames[y][x] == null) continue;
+				if(y < smallestY) smallestY = y;
+			}
+		}
+		return smallestY == Integer.MAX_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public float biggestX() {
+		int smallestX = Integer.MIN_VALUE;
+		for (int x = 0; x < tileNames[0].length; x++) {
+			for (int y = 0; y < tileNames.length; y++) {
+				if (tileNames[y][x] == null) continue;
+				if(x > smallestX) smallestX = x;
+			}
+		}
+		return smallestX == Integer.MIN_VALUE? -1: smallestX;
+	}
+
+	@Override
+	public float biggestY() {
+		int smallestY = Integer.MIN_VALUE;
+		for (int x = 0; x < tileNames[0].length; x++) {
+			for (int y = 0; y < tileNames.length; y++) {
+				if (tileNames[y][x] == null) continue;
+				if(y > smallestY) smallestY = y;
+			}
+		}
+		return smallestY == Integer.MIN_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
+		String out = "[layer; " + depth + "; " + width + "; " + height + "; ";
+
+		int startX = Math.max(0, (int) Math.floor(sx));
+		int startY = Math.max(0, (int) Math.floor(sy));
+		int endX = bx == -1? tileNames[0].length: Math.min(tileNames[0].length, (int) Math.ceil(bx));
+		int endY = by == -1? tileNames.length: Math.min(tileNames.length, (int) Math.ceil(by));
+
+		System.out.println(startX + " " + startY);
+		System.out.println(endX + " " + endY);
+
+		for (int x = startX; x < endX; x++) {
+			for (int y = startY; y < endY; y++) {
 				out += (names != null? names.indexOf(tileNames[y][x])+1: tileNames[y][x]) + (y < tileNames.length-1? ", ": "");
 			}
 

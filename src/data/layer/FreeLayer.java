@@ -102,7 +102,35 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public String toMapFormat(List<String> names) {
+	public float smallestX() {
+		float smallestX = Integer.MAX_VALUE;
+		for(GO g: images) if(g.x < smallestX) smallestX = g.x;
+		return smallestX == Integer.MAX_VALUE? -1: smallestX;
+	}
+
+	@Override
+	public float smallestY() {
+		float smallestY = Integer.MAX_VALUE;
+		for(GO g: images) if(g.y < smallestY) smallestY = g.y;
+		return smallestY == Integer.MAX_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public float biggestX() {
+		float smallestX = Integer.MIN_VALUE;
+		for(GO g: images) if(g.x > smallestX) smallestX = g.x;
+		return smallestX == Integer.MIN_VALUE? -1: smallestX;
+	}
+
+	@Override
+	public float biggestY() {
+		float smallestY = Integer.MIN_VALUE;
+		for(GO g: images) if(g.y > smallestY) smallestY = g.y;
+		return smallestY == Integer.MIN_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
 		String out = "";
 
 		synchronized (images) {
@@ -112,7 +140,7 @@ public class FreeLayer implements Layer {
 					Tag t = g.getTags().get(i);
 					tags += t.toMapFormat() + (i < g.getTags().size()-1? "; ": "");
 				}
-				out += "[put; " + depth + "; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + g.x + "; " + g.y + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
+				out += "[put; " + depth + "; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + (g.x-(sx==-1? 0: sx)) + "; " + (g.y-(sy==-1? 0: sy)) + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
 			}
 		}
 

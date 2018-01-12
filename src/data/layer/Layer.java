@@ -16,6 +16,10 @@ public interface Layer {
 
 	void draw(Graphics g);
 
+	float smallestX();
+	float smallestY();
+	float biggestX();
+	float biggestY();
 
-	String toMapFormat(List<String> names);
+	String toMapFormat(List<String> names, float smallestX, float smallestY, float biggestX, float biggestY);
 }
