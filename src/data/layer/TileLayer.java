@@ -130,12 +130,15 @@ public class TileLayer implements Layer {
 
 	@Override
 	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
-		String out = "[layer; " + depth + "; " + width + "; " + height + "; ";
-
 		int startX = Math.max(0, (int) Math.floor(sx));
 		int startY = Math.max(0, (int) Math.floor(sy));
 		int endX = bx == -1? tileNames[0].length: Math.min(tileNames[0].length, (int) Math.ceil(bx));
 		int endY = by == -1? tileNames.length: Math.min(tileNames.length, (int) Math.ceil(by));
+
+		int width = endX - startX;
+		int height = endY - startY;
+
+		String out = "[layer; " + depth + "; " + width + "; " + height + "; ";
 
 		System.out.println(startX + " " + startY);
 		System.out.println(endX + " " + endY);

@@ -150,9 +150,9 @@ public class MainToolBar extends JToolBar {
 								l.set("", x1, y1, false);
 								Area a = l.select(x1, y1);
 								a.setX1(x1);
-								a.setX2(x2);
+								a.setX2(x2 - 1.0f/(float)tileSize);
 								a.setY1(y1);
-								a.setY2(y2);
+								a.setY2(y2 - 1.0f/(float)tileSize);
 
 								int last = 0;
 								for(int j = 1; j < s.split("; \\[tag").length; j++) {
