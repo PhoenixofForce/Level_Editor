@@ -82,7 +82,7 @@ public class MainToolBar extends JToolBar {
 						else if(line.startsWith("t_")) {
 							float depth = Float.parseFloat(line.split(" ")[1]);
 							String[][] names = new String[height][width];
-							String name = line.split(" ")[0].split("_")[1].trim();
+							String name = line.split(" ")[0].substring(2).trim();
 
 							String data = line.split("\\[")[1];
 							for(int y = 4; y < data.split(";").length; y++) {
@@ -101,7 +101,7 @@ public class MainToolBar extends JToolBar {
 
 						else if(line.startsWith("f_")) {
 							float depth = Float.parseFloat(line.split(" ")[1]);
-							String name = line.split(" ")[0].split("_")[1].trim();
+							String name = line.split(" ")[0].substring(2).trim();
 
 							FreeLayer l = new FreeLayer(depth, width, height, tileSize);
 
@@ -134,7 +134,7 @@ public class MainToolBar extends JToolBar {
 
 						else if(line.startsWith("a_")) {
 							float depth = Float.parseFloat(line.split(" ")[1]);
-							String name = line.split(" ")[0].split("_")[1].trim();
+							String name = line.split(" ")[0].substring(2).trim();
 
 							AreaLayer l = new AreaLayer(depth, width, height, tileSize);
 
