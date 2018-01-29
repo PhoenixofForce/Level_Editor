@@ -2,13 +2,14 @@ package data;
 
 import data.layer.*;
 import data.layer.layerobjects.GO;
+import data.layer.layerobjects.TagObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GameMap {
+public class GameMap extends TagObject {
 	private int width, height, tileSize;
 	private Map<String, Layer> layers;
 
@@ -145,5 +146,10 @@ public class GameMap {
 
 
 		return repl + out;
+	}
+
+	@Override
+	public String getText() {
+		return "MAP";
 	}
 }

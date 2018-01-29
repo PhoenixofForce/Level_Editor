@@ -7,6 +7,8 @@ import window.UserInputs;
 import window.Window;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 
 public class Modifier extends JPanel{
@@ -15,7 +17,8 @@ public class Modifier extends JPanel{
 	private JLabel goStats;
 	private JButton add, remove;
 
-	private JTextField input;
+	private JTextArea input;
+	private JScrollPane scrollPane;
 	private JComboBox<String> attChooser;
 
 	public Modifier(Window w) {
@@ -25,11 +28,11 @@ public class Modifier extends JPanel{
 		goStats = new JLabel();
 		this.add(goStats, BorderLayout.PAGE_START);
 
-		input = new JTextField();
-		this.add(input, BorderLayout.PAGE_END);
-		input.addActionListener(e -> {
-			object.getTag((String) attChooser.getSelectedItem()).setAction(input.getText());
-		});
+		input = new JTextArea();
+		input.setEditable(true);
+		scrollPane = new JScrollPane(input);
+		scrollPane.setPreferredSize(new Dimension(0, 200));
+		this.add(scrollPane, BorderLayout.PAGE_END);
 
 		attChooser = new JComboBox();
 		this.add(attChooser, BorderLayout.CENTER);

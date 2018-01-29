@@ -80,6 +80,8 @@ public class MapViewer extends JPanel {
 				else if (SwingUtilities.isMiddleMouseButton(e)) {
 					midX = e.getX();
 					midY = e.getY();
+				} else if (e.getButton() == 4) {
+					imageList.getModifier().setTagObject(map);
 				}
 			}
 
