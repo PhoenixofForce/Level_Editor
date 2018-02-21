@@ -13,11 +13,11 @@ import java.awt.*;
 
 public class Modifier extends JPanel{
 
-	private TagObject object;
-	private JLabel goStats;
-	private JButton add, remove;
+	private TagObject object;			//object which tags are beeing edited
+	private JLabel goStats;				//label which shows texture name and coordinate of object
+	private JButton add, remove;			//buttons to add and remove tags
 
-	private JTextArea input;
+	private JTextArea input;			//textArea to input tag values
 	private JScrollPane scrollPane;
 	private JComboBox<String> attChooser;
 
