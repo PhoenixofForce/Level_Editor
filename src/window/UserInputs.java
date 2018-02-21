@@ -13,6 +13,10 @@ import java.awt.event.WindowEvent;
 
 public class UserInputs {
 
+	/** Creates window so the user can set the settings of the new layer
+	*   @param window to handle focus
+	*   @param layerPane to add layer 
+	**/
 	public static void createLayer(Window window, LayerPane layerPane) {
 		window.setEnabled(false);
 
@@ -22,8 +26,8 @@ public class UserInputs {
 		JLabel layerText = new JLabel("Tile - Area - Pixel");
 		JButton create = new JButton("Create");
 		JTextField depthInput = new JTextField("depth");
+		//allow float only
 		depthInput.setInputVerifier(new InputVerifier() {
-
 			@Override
 			public boolean verify(JComponent input) {
 				JTextField textField = ((JTextField) input);
@@ -40,6 +44,7 @@ public class UserInputs {
 			}
 		});
 
+		//resets focuc when closing
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -89,6 +94,11 @@ public class UserInputs {
 			frame.dispose();
 		});
 	}
+	
+	/** Creates window so the user can set the settings of the new tag
+	*   @param window to handle focus
+	*   @param mod to add modifier 
+	**/
 	public static void tagName(Window window, Modifier mod) {
 		window.setEnabled(false);
 
@@ -135,6 +145,9 @@ public class UserInputs {
 		});
 	}
 
+	/** Creates window so the user can set the settings of the new map
+	*   @param window to handle focus
+	**/
 	public static void newMap(Window window) {
 		window.setEnabled(false);
 
@@ -209,6 +222,10 @@ public class UserInputs {
 		});
 	}
 
+	/** Creates window so the user can confirm his action
+	*   @param message is shown to the user
+	*   @param actionListener runs when confirming the action
+	**/
 	public static void confirm(Window window, String message, ActionListener actionListener) {
 		window.setEnabled(false);
 		JFrame frame = new JFrame("Confirm");
