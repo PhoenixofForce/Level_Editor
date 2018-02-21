@@ -30,6 +30,24 @@ public class Modifier extends JPanel{
 
 		input = new JTextArea();
 		input.setEditable(true);
+
+		input.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				if (object != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				if (object != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				if (object != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+			}
+		});
+
 		scrollPane = new JScrollPane(input);
 		scrollPane.setPreferredSize(new Dimension(0, 200));
 		this.add(scrollPane, BorderLayout.PAGE_END);

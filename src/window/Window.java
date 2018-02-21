@@ -77,7 +77,7 @@ public class Window extends JFrame {
 	}
 
 	/** Setting new map and resetting controll objects
-	*//
+	*/
 	public void setMap(GameMap map) {
 		this.map = map;
 		if(buttons != null) buttons.reset();
