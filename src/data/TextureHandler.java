@@ -111,8 +111,7 @@ public class TextureHandler {
 		return textures_sprite_sheet_texture.keySet().stream().filter(s -> getSpriteSheetImage(s).equals(spriteSheetName)).collect(Collectors.toList());
 	}
 
-	/**
-	 *
+	/** Gets all images in form of ImageIcons, scales all image up to min 32x32
 	 * @return Map of all image names, with their bound image as an image icon
 	 */
 	public static Map<String, ImageIcon> getAllImages() {
@@ -125,6 +124,10 @@ public class TextureHandler {
 		return out;
 	}
 
+	/** Doubles the image size
+	*   @param in the image that gets scaled
+	*   @return the scaled image
+	**/
 	private static BufferedImage scale(BufferedImage in) {
 		BufferedImage out = new BufferedImage(in.getWidth() * 2, in.getHeight() * 2, BufferedImage.TYPE_INT_ARGB);
 		out.getGraphics().drawImage(in, 0, 0, out.getWidth(), out.getHeight(), null);
