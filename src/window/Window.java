@@ -12,21 +12,24 @@ import java.awt.event.*;
 
 public class Window extends JFrame {
 
-	private LayerPane layerPane;
-	private MainToolBar buttons;
-	private MapViewer mapViewer;
-	private ImageList images;
-	private GameMap map;
+	private LayerPane layerPane;			//bar on the right side to controll layers
+	private MainToolBar buttons;			//toolbar to save/ open/ export map and import ressources
+	private MapViewer mapViewer;			//displays the current map
+	private ImageList images;			//image selector and filter
+	private GameMap map;				//the map that is currently edited
 
 	public Window() {
+		//setting window attributes
 		this.setTitle("POF - Level Editor");
 		this.setLayout(new BorderLayout());
 		this.setMinimumSize(new Dimension(800, 600));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setVisible(true);
 
+		//creating new standart map
 		setMap(new GameMap(100,100,8));
 
+		//creating objects and adding them to the window
 		images = new ImageList(this);
 		this.add(images, BorderLayout.LINE_END);
 		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
@@ -41,6 +44,7 @@ public class Window extends JFrame {
 		mapViewer = new MapViewer(images, layerPane, map);
 		this.add(mapViewer, BorderLayout.CENTER);
 
+		//starting repaint thread
 		new Thread(() -> {
 			long lastTime;
 			while (true) {
@@ -58,6 +62,7 @@ public class Window extends JFrame {
 				layerPane.updateUI();
 		});
 
+		//resizing components on window resize
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
@@ -67,9 +72,12 @@ public class Window extends JFrame {
 					layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight() - buttons.getHeight());
 			}
 		});
+		//setting window size to trigger resize
 		this.setSize(this.getWidth() + 1, this.getHeight());
 	}
 
+	/** Setting new map and resetting controll objects
+	*//
 	public void setMap(GameMap map) {
 		this.map = map;
 		if(buttons != null) buttons.reset();
@@ -78,7 +86,7 @@ public class Window extends JFrame {
 		if (images != null)    images.getModifier().setTagObject(null);
 		if (layerPane != null) layerPane.updateGameMap(map);
 	}
-
+	
 	public GameMap getMap() {
 		return map;
 	}
