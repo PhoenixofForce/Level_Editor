@@ -132,8 +132,8 @@ public class TileLayer implements Layer {
 	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
 		int startX = Math.max(0, (int) Math.floor(sx));
 		int startY = Math.max(0, (int) Math.floor(sy));
-		int endX = bx == -1? tileNames[0].length: Math.min(tileNames[0].length, (int) Math.ceil(bx));
-		int endY = by == -1? tileNames.length: Math.min(tileNames.length, (int) Math.ceil(by));
+		int endX = bx == -1? tileNames[0].length: Math.min(tileNames[0].length, (int) Math.ceil(bx) + 1);
+		int endY = by == -1? tileNames.length: Math.min(tileNames.length, (int) Math.ceil(by) + 1);
 
 		int width = endX - startX;
 		int height = endY - startY;
