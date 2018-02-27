@@ -2,6 +2,7 @@ package data;
 
 import data.layer.*;
 import data.layer.layerobjects.GO;
+import data.layer.layerobjects.Tag;
 import data.layer.layerobjects.TagObject;
 
 import java.util.ArrayList;
@@ -138,7 +139,13 @@ public class GameMap extends TagObject {
 		for(FreeLayer l: frees) out += l.toMapFormat(names,  sx,  sy,  bx,  by);
 		for(AreaLayer a: areas) out += a.toMapFormat(names,  sx,  sy,  bx,  by);
 
-		String repl = tileSize + "\n";
+		String tags = "";
+		for(int i = 0; i < this.getTags().size(); i++) {
+			Tag t = this.getTags().get(i);
+			tags += t.toMapFormat() + (i < this.getTags().size()-1? "; ": "");
+		}
+
+		String repl = tileSize + (tags.length() > 0 ? ";" : "" ) + tags + "\n";
 		for(int i = 0; i < names.size(); i++) {
 			out = out.replaceAll(names.get(i), (i+1) + "");
 			repl += "#" + (i+1) + " - " + names.get(i) + "\n";

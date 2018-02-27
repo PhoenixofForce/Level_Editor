@@ -11,11 +11,12 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainToolBar extends JToolBar {
 
-	private JButton newMap, open, saveMap, saveAsMap, export, importRessource;
+	private JButton newMap, open, saveMap, saveAsMap, export, importRessource, editMapTags;
 	private File lastExport, lastImport, lastSave, lastOpen;
 
 	private List<File> inports;
@@ -55,12 +56,12 @@ public class MainToolBar extends JToolBar {
 
 					GameMap map = null;
 					int width = -1, height = -1, tileSize = -1;
-
+					HashMap<String, String> mapTags = new HashMap<>();
 					String line = r.readLine();
 					while(line != null) {
 
 						if(line.startsWith("i: ")) {
-							File text = new File(line.split(" ")[1]);
+							File text = new File(line.substring("i: ".length()));
 							File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length() - 4) + "png");
 
 							inports.add(text);
@@ -78,7 +79,20 @@ public class MainToolBar extends JToolBar {
 						else if(line.startsWith("h: ")) height = Integer.parseInt(line.split(" ")[1]);
 						else if(line.startsWith("w: ")) width = Integer.parseInt(line.split(" ")[1]);
 						else if(line.startsWith("t: ")) tileSize = Integer.parseInt(line.split(" ")[1]);
+						else if (line.startsWith("tags: ")) {
+							String[] tagString = line.substring("tags: ".length()).replaceAll(" ", "").replaceAll("\\[", "").replaceAll("]", "").split(";");
 
+							int i = 0;
+							while (i < tagString.length) {
+								if (tagString[i].equals("tag")) {
+									mapTags.put(tagString[i + 1], tagString[i + 2].replaceAll("δ", ";"));
+									i++;
+									i++;
+								}
+
+								i++;
+							}
+						}
 						else if(line.startsWith("t_")) {
 							float depth = Float.parseFloat(line.split(" ")[1]);
 							String[][] names = new String[height][width];
@@ -174,6 +188,10 @@ public class MainToolBar extends JToolBar {
 						}
 
 						line = r.readLine();
+					}
+
+					for (String tag: mapTags.keySet()) {
+						map.addTag(new Tag(tag, mapTags.get(tag)));
 					}
 
 					w.setMap(map);
@@ -284,6 +302,12 @@ public class MainToolBar extends JToolBar {
 			}
 		});
 		this.add(importRessource);
+
+		editMapTags = new JButton("Edit Map Tags");
+		editMapTags.addActionListener(e -> {
+			imageList.getModifier().setTagObject(w.getMap());
+		});
+		this.add(editMapTags);
 	}
 
 	private void saveAs(Window w) {
@@ -337,6 +361,13 @@ public class MainToolBar extends JToolBar {
 			wr.write("w: " + map.getWidth() + "\n");
 			wr.write("h: " + map.getHeight() + "\n");
 			wr.write("t: " + map.getTileSize() + "\n");
+
+			String tags = "";
+			for(int i = 0; i < map.getTags().size(); i++) {
+				Tag t = map.getTags().get(i);
+				tags += t.toMapFormat() + (i < map.getTags().size()-1? "; ": "");
+			}
+			wr.write("tags: " + tags + "\n");
 
 			for(String s: map.getLayers().keySet()) {
 				Layer l = map.getLayer(s);
