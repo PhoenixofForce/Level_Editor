@@ -21,6 +21,8 @@ public class Modifier extends JPanel{
 	private JScrollPane scrollPane;
 	private JComboBox<String> attChooser;
 
+	private DocumentListener dc;
+
 	public Modifier(Window w) {
 
 		this.setLayout(new BorderLayout());
@@ -31,7 +33,7 @@ public class Modifier extends JPanel{
 		input = new JTextArea();
 		input.setEditable(true);
 
-		input.getDocument().addDocumentListener(new DocumentListener() {
+		dc = new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				if (object != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
@@ -46,7 +48,7 @@ public class Modifier extends JPanel{
 			public void changedUpdate(DocumentEvent e) {
 				if (object != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
 			}
-		});
+		};
 
 		scrollPane = new JScrollPane(input);
 		scrollPane.setPreferredSize(new Dimension(0, 200));
@@ -80,6 +82,7 @@ public class Modifier extends JPanel{
 	public void add(String name) {
 		if(attChooser.getSelectedItem() == null) {
 			input.setEnabled(true);
+			input.getDocument().addDocumentListener(dc);
 		}
 		object.addTag(new Tag(name));
 
@@ -88,18 +91,23 @@ public class Modifier extends JPanel{
 
 		Tag t = object.getTag((String) attChooser.getSelectedItem());
 		if (t != null) {
+			input.getDocument().removeDocumentListener(dc);
 			input.setText(t.getAction());
+			input.getDocument().addDocumentListener(dc);
 		}
 	}
 
 	public void setTagObject(TagObject obj) {
 		add.setEnabled(obj != null);
 		remove.setEnabled(obj != null);
+
 		input.setEnabled(obj != null);
+		input.getDocument().removeDocumentListener(dc);
+
 		attChooser.setEnabled(obj != null);
 		attChooser.removeAllItems();
 		goStats.setText("");
-		input.setText(null);
+		input.setText("");
 		if(obj == null) return;
 
 		this.object = obj;
@@ -116,6 +124,7 @@ public class Modifier extends JPanel{
 			if (t != null) {
 				input.setText(t.getAction());
 			}
+			input.getDocument().addDocumentListener(dc);
 		} else input.setEnabled(false);
 
 		goStats.setText(obj.getText());
