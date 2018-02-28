@@ -36,17 +36,17 @@ public class Modifier extends JPanel{
 		dc = new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				if (object != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				if (object != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				if (object != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
 			}
 		};
 
@@ -72,8 +72,9 @@ public class Modifier extends JPanel{
 		remove = new JButton("-");
 		this.add(remove, BorderLayout.LINE_END);
 		remove.addActionListener(e -> {
-			attChooser.removeItem(attChooser.getSelectedItem());
 			object.removeTag((String) attChooser.getSelectedItem());
+			attChooser.removeItem(attChooser.getSelectedItem());
+			if(attChooser.getItemCount() == 0) input.setText("");
 		});
 
 		setTagObject(null);

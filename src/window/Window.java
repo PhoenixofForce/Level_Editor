@@ -20,7 +20,7 @@ public class Window extends JFrame {
 
 	public Window() {
 		//setting window attributes
-		this.setTitle("POF - Level Editor");
+		this.setTitle("Level Editor");
 		this.setLayout(new BorderLayout());
 		this.setMinimumSize(new Dimension(800, 600));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

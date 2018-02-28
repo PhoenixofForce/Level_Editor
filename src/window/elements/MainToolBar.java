@@ -135,11 +135,16 @@ public class MainToolBar extends JToolBar {
 								for(int j = 1; j < s.split("; \\[tag").length; j++) {
 
 									String data = s.substring(s.indexOf("; [tag", last));
+
+									System.out.print(data);
+
 									data = data.substring(3, data.length()-1);
 									last = s.indexOf("; [tag", last)+1;
 
+									System.out.println( " " + data);
+
 									if(data.length() == 0) continue;
-									go.addTag(new Tag(data.split(";")[1].trim(), data.substring(data.indexOf(";",data.indexOf(";")+1), data.indexOf("; [tag") == -1? data.length(): data.indexOf("; [tag")).trim().substring(2)));
+									go.addTag(new Tag(data.split(";")[1].trim(), data.substring(data.indexOf(";",data.indexOf(";")+1), data.indexOf("; [tag") == -1? data.length(): data.indexOf("; [tag")-1).trim().substring(2)));
 								}
 							}
 
@@ -261,7 +266,7 @@ public class MainToolBar extends JToolBar {
 				lastExport = f;
 				try {
 					PrintWriter wr = new PrintWriter(f);
-					wr.write(w.getMap().toMapFormat(true));
+					wr.write(w.getMap().toMapFormat(false));
 					wr.close();
 				} catch (FileNotFoundException e1) {
 					e1.printStackTrace();
