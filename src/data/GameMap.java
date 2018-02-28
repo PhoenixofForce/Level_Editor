@@ -119,7 +119,7 @@ public class GameMap extends TagObject {
 				if(cbx > bx) bx = cbx;
 				if(cby > by) by = cby;
 			}
-			for(FreeLayer l: frees) {
+			/*for(FreeLayer l: frees) {
 				float csx = l.smallestX(), csy = l.smallestY(), cbx = l.biggestX(), cby = l.biggestY();
 				if(csx < sx) sx = csx;
 				if(csy < sy) sy = csy;
@@ -132,7 +132,7 @@ public class GameMap extends TagObject {
 				if(csy < sy) sy = csy;
 				if(cbx > bx) bx = cbx;
 				if(cby > by) by = cby;
-			}
+			}*/
 		}
 
 		for(TileLayer l: tiles) out += l.toMapFormat(names,  sx,  sy,  bx,  by);

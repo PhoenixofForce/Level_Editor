@@ -266,7 +266,7 @@ public class MainToolBar extends JToolBar {
 				lastExport = f;
 				try {
 					PrintWriter wr = new PrintWriter(f);
-					wr.write(w.getMap().toMapFormat(false));
+					wr.write(w.getMap().toMapFormat(true));
 					wr.close();
 				} catch (FileNotFoundException e1) {
 					e1.printStackTrace();
