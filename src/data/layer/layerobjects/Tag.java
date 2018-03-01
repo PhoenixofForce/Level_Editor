@@ -11,7 +11,7 @@ public class Tag {
 
 	public Tag(String n, String a) {
 		this.name = n;
-		this.action = a;
+		this.action = a.replaceAll("δ", ";");
 	}
 
 	public void setAction(String a) {
@@ -19,7 +19,7 @@ public class Tag {
 	}
 
 	public String toMapFormat() {
-		return String.format("[tag; %s; %s]", name, action.replaceAll(";", "δ"));
+		return String.format("[tag; %s; %s]", name, action.replaceAll(";", "δ").replaceAll("\n", ""));
 	}
 
 	public String getAction() {

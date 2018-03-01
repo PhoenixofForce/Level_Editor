@@ -9,6 +9,7 @@ import window.elements.layer.LayerPane;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 
 public class Window extends JFrame {
 
@@ -91,4 +92,7 @@ public class Window extends JFrame {
 		return map;
 	}
 
+	public void open(File f) {
+		buttons.open(f);
+	}
 }

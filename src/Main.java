@@ -1,5 +1,7 @@
 import window.Window;
 
+import java.io.File;
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -15,7 +17,15 @@ public class Main {
 			-selection => much later (maybe)
 		 */
 
-		new Window();
+		Window window = new Window();
+
+		if (args.length > 0) {
+			try {
+				window.open(new File(args[0]));
+			} catch (Exception e) {
+				System.err.println("Could not open file " + args[0]);
+			}
+		}
 	}
 
 }
