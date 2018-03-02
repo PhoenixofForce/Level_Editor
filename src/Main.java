@@ -7,16 +7,17 @@ public class Main {
 	public static void main(String[] args) {
 		/*	TODO:
 			More Important:
-			-settings (?)
 			-STRG+Z
 			-Improved Save-Directory
 			-presets
 			-change layer settings
+			-open last/ view last edited files
 
 			Less Important
 			-view used ressources (?)
 			-copy paste
 			-selection => much later (maybe)
+			-settings (?)
 		 */
 
 		Window window = new Window();
