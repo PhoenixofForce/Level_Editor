@@ -10,6 +10,8 @@ public class Main {
 			-settings (?)
 			-STRG+Z
 			-Improved Save-Directory
+			-presets
+			-change layer settings
 
 			Less Important
 			-view used ressources (?)
