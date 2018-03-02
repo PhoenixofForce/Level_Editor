@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GameMap extends TagObject {
-	private int width, height, tileSize;
-	private Map<String, Layer> layers;
+	private int width, height, tileSize;		//width, height and tileSize of the map
+	private Map<String, Layer> layers;		//Layers saved to their name
 
 	public GameMap(int width, int height, int tileSize) {
 		layers = new HashMap<>();
@@ -20,6 +20,7 @@ public class GameMap extends TagObject {
 		this.height = height;
 		this.tileSize = tileSize;
 
+		//Adding default layers
 		addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
 		addLayer("Tile", new TileLayer(0.5f, width, height, tileSize));
 		addLayer("Object", new FreeLayer(0.0f, width, height, tileSize));
