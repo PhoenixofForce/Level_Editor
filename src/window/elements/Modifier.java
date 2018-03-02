@@ -13,15 +13,15 @@ import java.awt.*;
 
 public class Modifier extends JPanel{
 
-	private TagObject object;			//object which tags are beeing edited
-	private JLabel goStats;				//label which shows texture name and coordinate of object
-	private JButton add, remove;			//buttons to add and remove tags
+	private TagObject object;			//Object which tags are beeing edited
+	private JLabel goStats;				//Label which shows texture name and coordinate of object
+	private JButton add, remove;			//Buttons to add and remove tags
 
-	private JTextArea input;			//textArea to input tag values
-	private JScrollPane scrollPane;
-	private JComboBox<String> attChooser;
+	private JTextArea input;			//TextArea to input tag values
+	private JScrollPane scrollPane;			//ScrollPane to optimize textArea
+	private JComboBox<String> attChooser;		//ComboBox to select from existing Tags
 
-	private DocumentListener dc;
+	private DocumentListener dc;			//Listener that saves all changes
 
 	public Modifier(Window w) {
 
@@ -80,16 +80,25 @@ public class Modifier extends JPanel{
 		setTagObject(null);
 	}
 
+	/**
+	 * Adds a new Tag to the currently selected object
+	 *
+	 * @param name Name of the new Tag
+	*/
 	public void add(String name) {
+		//Resets textArea it was disabled
 		if(attChooser.getSelectedItem() == null) {
 			input.setEnabled(true);
 			input.getDocument().addDocumentListener(dc);
 		}
+		//Adds Tag to object
 		object.addTag(new Tag(name));
 
+		//Adds TagName to ComboBox and selects it
 		attChooser.addItem(name);
 		attChooser.setSelectedItem(name);
 
+		//Sets text from textArea to action of the tag
 		Tag t = object.getTag((String) attChooser.getSelectedItem());
 		if (t != null) {
 			input.getDocument().removeDocumentListener(dc);
@@ -98,7 +107,13 @@ public class Modifier extends JPanel{
 		}
 	}
 
+	/**
+	 * Sets selected Object
+	 *
+	 * @param obj the new selected TagObject
+	 */
 	public void setTagObject(TagObject obj) {
+		//Reset JObjects => Enabling if object is initialized, setting texts empty
 		add.setEnabled(obj != null);
 		remove.setEnabled(obj != null);
 
@@ -109,17 +124,22 @@ public class Modifier extends JPanel{
 		attChooser.removeAllItems();
 		goStats.setText("");
 		input.setText("");
+		//Return after reset if object is null
 		if(obj == null) return;
 
+		//Set selected object to the new one
 		this.object = obj;
 
+		//Count existing tags and add existing tags to comboBox
 		int c = 0;
 		for(Tag t: obj.getTags()) {
 			attChooser.addItem(t.getName());
 			c++;
 		}
 
+		//Set selected Tag in comboBox to the first, if there are entries
 		if(c > 0) attChooser.setSelectedIndex(0);
+		//If an entry is selected set the input text to the action of the tag
 		if(attChooser.getSelectedItem() != null) {
 			Tag t = object.getTag((String) attChooser.getSelectedItem());
 			if (t != null) {
@@ -128,6 +148,7 @@ public class Modifier extends JPanel{
 			input.getDocument().addDocumentListener(dc);
 		} else input.setEnabled(false);
 
+		//Set label text to tagObject information
 		goStats.setText(obj.getText());
 	}
 }
