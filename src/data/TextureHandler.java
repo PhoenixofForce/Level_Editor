@@ -47,7 +47,7 @@ public class TextureHandler {
 		if(textures_png.containsKey(spriteSheetName)) return;
 		try {
 			loadImagePng(spriteSheetName, fileName.substring(0, fileName.length()-4)+"png");
-			Scanner s = new Scanner(new File(fileName));
+			Scanner s = new Scanner(new File(fileName), "UTF8");
 
 			int amount = Integer.valueOf(s.nextLine());
 
