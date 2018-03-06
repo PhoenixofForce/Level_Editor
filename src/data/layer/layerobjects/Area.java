@@ -2,10 +2,13 @@ package data.layer.layerobjects;
 
 import java.awt.Color;
 
+/**
+ * Saves area that user has drawn
+ */
 public class Area extends TagObject {
-	private float x1, y1;
-	private float x2, y2;
-	private Color color;
+	private float x1, y1;		//position of the first corner
+	private float x2, y2;		//position of the second corner
+	private Color color;		//color with that the area gets rendered
 
 	public Area(float x1, float y1, float x2, float y2, Color color) {
 		this.x1 = x1;
@@ -16,26 +19,54 @@ public class Area extends TagObject {
 		this.color = color;
 	}
 
+	/**
+	 *
+	 * @return the smaller x value
+	 */
 	public float getSmallerX() {
 		return Math.min(x1, x2);
 	}
 
+	/**
+	 *
+	 * @return the bigger x value
+	 */
 	public float getBiggerX() {
 		return Math.max(x1, x2);
 	}
 
+	/**
+	 *
+	 * @return the smaller y value
+	 */
 	public float getSmallerY() {
 		return Math.min(y1, y2);
 	}
 
+	/**
+	 *
+	 * @return the bigger y value
+	 */
 	public float getBiggerY() {
 		return Math.max(y1, y2);
 	}
 
+	/**
+	 * checks if given coordinates are the coordinates of the first corner
+	 * @param x x value of the point to check
+	 * @param y y value of the point to check
+	 * @return true if the given coordinates match with the first corner
+	 */
 	public boolean equalsFirstPoint(float x, float y) {
 		return x == x1 && y == y1;
 	}
 
+	/**
+	 * checks if given coordinates are the coordinates of the second corner
+	 * @param x x value of the point to check
+	 * @param y y value of the point to check
+	 * @return true if the given coordinates match with the second corner
+	 */
 	public boolean equalsSecondPoint(float x, float y) {
 		return x == x2 && y == y2;
 	}
@@ -80,6 +111,10 @@ public class Area extends TagObject {
 		this.color = color;
 	}
 
+	/**
+	 * converts class to saveable text-format
+	 * @return
+	 */
 	@Override
 	public String getText() {
 		return String.format("(%f/%f) (%f/%f) (%d/%d/%d)", x1, y1, x2, y2, color.getRed(), color.getGreen(), color.getBlue());

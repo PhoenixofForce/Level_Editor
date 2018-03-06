@@ -9,12 +9,15 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A Layer in which the user can place textures freely
+ */
 public class FreeLayer implements Layer {
 
-	private float depth;
-	private final List<GO> images;
+	private float depth;						//drawing depth of this layer
+	private final List<GO> images;				//list of all placed textures
 
-	private int width, height, tileSize;
+	private int width, height, tileSize;		//width, height and tilesize of the map
 
 	public FreeLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
@@ -25,6 +28,9 @@ public class FreeLayer implements Layer {
 		this.tileSize = tileSize;
 	}
 
+	/**
+	 * @return a list of placed textures
+	 */
 	public List<GO> getImages() {
 		return images;
 	}
@@ -82,6 +88,11 @@ public class FreeLayer implements Layer {
 		return go;
 	}
 
+	/**
+	 * @param x given x coordinate
+	 * @param y given y coordinate
+	 * @return a texture that is at the point where the user clicked
+	 */
 	private GO find(float x, float y) {
 		for (int i = images.size() - 1; i >= 0; i--) {
 			GO go = images.get(i);

@@ -1,9 +1,12 @@
 package data.layer.layerobjects;
 
+/**
+ * A GameObject that has a position with width and height, it can have tags and must have a texture
+ */
 public class GO extends TagObject {
 
-	public float x, y, width, height;
-	public String name;
+	public float x, y, width, height;			//x, y coordinates, width and height of the object
+	public String name;							//name of the corresponding textur
 
 	public GO(String name, float x, float y, float width, float height) {
 		this.x = x;
@@ -13,11 +16,20 @@ public class GO extends TagObject {
 		this.name = name;
 	}
 
+	/**
+	 * moves this object in the given direction
+	 * @param dx x offset
+	 * @param dy y offset
+	 */
 	public void move(float dx, float dy) {
 		x += dx;
 		y += dy;
 	}
 
+	/**
+	 * converts class to saveable text-format
+	 * @return
+	 */
 	@Override
 	public String getText() {
 		return name + " (" + x + " | " + y + ")";

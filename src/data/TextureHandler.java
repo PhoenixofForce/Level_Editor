@@ -88,11 +88,6 @@ public class TextureHandler {
 		return c;
 	}
 
-
-	public static Rectangle getSpriteSheetBounds(String textureName) {
-		return textures_sprite_sheet.get(textureName);
-	}
-
 	public static String getSpriteSheetImage(String textureName){
 		return textures_sprite_sheet_texture.get(textureName);
 	}
@@ -105,10 +100,6 @@ public class TextureHandler {
 			return textures_png.get(textures_sprite_sheet_texture.get(textureName)).getSubimage(rec.x, rec.y, rec.width, rec.height);
 		}
 		throw new RuntimeException("No such image: " + textureName);
-	}
-
-	public static List<String> getImagesOnSpriteSheet(String spriteSheetName) {
-		return textures_sprite_sheet_texture.keySet().stream().filter(s -> getSpriteSheetImage(s).equals(spriteSheetName)).collect(Collectors.toList());
 	}
 
 	/** Gets all images in form of ImageIcons, scales all image up to min 32x32

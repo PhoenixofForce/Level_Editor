@@ -11,18 +11,18 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
-	private static final boolean TILE_HIGHLIGHT = true;
+	private static final boolean TILE_HIGHLIGHT = true;		//true if tiles should be highlighted
 
-	private ImageList imageList;
-	private LayerPane layerPane;
+	private ImageList imageList;							//the ImageList => get selected Image
+	private LayerPane layerPane;							//the LayerPane => get selected Layer
 
-	private Camera camera;
+	private Camera camera;									//Camera to set viewpoint
 
-	private int last_x, last_y, midX, midY;
+	private int last_x, last_y, midX, midY;					//x,y coordinates of the last click, ... of the last middle mouse click
 
-	private boolean mouseEntered, drawMode;
+	private boolean mouseEntered, drawMode;					//booleans if the mouse is in the window and the user has drawing mode (true) or erase mode (false)
 
-	private GameMap map;
+	private GameMap map;									//the game map
 
 	public MapViewer(ImageList imageList, LayerPane layerPane, GameMap map) {
 		this.layerPane = layerPane;
@@ -35,6 +35,7 @@ public class MapViewer extends JPanel {
 		camera = new Camera();
 		centerCamera();
 
+		//change zoom when using mousewheel
 		this.addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -78,6 +79,7 @@ public class MapViewer extends JPanel {
 				else if (SwingUtilities.isLeftMouseButton(e) && drawMode) set(e.getX(), e.getY(), false);
 				else if (SwingUtilities.isLeftMouseButton(e) && !drawMode) remove(e.getX(), e.getY());
 				else if (SwingUtilities.isMiddleMouseButton(e)) {
+					//Save clicked position
 					midX = e.getX();
 					midY = e.getY();
 				} else if (e.getButton() == 4) {
@@ -87,6 +89,7 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				//when the difference on middle mouse click and middle mouse release is smaller than than => swap between erasing and drawgin
 				if (SwingUtilities.isMiddleMouseButton(e) && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) drawMode = !drawMode;
 			}
 		});
@@ -97,11 +100,20 @@ public class MapViewer extends JPanel {
 		centerCamera();
 	}
 
+	/**
+	 * centers the camera position
+	 */
 	private void centerCamera() {
 		camera.setPosition(-map.getWidth() * map.getTileSize() / 2, -map.getHeight() * map.getTileSize() / 2);
 		camera.setZoom(0.5f);
 	}
 
+	/**
+	 * calling set() on the selected layer with the selected texture
+	 * @param x
+	 * @param y
+	 * @param drag
+	 */
 	private void set(int x, int y, boolean drag) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
@@ -114,6 +126,11 @@ public class MapViewer extends JPanel {
 		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
 	}
 
+	/**
+	 * calling remove() on the selected layer
+	 * @param x
+	 * @param y
+	 */
 	private void remove(int x, int y) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		if (selectedLayer == null  || layerPane.isHidden(selectedLayer)) {
@@ -125,6 +142,11 @@ public class MapViewer extends JPanel {
 		selectedLayer.remove(pos.x, pos.y);
 	}
 
+	/**
+	 * calling select() on the selected layer with the selected texture
+	 * @param x
+	 * @param y
+	 */
 	private void select(int x, int y) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
@@ -139,6 +161,13 @@ public class MapViewer extends JPanel {
 		imageList.getModifier().setTagObject(obj);
 	}
 
+	/**
+	 * calling drag() on the selected layer with the selected texture
+	 * @param x
+	 * @param y
+	 * @param targetX
+	 * @param targetY
+	 */
 	private void drag(int x, int y, int targetX, int targetY) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
@@ -152,6 +181,12 @@ public class MapViewer extends JPanel {
 		selectedLayer.drag(pos1.x, pos1.y, pos2.x, pos2.y);
 	}
 
+	/**
+	 * converts clickPosition to position on the map
+	 * @param xPos x coordinate the user clicked
+	 * @param yPos y coordinate the user clicked
+	 * @return the position on the whole map
+	 */
 	private Location getBlockLocation(int xPos, int yPos) {
 		float x = xPos, y = yPos;
 		x -= this.getWidth() / 2.0;
@@ -168,26 +203,36 @@ public class MapViewer extends JPanel {
 		return new Location(x, y);
 	}
 
+	/**
+	 * draws the map
+	 * @param g graphics object which should draw this
+	 */
 	@Override
 	protected void paintComponent(Graphics g) {
 		camera.update();
 
+		//Creates new BufferedImage for double buffering => no flickers
 		BufferedImage img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2 = (Graphics2D) img.getGraphics();
 
+		//fills this panel with background color
 		g2.setColor(new Color(240, 248, 255));
 		g2.fillRect(0, 0, img.getWidth(), img.getHeight());
 
+		//Applies camera settings to graphics object
 		g2.translate(this.getWidth() / 2.0, this.getHeight() / 2.0);
 		g2.scale(camera.zoom, camera.zoom);
 		g2.translate(camera.x, camera.y);
 
+		//draws map canvas
 		g2.setColor(Color.LIGHT_GRAY);
 		g2.fillRect(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
 
+		//prepares graphics object to draw tile separators
 		g2.setColor(Color.LIGHT_GRAY.darker());
 		g2.setStroke(new BasicStroke(1 / camera.zoom));
 
+		//draw tile separators
 		for (int x = 0; x < map.getWidth(); x++) {
 			for (int y = 0; y < map.getHeight(); y++) {
 				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), map.getWidth() * map.getTileSize(), y * map.getTileSize());
@@ -195,11 +240,13 @@ public class MapViewer extends JPanel {
 			}
 		}
 
+		//draws layer by their drawing depth
 		map.getLayers().values().stream()
 				.filter(l -> !layerPane.isHidden(l))
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
 				.forEach(l -> l.draw(g2));
 
+		//Draws a highlighter (in size of tile => tilelayer, of selected texture => freelayer, of area corner => arealayer) in green(drawing) or red(erasing)
 		if (mouseEntered && TILE_HIGHLIGHT) {
 			Location l = getBlockLocation(last_x, last_y);
 			g2.setColor(drawMode? Color.GREEN: Color.RED);

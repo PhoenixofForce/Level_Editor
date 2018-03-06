@@ -11,13 +11,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+/**
+ * combining all elements and displaying them in a window
+ */
 public class Window extends JFrame {
 
 	private LayerPane layerPane;			//bar on the right side to controll layers
 	private MainToolBar buttons;			//toolbar to save/ open/ export map and import ressources
 	private MapViewer mapViewer;			//displays the current map
-	private ImageList images;			//image selector and filter
-	private GameMap map;				//the map that is currently edited
+	private ImageList images;				//image selector and filter
+	private GameMap map;					//the map that is currently edited
 
 	public Window() {
 		//setting window attributes

@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * used so the user can open/save/.... maps
+ */
 public class MainToolBar extends JToolBar {
 
 	private JButton newMap, open, saveMap, saveAsMap, export, importRessource, editMapTags;

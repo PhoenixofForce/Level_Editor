@@ -10,9 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * the map contains all layers
+ */
 public class GameMap extends TagObject {
 	private int width, height, tileSize;		//width, height and tileSize of the map
-	private Map<String, Layer> layers;		//Layers saved to their name
+	private Map<String, Layer> layers;			//Layers saved to their name
 
 	public GameMap(int width, int height, int tileSize) {
 		layers = new HashMap<>();
@@ -27,6 +30,13 @@ public class GameMap extends TagObject {
 		addLayer("Camera", new AreaLayer(-1.0f, width, height, tileSize));
 	}
 
+	/**
+	 *
+	 * @param width width of the map
+	 * @param height height of the map
+	 * @param tileSize tilesize of the map
+	 * @param b true if the default layers should be added
+	 */
 	public GameMap(int width, int height, int tileSize, boolean b) {
 		layers = new HashMap<>();
 		this.width = width;
@@ -41,18 +51,34 @@ public class GameMap extends TagObject {
 		}
 	}
 
+	/**
+	 * @param name of the layer to get
+	 * @return the layer whith that name
+	 */
 	public Layer getLayer(String name) {
 		return layers.get(name);
 	}
 
+	/**
+	 * adds a layer to the map
+	 * @param name name of the layer to add
+	 * @param layer the layer to add
+	 */
 	public void addLayer(String name, Layer layer) {
 		layers.put(name, layer);
 	}
 
+	/**
+	 * removes a layer
+	 * @param name name of the layer to remove
+	 */
 	public void removeLayer(String name) {
 		layers.remove(name);
 	}
 
+	/**
+	 * @return the map containing all layers
+	 */
 	public Map<String, Layer> getLayers() {
 		return layers;
 	}
@@ -69,6 +95,11 @@ public class GameMap extends TagObject {
 		return tileSize;
 	}
 
+	/**
+	 * combines the map formats of all layers
+	 * @param expo if its used for an export
+	 * @return the map format of all layer
+	 */
 	public String toMapFormat(boolean expo) {
 		String out = "";
 
@@ -78,7 +109,7 @@ public class GameMap extends TagObject {
 
 		List<String> names = new ArrayList<>();
 
-
+		//Collecting all used textures
 		for(String s: layers.keySet()) {
 			Layer l = layers.get(s);
 			if(l instanceof TileLayer) {
@@ -106,6 +137,7 @@ public class GameMap extends TagObject {
 			}
 		}
 
+		//finding biggest and smalles coordinates
 		float sx = -1, sy = -1, bx = -1, by = -1;
 		if(expo) {
 			sx = Integer.MAX_VALUE;
@@ -120,6 +152,8 @@ public class GameMap extends TagObject {
 				if(cbx > bx) bx = cbx;
 				if(cby > by) by = cby;
 			}
+
+			//didnt work, could work when rounding up/down later
 			/*for(FreeLayer l: frees) {
 				float csx = l.smallestX(), csy = l.smallestY(), cbx = l.biggestX(), cby = l.biggestY();
 				if(csx < sx) sx = csx;
@@ -136,16 +170,19 @@ public class GameMap extends TagObject {
 			}*/
 		}
 
+		//Adding the map formats from every layer to the output string
 		for(TileLayer l: tiles) out += l.toMapFormat(names,  sx,  sy,  bx,  by);
 		for(FreeLayer l: frees) out += l.toMapFormat(names,  sx,  sy,  bx,  by);
 		for(AreaLayer a: areas) out += a.toMapFormat(names,  sx,  sy,  bx,  by);
 
+		//Adding the map tags
 		String tags = "";
 		for(int i = 0; i < this.getTags().size(); i++) {
 			Tag t = this.getTags().get(i);
 			tags += t.toMapFormat() + (i < this.getTags().size()-1? "; ": "");
 		}
 
+		//replacing the texture names with numbers
 		String repl = tileSize + (tags.length() > 0 ? ";" : "" ) + tags + "\n";
 		for(int i = 0; i < names.size(); i++) {
 			out = out.replaceAll(names.get(i), (i+1) + "");

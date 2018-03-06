@@ -1,5 +1,8 @@
 package data;
 
+/**
+ * a position
+ */
 public class Location {
 
 	public float x, y;

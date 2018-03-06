@@ -11,6 +11,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * used to allow the user to make better inputs
+ */
 public class UserInputs {
 
 	/** Creates window so the user can set the settings of the new layer

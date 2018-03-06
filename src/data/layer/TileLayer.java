@@ -7,12 +7,15 @@ import java.awt.Graphics;
 
 import java.util.List;
 
+/**
+ * a layer where the user can place textures on a grid
+ */
 public class TileLayer implements Layer {
 
-	private float depth;
-	private String[][] tileNames;
+	private float depth;					//the drawing depth
+	private String[][] tileNames;			//the texture grid
 
-	private int width, height, tileSize;
+	private int width, height, tileSize;	//width, height and tilesize of the map
 
 	public TileLayer(float depth, String[][] tiles, int tileSize) {
 		this.depth = depth;
@@ -61,6 +64,9 @@ public class TileLayer implements Layer {
 		return null;
 	}
 
+	/**
+	 * @return the tile grid
+	 */
 	public String[][] getTileNames() {
 		return tileNames;
 	}

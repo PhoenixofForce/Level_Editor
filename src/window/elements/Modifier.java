@@ -11,6 +11,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
+/**
+ * used to add tags to objects and change them
+ */
 public class Modifier extends JPanel{
 
 	private TagObject object;			//Object which tags are beeing edited

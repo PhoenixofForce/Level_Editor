@@ -8,13 +8,16 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A Layer in which the user can mark areas
+ */
 public class AreaLayer implements Layer {
-	private float depth;
+	private float depth;					//drawing depth of this layer
 
-	private List<Area> areas;
-	private int width, height, tileSize;
+	private List<Area> areas;				//list of all areas
+	private int width, height, tileSize;	//width, height and tilesize of the map
 
-	private Area selected;
+	private Area selected;					//currently selected area
 
 	public AreaLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
@@ -30,6 +33,13 @@ public class AreaLayer implements Layer {
 		return depth;
 	}
 
+	/**
+	 * gets an area at the point the user clicked
+	 * @param x the x coordinate the user clicked
+	 * @param y the y coordinate the user clicked
+	 * @param extended false if only corner-clicks count, true if "body"-clicks also count
+	 * @return the area the user clicked
+	 */
 	private Area find(float x, float y, boolean extended) {
 		for (int i = areas.size()-1; i >= 0; i--) {
 			Area area = areas.get(i);
@@ -58,6 +68,7 @@ public class AreaLayer implements Layer {
 	public Area select(float x, float y) {
 		Area area = find(x, y, true);
 
+		//brings area to the top
 		if (area != null) {
 			areas.remove(area);
 			areas.add(area);
@@ -73,13 +84,18 @@ public class AreaLayer implements Layer {
 		Area area = selected;
 
 		if (area != null) {
+			//Move second point
 			if (area.equalsSecondPoint(x, y)) {
 				area.setX2(targetX);
 				area.setY2(targetY);
-			} else if(area.equalsFirstPoint(x, y)){
+			}
+			//Move first point
+			else if(area.equalsFirstPoint(x, y)){
 				area.setX1(targetX);
 				area.setY1(targetY);
-			} else {
+			}
+			//Moves whole area
+			else {
 				if (area.getX1() + (targetX-x) < 0 || area.getY1() + (targetY-y) < 0 || area.getX1() + (targetX-x) >= width || area.getY1() + (targetY-y) >= height) return;
 				if (area.getX2() + (targetX-x) < 0 || area.getY2() + (targetY-y) < 0 || area.getX2() + (targetX-x) >= width || area.getY2() + (targetY-y) >= height) return;
 

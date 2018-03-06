@@ -9,13 +9,17 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * jcomponent to select layer
+ * contains also layerControl
+ */
 public class LayerPane extends JPanel {
-	private JList<String> jList;
-	private DefaultListModel<String> listModel;
-	private LayerControl layerControl;
+	private JList<String> jList;					//List of the layer names
+	private DefaultListModel<String> listModel;		//listModel used for setting/getting selected layers
+	private LayerControl layerControl;				//layer controll
 
-	private GameMap map;
-	private Map<Layer, Boolean> hidden;
+	private GameMap map;							//the game map
+	private Map<Layer, Boolean> hidden;				//map stores the data about the hidden state of each layer
 
 	public LayerPane(Window window, GameMap newMap) {
 		this.map = newMap;
@@ -29,6 +33,7 @@ public class LayerPane extends JPanel {
 		jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jList.setLayoutOrientation(JList.VERTICAL);
 
+		//change layer names depending on the layer beeing hidden
 		jList.setCellRenderer(new DefaultListCellRenderer() {
 
 			@Override
@@ -55,12 +60,22 @@ public class LayerPane extends JPanel {
 		updateGameMap(newMap);
 	}
 
+	/**
+	 * @return the selected layer
+	 */
 	public Layer getSelectedLayer() {
 		if (jList.getSelectedIndex() < 0) return null;
 		return map.getLayer(listModel.get(jList.getSelectedIndex()));
 	}
 
+	/**
+	 * adds a layer to the map
+	 * @param name name of the layer
+	 * @param type type of the layer 0-TileLayer, 1 - AreaLayer, 2-FreeLayer
+	 * @param depth drawing depth
+	 */
 	public void addLayer(String name, int type, float depth) {
+		//renames layer if name already exist
 		int i = 1;
 		while (map.getLayers().keySet().contains(name)) {
 			String newName = String.format("%s(%d)", name, i);
@@ -86,6 +101,7 @@ public class LayerPane extends JPanel {
 				return;
 		}
 
+		//Adds layer to map and to listModel at the position fitting to its depth
 		map.addLayer(name, layer);
 		int index = 0;
 		while (index < listModel.size() && map.getLayer(listModel.get(index)).depth() > layer.depth()) index++;
@@ -93,6 +109,9 @@ public class LayerPane extends JPanel {
 		jList.setSelectedIndex(index);
 	}
 
+	/**
+	 * removes a layer
+	 */
 	public void removeLayer() {
 		if (jList.getSelectedIndex() < 0) return;
 		int sel = jList.getSelectedIndex();
@@ -103,9 +122,14 @@ public class LayerPane extends JPanel {
 		else jList.setSelectedIndex(sel - 1);
 	}
 
+	/**
+	 * sets new map
+	 * @param map map to be updated
+	 */
 	public void updateGameMap(GameMap map) {
 		this.map = map;
 
+		//resets the listModel and list
 		listModel = new DefaultListModel<>();
 		for (String name : map.getLayers().keySet()) {
 			Layer layer = map.getLayer(name);
@@ -119,6 +143,11 @@ public class LayerPane extends JPanel {
 		jList.setSelectedIndex(0);
 	}
 
+	/**
+	 * resizes this component depending on window width and height
+	 * @param width
+	 * @param height
+	 */
 	public void reSize(int width, int height) {
 		height -= layerControl.getHeight();
 		Dimension d = new Dimension(width / 6, height);
@@ -126,11 +155,18 @@ public class LayerPane extends JPanel {
 		jList.setSize(d);
 	}
 
+	/**
+	 * @param layer which should be checked
+	 * @return true if a layer is hidden
+	 */
 	public boolean isHidden(Layer layer) {
 		if (hidden.containsKey(layer)) return hidden.get(layer);
 		return false;
 	}
 
+	/**
+	 * reverses the hidden value of the selected layer
+	 */
 	public void toggleHidden() {
 		if (map == null || jList.getSelectedIndex() < 0) return;
 
