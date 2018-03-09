@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.*;
 
 /**
@@ -19,7 +20,7 @@ public class ImageList extends JPanel{
 	private JPanel helpPanel;						//helping panel to put the textField in the correct position
 	private JTextField textField;					//textField that allows the user to search for textures
 	private JScrollPane imagePane;					//scrollPane to make the place for the textures bigger
-	private JList<ImageIcon> images;				//JList of all imported images
+	private JList images;				//JList of all imported images
 	private DefaultListModel<ImageIcon> listModel;	//the listModel of the List
 
 	private Map<String, ImageIcon> icons;			//map of texturenames and corresponding imageIcons
@@ -51,7 +52,18 @@ public class ImageList extends JPanel{
 		});
 
 		listModel = new DefaultListModel<>();
-		images = new JList<>(listModel);
+		images = new JList<ImageIcon>(listModel)/* {
+			public String getToolTipText(MouseEvent evt) {
+				int index = locationToIndex(evt.getPoint());
+				//if(index < 0) return "";
+				ImageIcon item = getModel().getElementAt(index);
+				for(String s: icons.keySet()) {
+					if(icons.get(s).equals(item)) return s;
+				}
+				return "ERROR";
+			}
+		}*/;
+
 
 		images.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		images.setLayoutOrientation(JList.HORIZONTAL_WRAP);

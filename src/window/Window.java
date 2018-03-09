@@ -31,7 +31,7 @@ public class Window extends JFrame {
 		this.setVisible(true);
 
 		//creating new standart map
-		setMap(new GameMap(100,100,8));
+		setMap(new GameMap(100,100,16));
 
 		//creating objects and adding them to the window
 		images = new ImageList(this);

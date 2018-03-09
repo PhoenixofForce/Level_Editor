@@ -1,11 +1,14 @@
 package data.layer;
 
+import data.Location;
 import data.layer.layerobjects.GO;
 import data.TextureHandler;
 
 import java.awt.Graphics;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * a layer where the user can place textures on a grid
@@ -57,6 +60,36 @@ public class TileLayer implements Layer {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void fill(String name, float x2, float y2) {
+		int x = (int) x2;
+		int y = (int) y2;
+		if (x >= 0 && y >= 0 && x < width && y < height) {
+			if(check(name, x, y)) return;
+			String oldName = tileNames[y][x];
+
+			Stack<Location> stack = new Stack<>();
+			stack.push(new Location(x, y));
+
+			while (!stack.isEmpty()) {
+				Location i = stack.pop();
+
+				if (check(oldName, i.x, i.y)) {
+					set(name, i.x, i.y, false);
+
+					if (i.x > 0) stack.push(new Location(i.x - 1, i.y));
+					if (i.y > 0) stack.push(new Location(i.x, i.y - 1));
+					if (i.x < width - 1) stack.push(new Location(i.x + 1, i.y));
+					if (i.y < height - 1) stack.push(new Location(i.x, i.y + 1));
+				}
+			}
+		}
+	}
+
+	private boolean check(String oldName, float y, float x) {
+		return (oldName == null && tileNames[(int)x][(int)y] == null) || ((tileNames[(int)x][(int)y] != null && oldName != null) && tileNames[(int)x][(int)y].equals(oldName));
 	}
 
 	@Override

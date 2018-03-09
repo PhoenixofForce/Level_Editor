@@ -48,6 +48,8 @@ public interface Layer {
 	 */
 	boolean remove(float x, float y);
 
+	void fill(String name, float x, float y);
+
 	/**
 	 * draws the layer
 	 * @param g the graphics object which should draw the layer

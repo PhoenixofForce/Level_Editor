@@ -120,6 +120,9 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
+	public void fill(String name, float x, float y) { }
+
+	@Override
 	public void draw(Graphics g) {
 		for (Area a: areas) {
 			g.setColor(a.getColor());

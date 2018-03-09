@@ -3,6 +3,7 @@ package window.elements;
 import data.*;
 import data.layer.*;
 import data.layer.layerobjects.TagObject;
+import window.Tools;
 import window.elements.layer.LayerPane;
 
 import javax.swing.*;
@@ -20,7 +21,8 @@ public class MapViewer extends JPanel {
 
 	private int last_x, last_y, midX, midY;					//x,y coordinates of the last click, ... of the last middle mouse click
 
-	private boolean mouseEntered, drawMode;					//booleans if the mouse is in the window and the user has drawing mode (true) or erase mode (false)
+	private boolean mouseEntered;							//booleans if the mouse is in the window and the user has drawing mode (true) or erase mode (false)
+	private Tools tool;
 
 	private GameMap map;									//the game map
 
@@ -29,7 +31,7 @@ public class MapViewer extends JPanel {
 		this.imageList = imageList;
 		this.map = map;
 
-		drawMode = true;
+		tool = Tools.BRUSH;
 		mouseEntered = false;
 
 		camera = new Camera();
@@ -54,8 +56,9 @@ public class MapViewer extends JPanel {
 			public void mouseDragged(MouseEvent e) {
 				if (SwingUtilities.isMiddleMouseButton(e)) camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
 				else if (SwingUtilities.isRightMouseButton(e)) drag(last_x, last_y, e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && drawMode) set(e.getX(), e.getY(), true);
-				else if (SwingUtilities.isLeftMouseButton(e) && !drawMode) remove(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BRUSH) set(e.getX(), e.getY(), true);
+				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.ERASER) remove(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY());
 
 				last_x = e.getX();
 				last_y = e.getY();
@@ -76,8 +79,9 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (SwingUtilities.isRightMouseButton(e)) select(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && drawMode) set(e.getX(), e.getY(), false);
-				else if (SwingUtilities.isLeftMouseButton(e) && !drawMode) remove(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BRUSH) set(e.getX(), e.getY(), false);
+				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.ERASER) remove(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY());
 				else if (SwingUtilities.isMiddleMouseButton(e)) {
 					//Save clicked position
 					midX = e.getX();
@@ -90,7 +94,7 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				//when the difference on middle mouse click and middle mouse release is smaller than than => swap between erasing and drawgin
-				if (SwingUtilities.isMiddleMouseButton(e) && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) drawMode = !drawMode;
+				if (SwingUtilities.isMiddleMouseButton(e) && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) tool = tool.next();
 			}
 		});
 	}
@@ -140,6 +144,18 @@ public class MapViewer extends JPanel {
 
 		Location pos = getBlockLocation(x, y);
 		selectedLayer.remove(pos.x, pos.y);
+	}
+
+	private void fill(int x, int y) {
+		Layer selectedLayer = layerPane.getSelectedLayer();
+		String selectedTexture = imageList.getSelectedImageName();
+		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
+			sendErrorMessage();
+			return;
+		}
+
+		Location pos = getBlockLocation(x, y);
+		selectedLayer.fill(selectedTexture, pos.x, pos.y);
 	}
 
 	/**
@@ -249,7 +265,7 @@ public class MapViewer extends JPanel {
 		//Draws a highlighter (in size of tile => tilelayer, of selected texture => freelayer, of area corner => arealayer) in green(drawing) or red(erasing)
 		if (mouseEntered && TILE_HIGHLIGHT) {
 			Location l = getBlockLocation(last_x, last_y);
-			g2.setColor(drawMode? Color.GREEN: Color.RED);
+			g2.setColor(tool.getColor());
 			boolean isAreaLayer = layerPane.getSelectedLayer() instanceof AreaLayer;
 			if (imageList.getSelectedImageName() != null || isAreaLayer) {
 				BufferedImage tex = imageList.getSelectedImageName() == null? null: TextureHandler.getImagePng(imageList.getSelectedImageName());

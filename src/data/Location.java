@@ -20,4 +20,18 @@ public class Location {
 		return Math.round(out);
 	}
 
+	@Override
+	public boolean equals(Object b) {
+		if(b instanceof Location) {
+			Location l = (Location) b;
+			return l.x == x && l.y == y;
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "(" + x + " | " + y + ")";
+	}
+
 }
