@@ -55,10 +55,11 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				if (SwingUtilities.isMiddleMouseButton(e)) camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
-				else if (SwingUtilities.isRightMouseButton(e)) drag(last_x, last_y, e.getX(), e.getY());
+				else if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET) drag(last_x, last_y, e.getX(), e.getY());
 				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BRUSH) set(e.getX(), e.getY(), true);
 				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.ERASER) remove(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
+				else if (SwingUtilities.isRightMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
 
 				last_x = e.getX();
 				last_y = e.getY();
@@ -78,10 +79,11 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (SwingUtilities.isRightMouseButton(e)) select(e.getX(), e.getY());
+				if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET) select(e.getX(), e.getY());
 				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BRUSH) set(e.getX(), e.getY(), false);
 				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.ERASER) remove(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
+				else if (SwingUtilities.isRightMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
 				else if (SwingUtilities.isMiddleMouseButton(e)) {
 					//Save clicked position
 					midX = e.getX();
@@ -146,7 +148,7 @@ public class MapViewer extends JPanel {
 		selectedLayer.remove(pos.x, pos.y);
 	}
 
-	private void fill(int x, int y) {
+	private void fill(int x, int y, boolean rem) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
 		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
@@ -155,7 +157,7 @@ public class MapViewer extends JPanel {
 		}
 
 		Location pos = getBlockLocation(x, y);
-		selectedLayer.fill(selectedTexture, pos.x, pos.y);
+		selectedLayer.fill(rem? null: selectedTexture, pos.x, pos.y);
 	}
 
 	/**

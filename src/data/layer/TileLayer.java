@@ -43,7 +43,7 @@ public class TileLayer implements Layer {
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			tileNames[y][x] = name;
-			if(name.split("_")[1].equalsIgnoreCase("block")) {
+			if(name != null && name.split("_")[1].equalsIgnoreCase("block")) {
 				update(x, y);
 				update(x+1, y);
 				update(x-1, y);
@@ -149,8 +149,10 @@ public class TileLayer implements Layer {
 		int x = (int) x2;
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
-			if(check(name, x, y)) return;
 			String oldName = tileNames[y][x];
+			boolean bool1 = check(name, x, y);
+			boolean bool2 = (oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
+			if(bool1 || bool2) return;
 
 			Stack<Location> stack = new Stack<>();
 			stack.push(new Location(x, y));
@@ -171,7 +173,9 @@ public class TileLayer implements Layer {
 	}
 
 	private boolean check(String oldName, float y, float x) {
-		return (oldName == null && tileNames[(int)x][(int)y] == null) || ((tileNames[(int)x][(int)y] != null && oldName != null) && tileNames[(int)x][(int)y].equals(oldName));
+		boolean bool1 = (oldName == null && tileNames[(int)x][(int)y] == null);
+		boolean bool2 = ((tileNames[(int)x][(int)y] != null && oldName != null) && tileNames[(int)x][(int)y].equals(oldName));
+		return bool1 || bool2;
 	}
 
 	@Override
