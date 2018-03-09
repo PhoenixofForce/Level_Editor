@@ -43,6 +43,83 @@ public class TileLayer implements Layer {
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			tileNames[y][x] = name;
+			if(name.split("_")[1].equalsIgnoreCase("block")) {
+				update(x, y);
+				update(x+1, y);
+				update(x-1, y);
+				update(x, y-1);
+				update(x, y+1);
+			}
+		}
+	}
+
+	private void update(int x, int y) {
+		if (x >= 0 && y >= 0 && x < width && y < height) {
+			String name = tileNames[y][x];
+			if (name == null) return;
+			if (name.split("_")[1].equalsIgnoreCase("block")) {
+				int out = 0;
+				if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(name.substring(0, name.lastIndexOf("_")+1)))
+					out += 2;
+				if (y != width-1&&tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(name.substring(0, name.lastIndexOf("_")+1)))
+					out += 4;
+				if (x !=0 &&tileNames[y][x - 1] != null && tileNames[y][x - 1].startsWith(name.substring(0, name.lastIndexOf("_")+1)))
+					out += 1;
+				if (x != height-1&&tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(name.substring(0, name.lastIndexOf("_")+1)))
+					out += 8;
+				
+				switch (out) {
+					case 0:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "0";
+						break;
+					case 1:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "3";
+						break;
+					case 2:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "12";
+						break;
+					case 3:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "15";
+						break;
+					case 4:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "4";
+						break;
+					case 5:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "7";
+						break;
+					case 6:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "8";
+						break;
+					case 7:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "11";
+						break;
+					case 8:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "1";
+						break;
+					case 9:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "2";
+						break;
+					case 10:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "13";
+						break;
+					case 11:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "14";
+						break;
+					case 12:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "5";
+						break;
+					case 13:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "6";
+						break;
+					case 14:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "9";
+						break;
+					case 15:
+						name = name.substring(0, name.lastIndexOf("_")+1) + "10";
+						break;
+				}
+			}
+			tileNames[y][x] = name;
 		}
 	}
 
@@ -57,6 +134,11 @@ public class TileLayer implements Layer {
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			tileNames[y][x] = null;
+
+			update(x+1, y);
+			update(x-1, y);
+			update(x, y-1);
+			update(x, y+1);
 			return true;
 		}
 		return false;
