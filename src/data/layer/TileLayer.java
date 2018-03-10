@@ -8,6 +8,7 @@ import java.awt.Graphics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
 /**
@@ -19,6 +20,7 @@ public class TileLayer implements Layer {
 	private String[][] tileNames;			//the texture grid
 
 	private int width, height, tileSize;	//width, height and tilesize of the map
+	private Random r;
 
 	public TileLayer(float depth, String[][] tiles, int tileSize) {
 		this.depth = depth;
@@ -26,15 +28,11 @@ public class TileLayer implements Layer {
 		this.tileSize = tileSize;
 		this.width = tiles[0].length;
 		this.height = tiles.length;
+		r = new Random();
 	}
 
 	public TileLayer(float depth, int width, int height, int tileSize) {
-		tileNames = new String[height][width];
-		this.depth = depth;
-
-		this.width = width;
-		this.height = height;
-		this.tileSize = tileSize;
+		this(depth, new String[height][width], tileSize);
 	}
 
 	@Override
@@ -44,82 +42,106 @@ public class TileLayer implements Layer {
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			tileNames[y][x] = name;
 			if(name != null && name.split("_")[1].equalsIgnoreCase("block")) {
-				update(x, y);
-				update(x+1, y);
-				update(x-1, y);
-				update(x, y-1);
-				update(x, y+1);
+				update(x, y, true);
 			}
 		}
 	}
 
-	private void update(int x, int y) {
+	private void update(int x, int y, boolean center) {
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String name = tileNames[y][x];
 			if (name == null) return;
 			if (name.split("_")[1].equalsIgnoreCase("block")) {
+				String[] parts = name.split("_");
+				String spriteSheet = parts[0];
+				String blockName = parts[2];
+				String blockPart = parts[3];
+
 				int out = 0;
-				if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(name.substring(0, name.lastIndexOf("_")+1)))
+				if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(spriteSheet+"_block_"+blockName+"_"))
 					out += 2;
-				if (y != width-1&&tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(name.substring(0, name.lastIndexOf("_")+1)))
+				if (y != width-1&&tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(spriteSheet+"_block_"+blockName+"_"))
 					out += 4;
-				if (x !=0 &&tileNames[y][x - 1] != null && tileNames[y][x - 1].startsWith(name.substring(0, name.lastIndexOf("_")+1)))
+				if (x !=0 &&tileNames[y][x - 1] != null && tileNames[y][x - 1].startsWith(spriteSheet+"_block_"+blockName+"_"))
 					out += 1;
-				if (x != height-1&&tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(name.substring(0, name.lastIndexOf("_")+1)))
+				if (x != height-1&&tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet+"_block_"+blockName+"_"))
 					out += 8;
 				
 				switch (out) {
 					case 0:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "0";
+						name = spriteSheet+"_block_"+blockName+"_" + "0";
 						break;
 					case 1:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "3";
+						name = spriteSheet+"_block_"+blockName+"_" + "3";
 						break;
 					case 2:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "12";
+						name = spriteSheet+"_block_"+blockName+"_" + "12";
 						break;
 					case 3:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "15";
+						name = spriteSheet+"_block_"+blockName+"_" + "15";
 						break;
 					case 4:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "4";
+						name = spriteSheet+"_block_"+blockName+"_" + "4";
 						break;
 					case 5:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "7";
+						name = spriteSheet+"_block_"+blockName+"_" + "7";
 						break;
 					case 6:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "8";
+						name = spriteSheet+"_block_"+blockName+"_" + "8";
 						break;
 					case 7:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "11";
+						name = spriteSheet+"_block_"+blockName+"_" + "11";
 						break;
 					case 8:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "1";
+						name = spriteSheet+"_block_"+blockName+"_" + "1";
 						break;
 					case 9:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "2";
+						name = spriteSheet+"_block_"+blockName+"_" + "2";
 						break;
 					case 10:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "13";
+						name = spriteSheet+"_block_"+blockName+"_" + "13";
 						break;
 					case 11:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "14";
+						name = spriteSheet+"_block_"+blockName+"_" + "14";
 						break;
 					case 12:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "5";
+						name = spriteSheet+"_block_"+blockName+"_" + "5";
 						break;
 					case 13:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "6";
+						name = spriteSheet+"_block_"+blockName+"_" + "6";
 						break;
 					case 14:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "9";
+						name = spriteSheet+"_block_"+blockName+"_" + "9";
 						break;
 					case 15:
-						name = name.substring(0, name.lastIndexOf("_")+1) + "10";
+						name = spriteSheet+"_block_"+blockName+"_" + "10";
 						break;
 				}
+
+				System.out.println(blockPart + "  " + name.split("_")[3]);
+				if(blockPart.equalsIgnoreCase(name.split("_")[3])) {
+					if(center) {
+						update(x+1, y, false);
+						update(x-1, y, false);
+						update(x, y-1, false);
+						update(x, y+1, false);
+					}
+					return;
+				}
+
+				int count = TextureHandler.getBlockCount(name);
+				if(count > 0) {
+					int random = r.nextInt(count);
+					name += "_"+random;
+				}
+				tileNames[y][x] = TextureHandler.existsImagePng(name)? name: "error_"+tileSize;
 			}
-			tileNames[y][x] = name;
+		}
+		if(center) {
+			update(x+1, y, false);
+			update(x-1, y, false);
+			update(x, y-1, false);
+			update(x, y+1, false);
 		}
 	}
 
@@ -135,10 +157,10 @@ public class TileLayer implements Layer {
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			tileNames[y][x] = null;
 
-			update(x+1, y);
-			update(x-1, y);
-			update(x, y-1);
-			update(x, y+1);
+			update(x+1, y, false);
+			update(x-1, y, false);
+			update(x, y-1, false);
+			update(x, y+1, false);
 			return true;
 		}
 		return false;
@@ -173,9 +195,11 @@ public class TileLayer implements Layer {
 	}
 
 	private boolean check(String oldName, float y, float x) {
-		boolean bool1 = (oldName == null && tileNames[(int)x][(int)y] == null);
-		boolean bool2 = ((tileNames[(int)x][(int)y] != null && oldName != null) && tileNames[(int)x][(int)y].equals(oldName));
-		return bool1 || bool2;
+		String name = tileNames[(int)x][(int)y];
+		boolean bool1 = (oldName == null && name == null);
+		boolean bool2 = ((name != null && oldName != null) && name.equals(oldName));
+		boolean bool3 = (oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
+		return bool1 || bool2 || bool3;
 	}
 
 	@Override

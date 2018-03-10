@@ -18,16 +18,7 @@ public class GameMap extends TagObject {
 	private Map<String, Layer> layers;			//Layers saved to their name
 
 	public GameMap(int width, int height, int tileSize) {
-		layers = new HashMap<>();
-		this.width = width;
-		this.height = height;
-		this.tileSize = tileSize;
-
-		//Adding default layers
-		addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
-		addLayer("Tile", new TileLayer(0.5f, width, height, tileSize));
-		addLayer("Object", new FreeLayer(0.0f, width, height, tileSize));
-		addLayer("Camera", new AreaLayer(-1.0f, width, height, tileSize));
+		this(width, height, tileSize, true);
 	}
 
 	/**
@@ -42,6 +33,8 @@ public class GameMap extends TagObject {
 		this.width = width;
 		this.height = height;
 		this.tileSize = tileSize;
+
+		TextureHandler.createError(tileSize);
 
 		if(b) {
 			addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
