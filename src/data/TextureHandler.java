@@ -46,7 +46,7 @@ public class TextureHandler {
 	 * @param fileName file that links to the .text file
 	 */
 	public static void loadImagePngSpriteSheet(String spriteSheetName, String fileName) {
-		if(textures_png.containsKey(spriteSheetName)) return;
+		//if(textures_png.containsKey(spriteSheetName)) return;
 		try {
 			loadImagePng(spriteSheetName, fileName.substring(0, fileName.length()-4)+"png");
 			Scanner s = new Scanner(new File(fileName), "UTF8");

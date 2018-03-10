@@ -50,7 +50,7 @@ public class Window extends JFrame {
 		this.add(layerPane, BorderLayout.LINE_START);
 		layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-		mapViewer = new MapViewer(images, layerPane, map);
+		mapViewer = new MapViewer(buttons, images, layerPane, map);
 		this.add(mapViewer, BorderLayout.CENTER);
 
 		//starting repaint thread
@@ -89,10 +89,10 @@ public class Window extends JFrame {
 	*/
 	public void setMap(GameMap map) {
 		this.map = map;
-		if(buttons != null) buttons.reset();
+		if(buttons != null) ;
 		if(menu != null) menu.reset();
 		if (mapViewer != null) mapViewer.setGameMap(map);
-		if (images != null)    images.getModifier().setTagObject(null);
+		if (images != null) images.getModifier().setTagObject(null);
 		if (layerPane != null) layerPane.updateGameMap(map);
 	}
 	
@@ -102,5 +102,9 @@ public class Window extends JFrame {
 
 	public void open(File f) {
 		menu.open(f);
+	}
+
+	public MapViewer getMapViewer() {
+		return mapViewer;
 	}
 }

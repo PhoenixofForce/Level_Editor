@@ -45,9 +45,8 @@ public class TileLayer implements Layer {
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			tileNames[y][x] = name;
-			if(name != null && name.split("_")[1].equalsIgnoreCase("block")) {
-				update(x, y, true);
-			}
+			update(x, y, true);
+
 		}
 	}
 
@@ -55,7 +54,15 @@ public class TileLayer implements Layer {
 		if(!map.getAutoTile()) return;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String name = tileNames[y][x];
-			if (name == null) return;
+			if (name == null) {
+				if(center) {
+					update(x+1, y, false);
+					update(x-1, y, false);
+					update(x, y-1, false);
+					update(x, y+1, false);
+				}
+				return;
+			}
 			if (name.split("_")[1].equalsIgnoreCase("block")) {
 				String[] parts = name.split("_");
 				String spriteSheet = parts[0];

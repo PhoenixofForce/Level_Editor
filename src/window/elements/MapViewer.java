@@ -16,6 +16,7 @@ public class MapViewer extends JPanel {
 
 	private ImageList imageList;							//the ImageList => get selected Image
 	private LayerPane layerPane;							//the LayerPane => get selected Layer
+	private MainToolBar tb;
 
 	private Camera camera;									//Camera to set viewpoint
 
@@ -26,12 +27,14 @@ public class MapViewer extends JPanel {
 
 	private GameMap map;									//the game map
 
-	public MapViewer(ImageList imageList, LayerPane layerPane, GameMap map) {
+	public MapViewer(MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
 		this.layerPane = layerPane;
 		this.imageList = imageList;
+		this.tb = tb;
 		this.map = map;
 
 		tool = Tools.BRUSH;
+		tb.update(tool);
 		mouseEntered = false;
 
 		camera = new Camera();
@@ -96,7 +99,10 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				//when the difference on middle mouse click and middle mouse release is smaller than than => swap between erasing and drawgin
-				if (SwingUtilities.isMiddleMouseButton(e) && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) tool = tool.next();
+				if (SwingUtilities.isMiddleMouseButton(e) && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) {
+					tool = tool.next();
+					tb.update(tool);
+				}
 			}
 		});
 	}
@@ -279,6 +285,11 @@ public class MapViewer extends JPanel {
 		}
 
 		g.drawImage(img, 0, 0, null);
+	}
+
+	public void setTool(Tools t) {
+		this.tool = t;
+		tb.update(tool);
 	}
 
 	private void sendErrorMessage() {

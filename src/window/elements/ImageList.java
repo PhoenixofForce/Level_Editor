@@ -94,7 +94,11 @@ public class ImageList extends JPanel{
 		for(String s: all.keySet()) {
 			if(!icons.keySet().contains(s)) {
 				icons.put(s, all.get(s));
-
+			}
+			if(icons.keySet().contains(s) && !all.get(s).equals(icons.get(s))) {
+				listModel.removeElement(icons.get(s));
+				icons.put(s, all.get(s));
+				listModel.addElement(icons.get(s));
 			}
 		}
 		filter();

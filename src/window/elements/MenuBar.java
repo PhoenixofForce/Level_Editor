@@ -16,19 +16,27 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MenuBar extends JMenuBar {
 
 	private JMenu file;
 	private JMenuItem newFile, openFile, saveFile, saveFileAs, exportFile;
 
-	private File lastExport, lastSave, lastOpen;
+	private JMenuItem res;
+	private JMenuItem importRes, updateRes;
+
+	private List<File> imports;
+	private File lastExport, lastSave, lastOpen, lastImport;
 	private Window w;
 	private MainToolBar toolBar;
 	private ImageList list;
 
 	public MenuBar(Window w, MainToolBar bar, ImageList list) {
+
+		imports = new ArrayList<>();
 
 		file = new JMenu("File");
 		newFile = new JMenuItem("New...");
@@ -44,6 +52,14 @@ public class MenuBar extends JMenuBar {
 		file.add(saveFileAs);
 		file.add(exportFile);
 		this.add(file);
+
+		res = new JMenu("Ressources");
+		importRes = new JMenuItem("Import Resource");
+		updateRes = new JMenuItem("Update Ressources");
+
+		res.add(importRes);
+		res.add(updateRes);
+		this.add(res);
 
 		this.w = w;
 		this.toolBar = bar;
@@ -132,6 +148,37 @@ public class MenuBar extends JMenuBar {
 
 			}
 		});
+
+		importRes.addActionListener(e -> {
+			JFileChooser chooser = new JFileChooser();
+
+			if(lastImport != null) chooser.setCurrentDirectory(lastImport);
+			//chooser.setOpaque(true);
+			chooser.setMultiSelectionEnabled(true);
+
+			chooser.setAcceptAllFileFilterUsed(false);
+			chooser.addChoosableFileFilter(new FileNameExtensionFilter(".text Files", "text"));
+
+			int returnVal = chooser.showDialog(new JFrame(), "Load Texture");
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				for(File text: chooser.getSelectedFiles()) {
+					File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length() - 4) + "png");
+
+					imports.add(text);
+
+					if (text.exists() && image.exists()) {
+						TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 4), text.getAbsolutePath());
+						list.update();
+					} else {
+						JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
+					}
+
+					lastImport = text.getParentFile();
+				}
+			}
+		});
+
+		updateRes.addActionListener(e -> reimport());
 	}
 
 	public void open(File f) {
@@ -151,7 +198,7 @@ public class MenuBar extends JMenuBar {
 					File text = new File(line.substring("i: ".length()));
 					File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length() - 4) + "png");
 
-					toolBar.addImport(text);
+					imports.add(text);
 
 					if (text.exists() && image.exists()) {
 						TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 4), text.getAbsolutePath());
@@ -160,7 +207,7 @@ public class MenuBar extends JMenuBar {
 						JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
 					}
 
-					toolBar.lastImport = text.getParentFile();
+					lastImport = text.getParentFile();
 				}
 
 				else if(line.startsWith("h: ")) height = Integer.parseInt(line.split(" ")[1]);
@@ -337,7 +384,7 @@ public class MenuBar extends JMenuBar {
 		try {
 			PrintWriter wr = new PrintWriter(f);
 
-			for(File i: toolBar.getImports()) {
+			for(File i: imports) {
 				wr.write("i: " + i.getAbsolutePath() + "\n");
 			}
 
@@ -364,8 +411,15 @@ public class MenuBar extends JMenuBar {
 		}
 	}
 
-	public void reset() {
-		lastExport = null;
+	public void reimport() {
+		for(File f: imports) {
+			TextureHandler.loadImagePngSpriteSheet(f.getName().substring(0, f.getName().length() - 5), f.getAbsolutePath());
+		}
+		list.update();
 	}
 
+	public void reset() {
+		lastExport = null;
+		lastImport = null;
+	}
 }
