@@ -20,9 +20,11 @@ public class LayerPane extends JPanel {
 
 	private GameMap map;							//the game map
 	private Map<Layer, Boolean> hidden;				//map stores the data about the hidden state of each layer
+	private Window window;
 
 	public LayerPane(Window window, GameMap newMap) {
 		this.map = newMap;
+		this.window = window;
 
 		this.setLayout(new BorderLayout());
 
@@ -95,7 +97,7 @@ public class LayerPane extends JPanel {
 				layer = new AreaLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
 				break;
 			case 0:
-				layer = new TileLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+				layer = new TileLayer(window.getMap(), depth, map.getWidth(), map.getHeight(), map.getTileSize());
 				break;
 			default:
 				return;

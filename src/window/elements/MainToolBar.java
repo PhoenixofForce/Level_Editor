@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class MainToolBar extends JToolBar {
 
-	private JButton newMap, open, saveMap, saveAsMap, export, importRessource, editMapTags;
+	private JButton newMap, open, saveMap, saveAsMap, export, importRessource, editMapTags, toggleAutoTile;
 	private File lastExport, lastImport, lastSave, lastOpen;
 
 	private List<File> inports;
@@ -166,6 +166,15 @@ public class MainToolBar extends JToolBar {
 			imageList.getModifier().setTagObject(w.getMap());
 		});
 		this.add(editMapTags);
+
+		this.addSeparator();
+		toggleAutoTile = new JButton("Disable AutoTile");
+		toggleAutoTile.addActionListener(e -> {
+			w.getMap().setAutoTile(!w.getMap().getAutoTile());
+			if(w.getMap().getAutoTile()) toggleAutoTile.setText("Disable AutoTile");
+			else toggleAutoTile.setText("Enable AutoTile");
+		});
+		this.add(toggleAutoTile);
 	}
 
 	public void open(File f) {
@@ -230,7 +239,7 @@ public class MainToolBar extends JToolBar {
 						}
 					}
 
-					TileLayer l = new TileLayer(depth, names, tileSize);
+					TileLayer l = new TileLayer(w.getMap(), depth, names, tileSize);
 					if(map != null) map.addLayer(name, l);
 				}
 

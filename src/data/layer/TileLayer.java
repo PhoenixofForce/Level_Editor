@@ -1,5 +1,6 @@
 package data.layer;
 
+import data.GameMap;
 import data.Location;
 import data.layer.layerobjects.GO;
 import data.TextureHandler;
@@ -22,17 +23,20 @@ public class TileLayer implements Layer {
 	private int width, height, tileSize;	//width, height and tilesize of the map
 	private Random r;
 
-	public TileLayer(float depth, String[][] tiles, int tileSize) {
+	private GameMap map;
+
+	public TileLayer(GameMap map, float depth, String[][] tiles, int tileSize) {
 		this.depth = depth;
 		this.tileNames = tiles;
 		this.tileSize = tileSize;
 		this.width = tiles[0].length;
 		this.height = tiles.length;
 		r = new Random();
+		this.map = map;
 	}
 
-	public TileLayer(float depth, int width, int height, int tileSize) {
-		this(depth, new String[height][width], tileSize);
+	public TileLayer(GameMap map, float depth, int width, int height, int tileSize) {
+		this(map, depth, new String[height][width], tileSize);
 	}
 
 	@Override
@@ -48,6 +52,7 @@ public class TileLayer implements Layer {
 	}
 
 	private void update(int x, int y, boolean center) {
+		if(!map.getAutoTile()) return;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String name = tileNames[y][x];
 			if (name == null) return;

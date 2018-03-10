@@ -17,6 +17,8 @@ public class GameMap extends TagObject {
 	private int width, height, tileSize;		//width, height and tileSize of the map
 	private Map<String, Layer> layers;			//Layers saved to their name
 
+	private boolean autoTile = true;
+
 	public GameMap(int width, int height, int tileSize) {
 		this(width, height, tileSize, true);
 	}
@@ -38,7 +40,7 @@ public class GameMap extends TagObject {
 
 		if(b) {
 			addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
-			addLayer("Tile", new TileLayer(0.5f, width, height, tileSize));
+			addLayer("Tile", new TileLayer(this, 0.5f, width, height, tileSize));
 			addLayer("Object", new FreeLayer(0.0f, width, height, tileSize));
 			addLayer("Camera", new AreaLayer(-1.0f, width, height, tileSize));
 		}
@@ -189,5 +191,13 @@ public class GameMap extends TagObject {
 	@Override
 	public String getText() {
 		return "MAP";
+	}
+
+	public void setAutoTile(boolean at) {
+		this.autoTile = at;
+	}
+
+	public boolean getAutoTile() {
+		return autoTile;
 	}
 }
