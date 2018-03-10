@@ -130,7 +130,6 @@ public class TileLayer implements Layer {
 						break;
 				}
 
-				System.out.println(blockPart + "  " + name.split("_")[3]);
 				if(blockPart.equalsIgnoreCase(name.split("_")[3])) {
 					if(center) {
 						update(x+1, y, false);
@@ -210,7 +209,7 @@ public class TileLayer implements Layer {
 		String name = tileNames[(int)x][(int)y];
 		boolean bool1 = (oldName == null && name == null);
 		boolean bool2 = ((name != null && oldName != null) && name.equals(oldName));
-		boolean bool3 = (oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
+		boolean bool3 = (map.getAutoTile() && oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
 		return bool1 || bool2 || bool3;
 	}
 
