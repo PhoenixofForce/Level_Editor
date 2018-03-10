@@ -4,6 +4,7 @@ import data.GameMap;
 import window.elements.ImageList;
 import window.elements.MainToolBar;
 import window.elements.MapViewer;
+import window.elements.MenuBar;
 import window.elements.layer.LayerPane;
 
 import javax.swing.*;
@@ -21,6 +22,7 @@ public class Window extends JFrame {
 	private MapViewer mapViewer;			//displays the current map
 	private ImageList images;				//image selector and filter
 	private GameMap map;					//the map that is currently edited
+	private MenuBar menu;
 
 	public Window() {
 		//setting window attributes
@@ -40,6 +42,9 @@ public class Window extends JFrame {
 
 		buttons = new MainToolBar(this, images);
 		this.add(buttons, BorderLayout.PAGE_START);
+
+		this.menu = new MenuBar(this, buttons, images);
+		this.setJMenuBar(menu);
 
 		layerPane = new LayerPane(this, map);
 		this.add(layerPane, BorderLayout.LINE_START);
@@ -85,7 +90,7 @@ public class Window extends JFrame {
 	public void setMap(GameMap map) {
 		this.map = map;
 		if(buttons != null) buttons.reset();
-
+		if(menu != null) menu.reset();
 		if (mapViewer != null) mapViewer.setGameMap(map);
 		if (images != null)    images.getModifier().setTagObject(null);
 		if (layerPane != null) layerPane.updateGameMap(map);
@@ -96,6 +101,6 @@ public class Window extends JFrame {
 	}
 
 	public void open(File f) {
-		buttons.open(f);
+		menu.open(f);
 	}
 }
