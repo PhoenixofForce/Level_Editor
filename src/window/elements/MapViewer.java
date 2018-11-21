@@ -9,6 +9,7 @@ import window.elements.layer.LayerPane;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
@@ -20,7 +21,10 @@ public class MapViewer extends JPanel {
 
 	private Camera camera;									//Camera to set viewpoint
 
+	private Location startClick;
 	private int last_x, last_y, midX, midY;					//x,y coordinates of the last click, ... of the last middle mouse click
+
+	private Area selection;
 
 	private boolean mouseEntered;							//booleans if the mouse is in the window and the user has drawing mode (true) or erase mode (false)
 	private Tools tool;
@@ -57,11 +61,11 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if (SwingUtilities.isMiddleMouseButton(e)) camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
+				if (SwingUtilities.isMiddleMouseButton(e))                        	   camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
 				else if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET) drag(last_x, last_y, e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BRUSH) set(e.getX(), e.getY(), true);
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.ERASER) remove(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
+				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.BRUSH)  set(e.getX(), e.getY(), true);
+				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.ERASER) remove(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
 				else if (SwingUtilities.isRightMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
 
 				last_x = e.getX();
@@ -82,12 +86,17 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET) select(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BRUSH) set(e.getX(), e.getY(), false);
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.ERASER) remove(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
-				else if (SwingUtilities.isRightMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
-				else if (SwingUtilities.isMiddleMouseButton(e)) {
+				if (e.getButton() == 3 && tool != Tools.BUCKET && tool != Tools.SELECT) select(e.getX(), e.getY());
+				else if (e.getButton() == 1 && tool == Tools.BRUSH) set(e.getX(), e.getY(), false);
+				else if (e.getButton() == 1 && tool == Tools.ERASER) remove(e.getX(), e.getY());
+				else if (e.getButton() == 1 && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
+				else if (e.getButton() == 3 && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
+				else if(e.getButton() == 1 && tool == Tools.SELECT) startClick = getBlockLocation(e.getX(), e.getY());
+				else if(e.getButton() == 3 && tool == Tools.SELECT) {
+					selection = null;
+					startClick = null;
+				}
+				else if (e.getButton() == 2) {
 					//Save clicked position
 					midX = e.getX();
 					midY = e.getY();
@@ -99,10 +108,79 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				//when the difference on middle mouse click and middle mouse release is smaller than than => swap between erasing and drawgin
-				if (SwingUtilities.isMiddleMouseButton(e) && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) {
+				if (e.getButton() == 2 && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) {
 					tool = tool.next();
 					tb.update(tool);
+					startClick = null;
 				}
+
+				if(e.getButton() == 1 && tool == Tools.SELECT && startClick != null) {
+					Location last = getBlockLocation(e.getX(), e.getY());
+					int x = (int)(Math.min(last.x, startClick.x));
+					int y = (int)(Math.min(last.y, startClick.y));
+
+					if(x < 0) x = 0;
+					if(y < 0) y = 0;
+
+					int w = (int)(Math.max(last.x, startClick.x)) -x+1;
+					int h = (int)(Math.max(last.y, startClick.y)) -y+1;
+
+					if(w < 0 || h < 0 || x > map.getWidth() || y > map.getWidth()) {
+						startClick = null;
+						selection = null;
+						return;
+					}
+					if(x + w > map.getWidth()) w = map.getWidth()-x;
+					if(y + h > map.getHeight()) h = map.getHeight()-y;
+
+					Rectangle r = new Rectangle(x * map.getTileSize(), y * map.getTileSize(), w * map.getTileSize(),h * map.getTileSize());
+
+					if(selection == null || (!e.isShiftDown() && !e.isControlDown())) {
+						selection = new Area(r);
+					} else if(e.isShiftDown() && !e.isControlDown()) selection.add(new Area(r));
+					else if(!e.isShiftDown() && e.isControlDown()) selection.subtract(new Area(r));
+					startClick = null;
+				}
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				requestFocus();
+			}
+		});
+
+		this.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				System.out.println(e.getKeyChar() + " " + e.getKeyCode());
+				if(e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
+					if(e.getKeyCode() == 521) {	// +
+						camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
+					} else if(e.getKeyCode() == 45) {	// -
+						camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
+					}  else if(e.getKeyCode() == 67) {	// c
+					}  else if(e.getKeyCode() == 86) {	// v
+					}  else if(e.getKeyCode() == 90) {	// z
+					}  else if(e.getKeyCode() == 65) {	// a
+						selection = null;
+						startClick = null;
+					}
+				} else {
+					if(e.getKeyCode()>=48 && e.getKeyCode() <= 57) {
+						int toolIndex = e.getKeyCode()-48;
+						tool = Tools.get(toolIndex-1);
+						tb.update(tool);
+					}
+				}
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
 			}
 		});
 	}
@@ -282,6 +360,26 @@ public class MapViewer extends JPanel {
 				else
 					g2.drawRect((int) (l.x) * map.getTileSize(), (int) (l.y) * map.getTileSize(), tex.getWidth(), tex.getHeight());
 			}
+		}
+
+		//Draws selection
+		g2.setStroke(new BasicStroke(2 / camera.zoom));
+		if(selection != null) {
+			Color c = Tools.SELECT.getColor();
+			g2.setColor(c);
+			g2.draw(selection);
+			g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 60));
+			g2.fill(selection);
+		}
+		if(startClick != null) {
+			g2.setColor(Tools.SELECT.getColor().brighter());
+			Location last = getBlockLocation(last_x, last_y);
+			int x = (int)(Math.min(last.x, startClick.x));
+			int y = (int)(Math.min(last.y, startClick.y));
+			int w = (int)(Math.max(last.x, startClick.x)) -x+1;
+			int h = (int)(Math.max(last.y, startClick.y)) -y+1;
+			Rectangle r = new Rectangle(x * map.getTileSize(), y * map.getTileSize(), w * map.getTileSize(),h * map.getTileSize());
+			g2.draw(new Area(r));
 		}
 
 		g.drawImage(img, 0, 0, null);

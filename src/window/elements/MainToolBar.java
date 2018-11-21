@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class MainToolBar extends JToolBar {
 
-	private JButton editMapTags, toggleAutoTile, chooseBrush, chooseEraser, chooseBucket;
+	private JButton editMapTags, toggleAutoTile, chooseBrush, chooseEraser, chooseBucket, chooseSelect;
 
 	public MainToolBar(Window w, ImageList imageList) {
 		this.setFloatable(false);
@@ -48,11 +48,16 @@ public class MainToolBar extends JToolBar {
 		chooseBucket = new JButton("Fill");
 		chooseBucket.addActionListener(e -> w.getMapViewer().setTool(Tools.BUCKET));
 		this.add(chooseBucket);
+
+		chooseSelect = new JButton("Select");
+		chooseSelect.addActionListener(e -> w.getMapViewer().setTool(Tools.SELECT));
+		this.add(chooseSelect);
 	}
 
 	protected void update(Tools t) {
 		chooseBucket.setEnabled(t != Tools.BUCKET);
 		chooseEraser.setEnabled(t != Tools.ERASER);
 		chooseBrush.setEnabled(t != Tools.BRUSH);
+		chooseSelect.setEnabled(t != Tools.SELECT);
 	}
 }

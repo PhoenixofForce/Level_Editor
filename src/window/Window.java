@@ -39,6 +39,7 @@ public class Window extends JFrame {
 		images = new ImageList(this);
 		this.add(images, BorderLayout.LINE_END);
 		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
+		images.setFocusable(false);
 
 		buttons = new MainToolBar(this, images);
 		this.add(buttons, BorderLayout.PAGE_START);
@@ -52,6 +53,7 @@ public class Window extends JFrame {
 
 		mapViewer = new MapViewer(buttons, images, layerPane, map);
 		this.add(mapViewer, BorderLayout.CENTER);
+		mapViewer.setFocusable(true);
 
 		//starting repaint thread
 		new Thread(() -> {

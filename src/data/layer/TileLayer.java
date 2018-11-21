@@ -7,7 +7,6 @@ import data.TextureHandler;
 
 import java.awt.Graphics;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -78,7 +77,7 @@ public class TileLayer implements Layer {
 					out += 1;
 				if (x != height-1&&tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet+"_block_"+blockName+"_"))
 					out += 8;
-				
+
 				switch (out) {
 					case 0:
 						name = spriteSheet+"_block_"+blockName+"_" + "0";
