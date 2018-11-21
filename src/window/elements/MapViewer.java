@@ -32,6 +32,9 @@ public class MapViewer extends JPanel {
 	private GameMap map;									//the game map
 
 	public MapViewer(MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
+		requestFocus();
+		grabFocus();
+
 		this.layerPane = layerPane;
 		this.imageList = imageList;
 		this.tb = tb;
@@ -86,6 +89,9 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				requestFocus();
+				grabFocus();
+
 				if (e.getButton() == 3 && tool != Tools.BUCKET && tool != Tools.SELECT) select(e.getX(), e.getY());
 				else if (e.getButton() == 1 && tool == Tools.BRUSH) set(e.getX(), e.getY(), false);
 				else if (e.getButton() == 1 && tool == Tools.ERASER) remove(e.getX(), e.getY());
@@ -145,7 +151,6 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				requestFocus();
 			}
 		});
 
@@ -153,29 +158,28 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
+				//System.out.println(e.getKeyCode() == KeyEvent.VK_UP);
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				System.out.println(e.getKeyChar() + " " + e.getKeyCode());
-				if(e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
-					if(e.getKeyCode() == 521) {	// +
-						camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
-					} else if(e.getKeyCode() == 45) {	// -
-						camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
-					}  else if(e.getKeyCode() == 67) {	// c
-					}  else if(e.getKeyCode() == 86) {	// v
-					}  else if(e.getKeyCode() == 90) {	// z
-					}  else if(e.getKeyCode() == 65) {	// a
-						selection = null;
-						startClick = null;
-					}
-				} else {
-					if(e.getKeyCode()>=48 && e.getKeyCode() <= 57) {
-						int toolIndex = e.getKeyCode()-48;
-						tool = Tools.get(toolIndex-1);
-						tb.update(tool);
-					}
+				System.out.println(e.getKeyChar() + " " + e.getKeyCode() + e.isControlDown());
+				if (e.getKeyCode() == 521 && (e.getKeyChar() != '+' || e.isControlDown())) {    // +
+					camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
+				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    // -
+					camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
+				} else if (e.getKeyCode() == 67 && (e.getKeyChar() != 'c') && e.getKeyChar() != 'C' || e.isControlDown()) {    // c
+				} else if (e.getKeyCode() == 86 && (e.getKeyChar() != 'v') && e.getKeyChar() != 'V' || e.isControlDown()) {    // v
+				} else if (e.getKeyCode() == 90 && (e.getKeyChar() != 'z') && e.getKeyChar() != 'Z' || e.isControlDown()) {    // z
+				} else if (e.getKeyCode() == 65 && (e.getKeyChar() != 'a') && e.getKeyChar() != 'A' || e.isControlDown()) {    // a
+					selection = null;
+					startClick = null;
+				}
+
+				if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
+					int toolIndex = e.getKeyCode() - 48;
+					tool = Tools.get(toolIndex - 1);
+					tb.update(tool);
 				}
 			}
 
@@ -213,6 +217,7 @@ public class MapViewer extends JPanel {
 		}
 
 		Location pos = getBlockLocation(x, y);
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
 	}
 
@@ -229,19 +234,22 @@ public class MapViewer extends JPanel {
 		}
 
 		Location pos = getBlockLocation(x, y);
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.remove(pos.x, pos.y);
 	}
 
 	private void fill(int x, int y, boolean rem) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
+		if (selectedLayer == null || selectedTexture == null || !(selectedLayer instanceof TileLayer) || layerPane.isHidden(selectedLayer)) {
 			sendErrorMessage();
 			return;
 		}
 
+		TileLayer tl = (TileLayer) selectedLayer;
 		Location pos = getBlockLocation(x, y);
-		selectedLayer.fill(rem? null: selectedTexture, pos.x, pos.y);
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
+		tl.fill(selection, rem? null: selectedTexture, pos.x, pos.y);
 	}
 
 	/**

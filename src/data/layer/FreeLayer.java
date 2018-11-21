@@ -77,9 +77,6 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public void fill(String name, float x, float y) { }
-
-	@Override
 	public GO select(float x, float y) {
 		GO go = find(x, y);
 		if (go != null) {
