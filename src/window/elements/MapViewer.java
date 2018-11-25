@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
+import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
@@ -17,6 +18,7 @@ public class MapViewer extends JPanel {
 
 	private ImageList imageList;							//the ImageList => get selected Image
 	private LayerPane layerPane;							//the LayerPane => get selected Layer
+	private TileLayer copyLayer;
 	private MainToolBar tb;
 
 	private Camera camera;									//Camera to set viewpoint
@@ -70,6 +72,9 @@ public class MapViewer extends JPanel {
 				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.ERASER) remove(e.getX(), e.getY());
 				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
 				else if (SwingUtilities.isRightMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
+				else if(SwingUtilities.isLeftMouseButton(e)   && tool == Tools.MOVE)   {
+					moveSelection(last_x, last_y, e.getX(), e.getY());
+				}
 
 				last_x = e.getX();
 				last_y = e.getY();
@@ -147,6 +152,10 @@ public class MapViewer extends JPanel {
 					else if(!e.isShiftDown() && e.isControlDown()) selection.subtract(new Area(r));
 					startClick = null;
 				}
+
+				if(e.getButton() == 1 && tool == Tools.MOVE) {
+					//TODO: Round to Tile_Size
+				}
 			}
 
 			@Override
@@ -158,12 +167,15 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				//System.out.println(e.getKeyCode() == KeyEvent.VK_UP);
+			//	System.out.println(e.getKeyCode() == KeyEvent.VK_UP);
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
 				System.out.println(e.getKeyChar() + " " + e.getKeyCode() + e.isControlDown());
+				if(selection!= null) {
+				}
+
 				if (e.getKeyCode() == 521 && (e.getKeyChar() != '+' || e.isControlDown())) {    // +
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
 				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    // -
@@ -175,6 +187,8 @@ public class MapViewer extends JPanel {
 					selection = null;
 					startClick = null;
 				}
+
+
 
 				if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
 					int toolIndex = e.getKeyCode() - 48;
@@ -391,6 +405,29 @@ public class MapViewer extends JPanel {
 		}
 
 		g.drawImage(img, 0, 0, null);
+	}
+
+	private void moveSelection(int x1, int y1, int x2, int y2) {
+		//TODO: Make it better
+		Polygon p = areaToShape();
+		p.translate(x2-x1, y2-y1);
+		selection = new Area(p);
+	}
+
+	private Polygon areaToShape() {
+		PathIterator iterator = selection.getPathIterator(null);
+		float[] floats = new float[6];
+		Polygon polygon = new Polygon();
+		while (!iterator.isDone()) {
+			int type = iterator.currentSegment(floats);
+			int x = (int) floats[0];
+			int y = (int) floats[1];
+			if(type != PathIterator.SEG_CLOSE) {
+				polygon.addPoint(x, y);
+			}
+			iterator.next();
+		}
+		return polygon;
 	}
 
 	public void setTool(Tools t) {

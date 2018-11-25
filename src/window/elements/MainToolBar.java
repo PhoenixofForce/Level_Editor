@@ -1,21 +1,16 @@
 package window.elements;
 
-import data.*;
 import window.Tools;
 import window.Window;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * used so the user can open/save/.... maps
- */
 public class MainToolBar extends JToolBar {
 
-	private JButton editMapTags, toggleAutoTile, chooseBrush, chooseEraser, chooseBucket, chooseSelect;
+	private JButton editMapTags, toggleAutoTile;
+	private List<JButton> chooser;
 
 	public MainToolBar(Window w, ImageList imageList) {
 		this.setFloatable(false);
@@ -37,27 +32,18 @@ public class MainToolBar extends JToolBar {
 
 		this.addSeparator();
 
-		chooseBrush = new JButton("Brush");
-		chooseBrush.addActionListener(e -> w.getMapViewer().setTool(Tools.BRUSH));
-		this.add(chooseBrush);
-
-		chooseEraser = new JButton("Eraser");
-		chooseEraser.addActionListener(e -> w.getMapViewer().setTool(Tools.ERASER));
-		this.add(chooseEraser);
-
-		chooseBucket = new JButton("Fill");
-		chooseBucket.addActionListener(e -> w.getMapViewer().setTool(Tools.BUCKET));
-		this.add(chooseBucket);
-
-		chooseSelect = new JButton("Select");
-		chooseSelect.addActionListener(e -> w.getMapViewer().setTool(Tools.SELECT));
-		this.add(chooseSelect);
+		chooser = new ArrayList<>();
+		for(Tools t: Tools.values()) {
+			JButton button = new JButton(t.toString().substring(0, 1) + t.toString().substring(1).toLowerCase());
+			button.addActionListener(e -> w.getMapViewer().setTool(t));
+			this.add(button);
+			chooser.add(button);
+		}
 	}
 
 	protected void update(Tools t) {
-		chooseBucket.setEnabled(t != Tools.BUCKET);
-		chooseEraser.setEnabled(t != Tools.ERASER);
-		chooseBrush.setEnabled(t != Tools.BRUSH);
-		chooseSelect.setEnabled(t != Tools.SELECT);
+		for(int i = 0; i < chooser.size(); i++) {
+			chooser.get(i).setEnabled(i != t.getIndex());
+		}
 	}
 }

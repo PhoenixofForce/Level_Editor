@@ -3,7 +3,7 @@ package window;
 import java.awt.*;
 
 public enum Tools {
-	BRUSH(0, Color.GREEN), ERASER(1, Color.RED), BUCKET(2, Color.BLUE), SELECT(3, Color.YELLOW);
+	BRUSH(0, Color.GREEN), ERASER(1, Color.RED), BUCKET(2, Color.BLUE), SELECT(3, Color.YELLOW), MOVE(4, Color.YELLOW);
 
 	private int pos;
 	private Color c;
@@ -17,6 +17,9 @@ public enum Tools {
 	}
 	public Color getColor() {
 		return c;
+	}
+	public int getIndex() {
+		return pos;
 	}
 
 	public static Tools get(int i) {

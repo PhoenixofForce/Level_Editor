@@ -204,6 +204,29 @@ public class TileLayer implements Layer {
 		}
 	}
 
+	public void fill(Area sel, String name) {
+		int x = sel.getBounds().x+1;
+		int y = sel.getBounds().y+1;
+		if (x >= 0 && y >= 0 && x < width && y < height) {
+
+			Stack<Location> stack = new Stack<>();
+			stack.push(new Location(x, y));
+
+			while (!stack.isEmpty()) {
+				Location i = stack.pop();
+
+				if ((sel == null || (sel != null && sel.contains(i.x*map.getTileSize(), i.y*map.getTileSize())))) {
+					set(name, i.x, i.y, false);
+
+					if (i.x > 0) stack.push(new Location(i.x - 1, i.y));
+					if (i.y > 0) stack.push(new Location(i.x, i.y - 1));
+					if (i.x < width - 1) stack.push(new Location(i.x + 1, i.y));
+					if (i.y < height - 1) stack.push(new Location(i.x, i.y + 1));
+				}
+			}
+		}
+	}
+
 	private boolean check(String oldName, float y, float x) {
 		String name = tileNames[(int)x][(int)y];
 		boolean bool1 = (oldName == null && name == null);
