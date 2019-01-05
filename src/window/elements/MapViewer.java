@@ -4,6 +4,7 @@ import data.*;
 import data.layer.*;
 import data.layer.layerobjects.GO;
 import data.layer.layerobjects.TagObject;
+import window.ClipBoardUtil;
 import window.Tools;
 import window.elements.layer.LayerPane;
 
@@ -86,7 +87,6 @@ public class MapViewer extends JPanel {
 							for(int x = 0;  x < map.getWidth(); x++) {
 								for(int y = 0;  y < map.getHeight(); y++) {
 									if(selection.getArea().contains(x*map.getTileSize(), y*map.getTileSize())) {
-										System.out.println(selectedLayer.getTileNames()[y][x]);
 										if(selectedLayer.getTileNames()[y][x] != null) {
 											copyLayer.set(selectedLayer.getTileNames()[y][x], x, y, false);
 											selectedLayer.set(null, x, y, false);
@@ -94,7 +94,6 @@ public class MapViewer extends JPanel {
 									}
 								}
 							}
-							System.out.println(copyLayer.getImages().size());
 						}
 						moveSelection(last_x, last_y, e.getX(), e.getY(), true);
 					}
@@ -205,12 +204,53 @@ public class MapViewer extends JPanel {
 				if(selection!= null) {
 				}
 
+				//TODO: Recognition is not working properly
 				if (e.getKeyCode() == 521 && (e.getKeyChar() != '+' || e.isControlDown())) {   								   // +
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
 				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    						   // -
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
 				} else if (e.getKeyCode() == 67 && (e.getKeyChar() != 'c') && e.getKeyChar() != 'C' || e.isControlDown()) {    // c
+					if(selection == null || !(layerPane.getSelectedLayer() instanceof TileLayer)) return;
+					if(copyLayer != null) mergeCopyLayer();
+
+					String copiedMap = "";
+					TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
+					for(int x = 0;  x < map.getWidth(); x++) {
+						boolean hadInSel = false;
+						for(int y = 0;  y < map.getHeight(); y++) {
+							if(selection.getArea().contains(x*map.getTileSize(), y*map.getTileSize())) {
+								copiedMap += (selectedLayer.getTileNames()[y][x] == null? "[x]": selectedLayer.getTileNames()[y][x]) + " ";
+								hadInSel = true;
+							}
+						}
+						if(hadInSel) copiedMap += "\n";
+					}
+					ClipBoardUtil.StringToClip(copiedMap);
 				} else if (e.getKeyCode() == 86 && (e.getKeyChar() != 'v') && e.getKeyChar() != 'V' || e.isControlDown()) {    // v
+					if(copyLayer != null) mergeCopyLayer();
+					tool = Tools.MOVE;
+					tb.update(tool);
+
+					copyLayer = new FreeLayer(0.5f, map.getWidth(), map.getHeight(), map.getTileSize());
+
+					String in = ClipBoardUtil.ClipToString();
+					String[] lines = in.split("\n");
+					int lineC = lines.length;
+					int textureC = 0;
+					//TODO: BetterPositioning, Warning when textures not existing
+
+					if(lineC == 0) return;
+					for(int x = 0; x < lineC; x++) {
+						String[] textures = in.split("\n")[x].split(" ");
+						textureC = textures.length;
+						for(int y = 0; y < textureC; y++) {
+							String texture = textures[y];
+							if(!texture.equalsIgnoreCase("[x]")) copyLayer.set(texture, x, y, false);
+						}
+					}
+
+					selection = new Selection();
+					selection.add(new Rectangle(0, 0, lineC*map.getTileSize(), textureC *map.getTileSize()));
 				} else if (e.getKeyCode() == 90 && (e.getKeyChar() != 'z') && e.getKeyChar() != 'Z' || e.isControlDown()) {    // z
 				} else if (e.getKeyCode() == 65 && (e.getKeyChar() != 'a') && e.getKeyChar() != 'A' || e.isControlDown()) {    // a
 					selection = null;
@@ -290,7 +330,7 @@ public class MapViewer extends JPanel {
 		TileLayer tl = (TileLayer) selectedLayer;
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
-		tl.fill(selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
+		tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
 	}
 
 	/**
@@ -453,7 +493,7 @@ public class MapViewer extends JPanel {
 	}
 
 	private void mergeCopyLayer() {
-		if(copyLayer != null) {
+		if(copyLayer != null) {		//TODO: SelectedLayer could be other Layer
 			if(layerPane.getSelectedLayer() instanceof TileLayer) {
 				TileLayer layer = (TileLayer) layerPane.getSelectedLayer();
 				for(GO g: copyLayer.getImages()) {
