@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
-import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
@@ -26,7 +25,7 @@ public class MapViewer extends JPanel {
 	private Location startClick;
 	private int last_x, last_y, midX, midY;					//x,y coordinates of the last click, ... of the last middle mouse click
 
-	private Area selection;
+	private Selection selection;
 
 	private boolean mouseEntered;							//booleans if the mouse is in the window and the user has drawing mode (true) or erase mode (false)
 	private Tools tool;
@@ -147,14 +146,15 @@ public class MapViewer extends JPanel {
 					Rectangle r = new Rectangle(x * map.getTileSize(), y * map.getTileSize(), w * map.getTileSize(),h * map.getTileSize());
 
 					if(selection == null || (!e.isShiftDown() && !e.isControlDown())) {
-						selection = new Area(r);
-					} else if(e.isShiftDown() && !e.isControlDown()) selection.add(new Area(r));
-					else if(!e.isShiftDown() && e.isControlDown()) selection.subtract(new Area(r));
+						selection = new Selection();
+						selection.add(r);
+					} else if(e.isShiftDown() && !e.isControlDown()) selection.add(r);
+					else if(!e.isShiftDown() && e.isControlDown()) selection.subtract(r);
 					startClick = null;
 				}
 
 				if(e.getButton() == 1 && tool == Tools.MOVE) {
-					//TODO: Round to Tile_Size
+					selection.roundPosition(map.getTileSize());
 				}
 			}
 
@@ -231,7 +231,7 @@ public class MapViewer extends JPanel {
 		}
 
 		Location pos = getBlockLocation(x, y);
-		if(selectedLayer instanceof TileLayer && (selection != null && !selection.contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
 	}
 
@@ -248,7 +248,7 @@ public class MapViewer extends JPanel {
 		}
 
 		Location pos = getBlockLocation(x, y);
-		if(selectedLayer instanceof TileLayer && (selection != null && !selection.contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.remove(pos.x, pos.y);
 	}
 
@@ -262,8 +262,8 @@ public class MapViewer extends JPanel {
 
 		TileLayer tl = (TileLayer) selectedLayer;
 		Location pos = getBlockLocation(x, y);
-		if(selectedLayer instanceof TileLayer && (selection != null && !selection.contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
-		tl.fill(selection, rem? null: selectedTexture, pos.x, pos.y);
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
+		tl.fill(selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
 	}
 
 	/**
@@ -389,9 +389,9 @@ public class MapViewer extends JPanel {
 		if(selection != null) {
 			Color c = Tools.SELECT.getColor();
 			g2.setColor(c);
-			g2.draw(selection);
+			g2.draw(selection.getArea());
 			g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 60));
-			g2.fill(selection);
+			g2.fill(selection.getArea());
 		}
 		if(startClick != null) {
 			g2.setColor(Tools.SELECT.getColor().brighter());
@@ -408,26 +408,9 @@ public class MapViewer extends JPanel {
 	}
 
 	private void moveSelection(int x1, int y1, int x2, int y2) {
-		//TODO: Make it better
-		Polygon p = areaToShape();
-		p.translate(x2-x1, y2-y1);
-		selection = new Area(p);
-	}
-
-	private Polygon areaToShape() {
-		PathIterator iterator = selection.getPathIterator(null);
-		float[] floats = new float[6];
-		Polygon polygon = new Polygon();
-		while (!iterator.isDone()) {
-			int type = iterator.currentSegment(floats);
-			int x = (int) floats[0];
-			int y = (int) floats[1];
-			if(type != PathIterator.SEG_CLOSE) {
-				polygon.addPoint(x, y);
-			}
-			iterator.next();
-		}
-		return polygon;
+		Location from = getBlockLocation(x1, y1);
+		Location to = getBlockLocation(x2, y2);
+		selection.translate(Math.round((float)map.getTileSize() * (to.x-from.x)), Math.round((float)map.getTileSize()*(to.y-from.y)));
 	}
 
 	public void setTool(Tools t) {
