@@ -2,6 +2,7 @@ package window.elements;
 
 import data.*;
 import data.layer.*;
+import data.layer.layerobjects.GO;
 import data.layer.layerobjects.TagObject;
 import window.Tools;
 import window.elements.layer.LayerPane;
@@ -17,7 +18,7 @@ public class MapViewer extends JPanel {
 
 	private ImageList imageList;							//the ImageList => get selected Image
 	private LayerPane layerPane;							//the LayerPane => get selected Layer
-	private TileLayer copyLayer;
+	private FreeLayer copyLayer;
 	private MainToolBar tb;
 
 	private Camera camera;									//Camera to set viewpoint
@@ -66,13 +67,37 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				if (SwingUtilities.isMiddleMouseButton(e))                        	   camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
-				else if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET) drag(last_x, last_y, e.getX(), e.getY());
+				else if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET && tool != Tools.MOVE) drag(last_x, last_y, e.getX(), e.getY());
 				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.BRUSH)  set(e.getX(), e.getY(), true);
 				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.ERASER) remove(e.getX(), e.getY());
 				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
 				else if (SwingUtilities.isRightMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
 				else if(SwingUtilities.isLeftMouseButton(e)   && tool == Tools.MOVE)   {
-					moveSelection(last_x, last_y, e.getX(), e.getY());
+					if(selection != null) moveSelection(last_x, last_y, e.getX(), e.getY(), false);
+				}
+				else if(SwingUtilities.isRightMouseButton(e)   && tool == Tools.MOVE)   {
+					if(selection != null && layerPane.getSelectedLayer() instanceof TileLayer) {
+						TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
+						if(copyLayer == null) {
+
+							//COPY selectedLayer into copyLayer and clear the copied space
+
+							copyLayer = new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize());
+							for(int x = 0;  x < map.getWidth(); x++) {
+								for(int y = 0;  y < map.getHeight(); y++) {
+									if(selection.getArea().contains(x*map.getTileSize(), y*map.getTileSize())) {
+										System.out.println(selectedLayer.getTileNames()[y][x]);
+										if(selectedLayer.getTileNames()[y][x] != null) {
+											copyLayer.set(selectedLayer.getTileNames()[y][x], x, y, false);
+											selectedLayer.set(null, x, y, false);
+										}
+									}
+								}
+							}
+							System.out.println(copyLayer.getImages().size());
+						}
+						moveSelection(last_x, last_y, e.getX(), e.getY(), true);
+					}
 				}
 
 				last_x = e.getX();
@@ -122,6 +147,7 @@ public class MapViewer extends JPanel {
 					tool = tool.next();
 					tb.update(tool);
 					startClick = null;
+					mergeCopyLayer();
 				}
 
 				if(e.getButton() == 1 && tool == Tools.SELECT && startClick != null) {
@@ -154,7 +180,12 @@ public class MapViewer extends JPanel {
 				}
 
 				if(e.getButton() == 1 && tool == Tools.MOVE) {
-					selection.roundPosition(map.getTileSize());
+					if(selection != null) selection.roundPosition(map.getTileSize());
+				}
+
+				if(e.getButton() == 3 && tool == Tools.MOVE) {
+					if(selection != null) selection.roundPosition(map.getTileSize());
+					if(copyLayer != null) copyLayer.roundAll(map.getTileSize());
 				}
 			}
 
@@ -166,9 +197,7 @@ public class MapViewer extends JPanel {
 		this.addKeyListener(new KeyListener() {
 
 			@Override
-			public void keyTyped(KeyEvent e) {
-			//	System.out.println(e.getKeyCode() == KeyEvent.VK_UP);
-			}
+			public void keyTyped(KeyEvent e) {}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -176,9 +205,9 @@ public class MapViewer extends JPanel {
 				if(selection!= null) {
 				}
 
-				if (e.getKeyCode() == 521 && (e.getKeyChar() != '+' || e.isControlDown())) {    // +
+				if (e.getKeyCode() == 521 && (e.getKeyChar() != '+' || e.isControlDown())) {   								   // +
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
-				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    // -
+				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    						   // -
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
 				} else if (e.getKeyCode() == 67 && (e.getKeyChar() != 'c') && e.getKeyChar() != 'C' || e.isControlDown()) {    // c
 				} else if (e.getKeyCode() == 86 && (e.getKeyChar() != 'v') && e.getKeyChar() != 'V' || e.isControlDown()) {    // v
@@ -187,8 +216,6 @@ public class MapViewer extends JPanel {
 					selection = null;
 					startClick = null;
 				}
-
-
 
 				if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
 					int toolIndex = e.getKeyCode() - 48;
@@ -384,6 +411,10 @@ public class MapViewer extends JPanel {
 			}
 		}
 
+		if(copyLayer != null) {
+			copyLayer.draw(g2);
+		}
+
 		//Draws selection
 		g2.setStroke(new BasicStroke(2 / camera.zoom));
 		if(selection != null) {
@@ -407,15 +438,30 @@ public class MapViewer extends JPanel {
 		g.drawImage(img, 0, 0, null);
 	}
 
-	private void moveSelection(int x1, int y1, int x2, int y2) {
+	private void moveSelection(int x1, int y1, int x2, int y2, boolean isRight) {
 		Location from = getBlockLocation(x1, y1);
 		Location to = getBlockLocation(x2, y2);
 		selection.translate(Math.round((float)map.getTileSize() * (to.x-from.x)), Math.round((float)map.getTileSize()*(to.y-from.y)));
+		if(isRight && copyLayer != null) copyLayer.moveAll((to.x-from.x), (to.y-from.y));
 	}
 
 	public void setTool(Tools t) {
+		mergeCopyLayer();
+
 		this.tool = t;
 		tb.update(tool);
+	}
+
+	private void mergeCopyLayer() {
+		if(copyLayer != null) {
+			if(layerPane.getSelectedLayer() instanceof TileLayer) {
+				TileLayer layer = (TileLayer) layerPane.getSelectedLayer();
+				for(GO g: copyLayer.getImages()) {
+					layer.set(g.name, (int)g.x, (int)g.y, false);
+				}
+			}
+		}
+		copyLayer = null;
 	}
 
 	private void sendErrorMessage() {

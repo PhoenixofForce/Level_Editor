@@ -88,6 +88,29 @@ public class FreeLayer implements Layer {
 		return go;
 	}
 
+	public void moveAll(float dx, float dy) {
+		for(int i = 0; i < images.size(); i++) {
+			GO go = images.get(i);
+
+			go.move(dx, dy);
+			if (go.x < 0 || go.x + go.width > this.width || go.y < 0 || go.y + go.height > this.height)
+				go.move(-dx, -dy);
+		}
+	}
+
+	public void roundAll(int tileSize) {
+		float smallestX = Integer.MAX_VALUE,
+			smallestY = Integer.MAX_VALUE;
+
+		for(int i = 0; i < images.size(); i++) {
+			GO r = images.get(i);
+			if(smallestX > r.x) smallestX = r.x;
+			if(smallestY > r.y) smallestY = r.y;
+		}
+
+		moveAll(-(smallestX%1), -(smallestY%1));
+	}
+
 	/**
 	 * @param x given x coordinate
 	 * @param y given y coordinate
