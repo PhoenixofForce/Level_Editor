@@ -15,8 +15,7 @@ public class Main {
 
 			Less Important
 			-view used ressources (?)
-			-copy paste
-			-selection => copy, delete....
+			-selection => delete....
 			-settings (?)
 		 */
 

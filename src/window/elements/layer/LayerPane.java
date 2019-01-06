@@ -59,7 +59,7 @@ public class LayerPane extends JPanel {
 		this.add(jList, BorderLayout.PAGE_START);
 		this.add(layerControl, BorderLayout.PAGE_END);
 
-		updateGameMap(newMap);
+		updateGameMap(newMap, true);
 	}
 
 	/**
@@ -128,9 +128,10 @@ public class LayerPane extends JPanel {
 	 * sets new map
 	 * @param map map to be updated
 	 */
-	public void updateGameMap(GameMap map) {
+	public void updateGameMap(GameMap map, boolean isNewMap) {
 		this.map = map;
 
+		int selectedIndex = jList.getSelectedIndex();
 		//resets the listModel and list
 		listModel = new DefaultListModel<>();
 		for (String name : map.getLayers().keySet()) {
@@ -142,7 +143,8 @@ public class LayerPane extends JPanel {
 		}
 
 		jList.setModel(listModel);
-		jList.setSelectedIndex(0);
+		if(isNewMap) jList.setSelectedIndex(0);
+		else jList.setSelectedIndex(selectedIndex);
 	}
 
 	/**

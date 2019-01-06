@@ -86,7 +86,7 @@ public class MenuBar extends JMenuBar {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File f = chooser.getSelectedFile();
 
-				open(f);
+				open(f, true);
 			}
 		});
 
@@ -181,10 +181,11 @@ public class MenuBar extends JMenuBar {
 		updateRes.addActionListener(e -> reimport());
 	}
 
-	public void open(File f) {
-		lastSave = f;
-		lastOpen = f;
-
+	public void open(File f, boolean isNewMap) {
+		if(isNewMap) {
+			lastSave = f;
+			lastOpen = f;
+		}
 		try {
 			BufferedReader r = new BufferedReader(new FileReader(f));
 
@@ -202,7 +203,7 @@ public class MenuBar extends JMenuBar {
 
 					if (text.exists() && image.exists()) {
 						TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 4), text.getAbsolutePath());
-						list.update();
+						if(isNewMap) list.update();
 					} else {
 						JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
 					}
@@ -333,7 +334,7 @@ public class MenuBar extends JMenuBar {
 				map.addTag(new Tag(tag, mapTags.get(tag)));
 			}
 
-			w.setMap(map);
+			w.setMap(map, isNewMap);
 			r.close();
 		} catch (Exception e1) {
 			lastSave = null;
@@ -381,6 +382,10 @@ public class MenuBar extends JMenuBar {
 	}
 
 	private void writeToFile(Window w, File f) {
+		writeToFile(w.getMap(), f);
+	}
+
+	public void writeToFile(GameMap map, File f) {
 		try {
 			PrintWriter wr = new PrintWriter(f);
 
@@ -388,7 +393,6 @@ public class MenuBar extends JMenuBar {
 				wr.write("i: " + i.getAbsolutePath() + "\n");
 			}
 
-			GameMap map = w.getMap();
 			wr.write("w: " + map.getWidth() + "\n");
 			wr.write("h: " + map.getHeight() + "\n");
 			wr.write("t: " + map.getTileSize() + "\n");

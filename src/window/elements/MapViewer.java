@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class MapViewer extends JPanel {
 	private static final boolean TILE_HIGHLIGHT = true;		//true if tiles should be highlighted
@@ -20,6 +21,7 @@ public class MapViewer extends JPanel {
 	private ImageList imageList;							//the ImageList => get selected Image
 	private LayerPane layerPane;							//the LayerPane => get selected Layer
 	private FreeLayer copyLayer;
+	private MenuBar mb;
 	private MainToolBar tb;
 
 	private Camera camera;									//Camera to set viewpoint
@@ -34,14 +36,21 @@ public class MapViewer extends JPanel {
 
 	private GameMap map;									//the game map
 
-	public MapViewer(MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
+	private boolean didAction = false;
+	private int actions = 0;
+	private int maxAction = 0;
+
+	public MapViewer(MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
 		requestFocus();
 		grabFocus();
 
 		this.layerPane = layerPane;
 		this.imageList = imageList;
+		this.mb = mb;
 		this.tb = tb;
 		this.map = map;
+
+		addAction();
 
 		tool = Tools.BRUSH;
 		tb.update(tool);
@@ -80,7 +89,7 @@ public class MapViewer extends JPanel {
 					if(selection != null && layerPane.getSelectedLayer() instanceof TileLayer) {
 						TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
 						if(copyLayer == null) {
-
+							addAction();
 							//COPY selectedLayer into copyLayer and clear the copied space
 
 							copyLayer = new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize());
@@ -186,6 +195,10 @@ public class MapViewer extends JPanel {
 					if(selection != null) selection.roundPosition(map.getTileSize());
 					if(copyLayer != null) copyLayer.roundAll(map.getTileSize());
 				}
+
+				if(didAction) {
+					addAction();
+				}
 			}
 
 			@Override
@@ -204,12 +217,11 @@ public class MapViewer extends JPanel {
 				if(selection!= null) {
 				}
 
-				//TODO: Recognition is not working properly
 				if (e.getKeyCode() == 521 && (e.getKeyChar() != '+' || e.isControlDown())) {   								   // +
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
 				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    						   // -
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
-				} else if (e.getKeyCode() == 67 && (e.getKeyChar() != 'c') && e.getKeyChar() != 'C' || e.isControlDown()) {    // c
+				} else if (e.getKeyCode() == 67 && ((e.getKeyChar() != 'c' && e.getKeyChar() != 'C') || e.isControlDown())) {    // c
 					if(selection == null || !(layerPane.getSelectedLayer() instanceof TileLayer)) return;
 					if(copyLayer != null) mergeCopyLayer();
 
@@ -226,7 +238,7 @@ public class MapViewer extends JPanel {
 						if(hadInSel) copiedMap += "\n";
 					}
 					ClipBoardUtil.StringToClip(copiedMap);
-				} else if (e.getKeyCode() == 86 && (e.getKeyChar() != 'v') && e.getKeyChar() != 'V' || e.isControlDown()) {    // v
+				} else if (e.getKeyCode() == 86 && ((e.getKeyChar() != 'v' && e.getKeyChar() != 'V') || e.isControlDown())) {    // v
 					if(copyLayer != null) mergeCopyLayer();
 					tool = Tools.MOVE;
 					tb.update(tool);
@@ -251,8 +263,19 @@ public class MapViewer extends JPanel {
 
 					selection = new Selection();
 					selection.add(new Rectangle(0, 0, lineC*map.getTileSize(), textureC *map.getTileSize()));
-				} else if (e.getKeyCode() == 90 && (e.getKeyChar() != 'z') && e.getKeyChar() != 'Z' || e.isControlDown()) {    // z
-				} else if (e.getKeyCode() == 65 && (e.getKeyChar() != 'a') && e.getKeyChar() != 'A' || e.isControlDown()) {    // a
+				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
+					if(actions == 0) return;
+					actions--;
+					String tempFolder = System.getProperty("java.io.tmpdir") + "\\";
+					String fileName = "save_" + actions + ".umap";
+					mb.open(new File(tempFolder + fileName), false);
+				} else if (e.getKeyCode() == 89 && ((e.getKeyChar() != 'y' && e.getKeyChar() != 'Y') || e.isControlDown())) {    // y
+					if(actions == maxAction) return;
+					actions++;
+					String tempFolder = System.getProperty("java.io.tmpdir") + "\\";
+					String fileName = "save_" + actions + ".umap";
+					mb.open(new File(tempFolder + fileName), false);
+				} else if (e.getKeyCode() == 65 && ((e.getKeyChar() != 'a' && e.getKeyChar() != 'A') || e.isControlDown())) {    // a
 					selection = null;
 					startClick = null;
 				}
@@ -270,9 +293,9 @@ public class MapViewer extends JPanel {
 		});
 	}
 
-	public void setGameMap(GameMap map) {
+	public void setGameMap(GameMap map, boolean isNewMap) {
 		this.map = map;
-		centerCamera();
+		if(isNewMap) centerCamera();
 	}
 
 	/**
@@ -300,6 +323,8 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
+
+		didAction = true;
 	}
 
 	/**
@@ -317,6 +342,8 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.remove(pos.x, pos.y);
+
+		didAction = true;
 	}
 
 	private void fill(int x, int y, boolean rem) {
@@ -331,6 +358,8 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
+
+		didAction = true;
 	}
 
 	/**
@@ -370,6 +399,7 @@ public class MapViewer extends JPanel {
 		Location pos1 = getBlockLocation(x, y);
 		Location pos2 = getBlockLocation(targetX, targetY);
 		selectedLayer.drag(pos1.x, pos1.y, pos2.x, pos2.y);
+		didAction = true;
 	}
 
 	/**
@@ -492,6 +522,17 @@ public class MapViewer extends JPanel {
 		tb.update(tool);
 	}
 
+	public void addAction() {
+		actions++;
+		String tempFolder = System.getProperty("java.io.tmpdir") + "\\";
+		String fileName = "save_" + actions + ".umap";
+		maxAction = actions;
+		didAction = false;
+		File f = new File(tempFolder + fileName);
+		f.deleteOnExit();
+		mb.writeToFile(map, f);
+	}
+
 	private void mergeCopyLayer() {
 		if(copyLayer != null) {		//TODO: SelectedLayer could be other Layer
 			if(layerPane.getSelectedLayer() instanceof TileLayer) {
@@ -500,6 +541,7 @@ public class MapViewer extends JPanel {
 					layer.set(g.name, (int)g.x, (int)g.y, false);
 				}
 			}
+			addAction();
 		}
 		copyLayer = null;
 	}

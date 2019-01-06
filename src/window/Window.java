@@ -17,7 +17,7 @@ import java.io.File;
  */
 public class Window extends JFrame {
 
-	private LayerPane layerPane;			//bar on the right side to controll layers
+	private LayerPane layerPane;			//bar on the left side to controll layers
 	private MainToolBar buttons;			//toolbar to save/ open/ export map and import ressources
 	private MapViewer mapViewer;			//displays the current map
 	private ImageList images;				//image selector and filter
@@ -33,7 +33,7 @@ public class Window extends JFrame {
 		this.setVisible(true);
 
 		//creating new standart map
-		setMap(new GameMap(100,100,16));
+		setMap(new GameMap(100,100,16), true);
 
 		//creating objects and adding them to the window
 		images = new ImageList(this);
@@ -51,7 +51,7 @@ public class Window extends JFrame {
 		this.add(layerPane, BorderLayout.LINE_START);
 		layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-		mapViewer = new MapViewer(buttons, images, layerPane, map);
+		mapViewer = new MapViewer(menu, buttons, images, layerPane, map);
 		this.add(mapViewer, BorderLayout.CENTER);
 		mapViewer.setFocusable(true);
 
@@ -89,13 +89,13 @@ public class Window extends JFrame {
 
 	/** Setting new map and resetting controll objects
 	*/
-	public void setMap(GameMap map) {
+	public void setMap(GameMap map, boolean isNewMap) {
 		this.map = map;
 		if(buttons != null) ;
-		if(menu != null) menu.reset();
-		if (mapViewer != null) mapViewer.setGameMap(map);
-		if (images != null) images.getModifier().setTagObject(null);
-		if (layerPane != null) layerPane.updateGameMap(map);
+		if(menu != null && isNewMap) menu.reset();
+		if (mapViewer != null) mapViewer.setGameMap(map, isNewMap);
+		if (images != null && isNewMap) images.getModifier().setTagObject(null);
+		if (layerPane != null) layerPane.updateGameMap(map, isNewMap);
 	}
 	
 	public GameMap getMap() {
@@ -103,7 +103,7 @@ public class Window extends JFrame {
 	}
 
 	public void open(File f) {
-		menu.open(f);
+		menu.open(f, true);
 	}
 
 	public MapViewer getMapViewer() {
