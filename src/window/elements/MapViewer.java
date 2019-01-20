@@ -46,7 +46,7 @@ public class MapViewer extends JPanel {
 	private int maxAction = 0;
 	private int savedAction = 1;
 
-	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
+	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map2) {
 		requestFocus();
 		grabFocus();
 
@@ -55,7 +55,7 @@ public class MapViewer extends JPanel {
 		this.imageList = imageList;
 		this.mb = mb;
 		this.tb = tb;
-		this.map = map;
+		this.map = map2;
 
 		prevActions = new ArrayList<>();
 		addAction();
@@ -101,16 +101,19 @@ public class MapViewer extends JPanel {
 							//COPY selectedLayer into copyLayer and clear the copied space
 
 							copyLayer = new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize());
+							List<int[]> resetPositions = new ArrayList<>();
 							for(int x = 0;  x < map.getWidth(); x++) {
 								for(int y = 0;  y < map.getHeight(); y++) {
 									if(selection.getArea().contains(x*map.getTileSize(), y*map.getTileSize())) {
 										if(selectedLayer.getTileNames()[y][x] != null) {
 											copyLayer.set(selectedLayer.getTileNames()[y][x], x, y, false);
-											selectedLayer.set(null, x, y, false);
+											resetPositions.add(new int[]{x, y});
 										}
 									}
 								}
 							}
+
+							for(int[] i: resetPositions)selectedLayer.set(null, i[0], i[1], false);
 						}
 						moveSelection(last_x, last_y, e.getX(), e.getY(), true);
 					}
@@ -266,7 +269,7 @@ public class MapViewer extends JPanel {
 					int textureC = 0;
 					//TODO: Warning when textures not existing or invalid copy
 
-					Location l = getBlockLocation(0, 0);
+					Location l = getBlockLocation(getWidth()/2, getHeight()/2);
 
 					if(lineC == 0) return;
 					for(int x = 0; x < lineC; x++) {
@@ -280,6 +283,8 @@ public class MapViewer extends JPanel {
 
 					selection = new Selection();
 					selection.add(new Rectangle(Math.round(l.x* map.getTileSize()), Math.round(l.y* map.getTileSize()), lineC*map.getTileSize(), textureC *map.getTileSize()));
+					selection.roundPosition(map.getTileSize());
+					copyLayer.roundAll(map.getTileSize());
 				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
 					if(actions == 1) return;
 					actions--;
@@ -316,8 +321,12 @@ public class MapViewer extends JPanel {
 
 	public void setGameMap(GameMap map, boolean isNewMap) {
 		this.map = map;
+		this.map.updateMap();
 		if(isNewMap) {
 			centerCamera();
+			prevActions = new ArrayList<>();
+			savedAction = 1;
+			didAction = false;
 			actions = 0;
 			addAction();
 		}
@@ -538,6 +547,9 @@ public class MapViewer extends JPanel {
 		Location to = getBlockLocation(x2, y2);
 		selection.translate(Math.round((float)map.getTileSize() * (to.x-from.x)), Math.round((float)map.getTileSize()*(to.y-from.y)));
 		if(isRight && copyLayer != null) copyLayer.moveAll((to.x-from.x), (to.y-from.y));
+		else {
+			mergeCopyLayer();
+		}
 	}
 
 	public void setTool(Tools t) {

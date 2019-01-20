@@ -224,6 +224,7 @@ public class GameMap extends TagObject {
 	@Override
 	public GameMap clone() {
 		GameMap out = new GameMap(width, height, tileSize);
+		out.setAutoTile(autoTile);
 		ArrayList<java.util.Map.Entry<String, Layer>> listOfEntry = new ArrayList<>(layers.entrySet());
 		for(java.util.Map.Entry<String, Layer> e: listOfEntry) {
 			Layer l = e.getValue();
@@ -244,8 +245,18 @@ public class GameMap extends TagObject {
 				continue;
 			}
 		}
-		out.setAutoTile(autoTile);
 		return out;
+	}
+
+	public void updateMap() {
+		ArrayList<java.util.Map.Entry<String, Layer>> listOfEntry = new ArrayList<>(layers.entrySet());
+		for(java.util.Map.Entry<String, Layer> e: listOfEntry) {
+			Layer l = e.getValue();
+			if (l instanceof TileLayer) {
+				TileLayer tl = (TileLayer) l;
+				tl.setMap(this);
+			}
+		}
 	}
 
 	public boolean getAutoTile() {

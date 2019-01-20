@@ -108,7 +108,9 @@ public class FreeLayer implements Layer {
 			if(smallestY > r.y) smallestY = r.y;
 		}
 
-		moveAll(-(smallestX%1), -(smallestY%1));
+		float 	dx = (smallestX%1),
+				dy = (smallestY%1);
+		moveAll(dx < 0.5f? -dx: 1-dx, dy < 0.5f? -dy: 1-dy);
 	}
 
 	/**

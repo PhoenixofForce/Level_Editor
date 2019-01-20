@@ -55,7 +55,9 @@ public class Selection {
 			if(smallestY > r.y) smallestY = r.y;
 		}
 
-		translate(-(smallestX%tileSize), -(smallestY%tileSize));
+		int dx = smallestX%tileSize,
+			dy = smallestY%tileSize;
+		translate(dx < tileSize/2? -dx: tileSize-dx, dy < tileSize/2? -dy: tileSize-dy);
 	}
 
 	public Area getArea() {

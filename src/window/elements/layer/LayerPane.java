@@ -105,6 +105,7 @@ public class LayerPane extends JPanel {
 
 		//Adds layer to map and to listModel at the position fitting to its depth
 		map.addLayer(name, layer);
+		window.getMapViewer().addAction();
 		int index = 0;
 		while (index < listModel.size() && map.getLayer(listModel.get(index)).depth() > layer.depth()) index++;
 		listModel.add(index, name);
@@ -119,6 +120,7 @@ public class LayerPane extends JPanel {
 		int sel = jList.getSelectedIndex();
 		String name = listModel.get(sel);
 		map.removeLayer(name);
+		window.getMapViewer().addAction();
 		listModel.remove(sel);
 		if (sel == 0) jList.setSelectedIndex(0);
 		else jList.setSelectedIndex(sel - 1);
@@ -129,9 +131,15 @@ public class LayerPane extends JPanel {
 	 * @param map map to be updated
 	 */
 	public void updateGameMap(GameMap map, boolean isNewMap) {
+		Map<Layer, Boolean> newHidden = new HashMap<>();
+		for(String s: map.getLayers().keySet()) {
+			Layer l = this.map.getLayer(s);
+			newHidden.put(map.getLayer(s), hidden.containsKey(l)? hidden.get(l): false);
+		}
+
 		this.map = map;
 
-		int selectedIndex = jList.getSelectedIndex();
+		String selected = jList.getSelectedIndex() >= 0? listModel.get(jList.getSelectedIndex()): null;
 		//resets the listModel and list
 		listModel = new DefaultListModel<>();
 		for (String name : map.getLayers().keySet()) {
@@ -143,8 +151,17 @@ public class LayerPane extends JPanel {
 		}
 
 		jList.setModel(listModel);
-		if(isNewMap) jList.setSelectedIndex(0);
-		else jList.setSelectedIndex(selectedIndex);
+		jList.setSelectedIndex(0);
+		if(!isNewMap) {
+			for(int i = 0; i < listModel.size(); i++) {
+				if(listModel.get(i).equals(selected)) {
+					jList.setSelectedIndex(i);
+					break;
+				}
+			}
+		}
+
+		hidden = newHidden;
 	}
 
 	/**
