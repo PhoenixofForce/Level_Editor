@@ -2,36 +2,63 @@ package window.elements;
 
 import data.*;
 import data.layer.*;
+import data.layer.layerobjects.GO;
 import data.layer.layerobjects.TagObject;
+import window.ClipBoardUtil;
 import window.Tools;
+import window.Window;
 import window.elements.layer.LayerPane;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
 	private static final boolean TILE_HIGHLIGHT = true;		//true if tiles should be highlighted
 
+	private Window window;
 	private ImageList imageList;							//the ImageList => get selected Image
 	private LayerPane layerPane;							//the LayerPane => get selected Layer
+	private FreeLayer copyLayer;
+	private MenuBar mb;
 	private MainToolBar tb;
 
 	private Camera camera;									//Camera to set viewpoint
 
+	private Location startClick;
 	private int last_x, last_y, midX, midY;					//x,y coordinates of the last click, ... of the last middle mouse click
+
+	private Selection selection;
 
 	private boolean mouseEntered;							//booleans if the mouse is in the window and the user has drawing mode (true) or erase mode (false)
 	private Tools tool;
 
 	private GameMap map;									//the game map
 
-	public MapViewer(MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
+	private List<GameMap> prevActions;
+	private boolean didAction = false;
+	private int actions = 0;
+	private int maxAction = 0;
+	private int savedAction = 1;
+
+	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
+		requestFocus();
+		grabFocus();
+
+		this.window = window;
 		this.layerPane = layerPane;
 		this.imageList = imageList;
+		this.mb = mb;
 		this.tb = tb;
 		this.map = map;
+
+		prevActions = new ArrayList<>();
+		addAction();
 
 		tool = Tools.BRUSH;
 		tb.update(tool);
@@ -57,12 +84,37 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if (SwingUtilities.isMiddleMouseButton(e)) camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
-				else if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET) drag(last_x, last_y, e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BRUSH) set(e.getX(), e.getY(), true);
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.ERASER) remove(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
+				if (SwingUtilities.isMiddleMouseButton(e))                        	   camera.move((e.getX() - last_x) / camera.zoom,(e.getY() - last_y) / camera.zoom);
+				else if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET && tool != Tools.MOVE) drag(last_x, last_y, e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.BRUSH)  set(e.getX(), e.getY(), true);
+				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.ERASER) remove(e.getX(), e.getY());
+				else if (SwingUtilities.isLeftMouseButton(e)  && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
 				else if (SwingUtilities.isRightMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
+				else if(SwingUtilities.isLeftMouseButton(e)   && tool == Tools.MOVE)   {
+					if(selection != null) moveSelection(last_x, last_y, e.getX(), e.getY(), false);
+				}
+				else if(SwingUtilities.isRightMouseButton(e)   && tool == Tools.MOVE)   {
+					if(selection != null && layerPane.getSelectedLayer() instanceof TileLayer) {
+						TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
+						if(copyLayer == null) {
+							addAction();
+							//COPY selectedLayer into copyLayer and clear the copied space
+
+							copyLayer = new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize());
+							for(int x = 0;  x < map.getWidth(); x++) {
+								for(int y = 0;  y < map.getHeight(); y++) {
+									if(selection.getArea().contains(x*map.getTileSize(), y*map.getTileSize())) {
+										if(selectedLayer.getTileNames()[y][x] != null) {
+											copyLayer.set(selectedLayer.getTileNames()[y][x], x, y, false);
+											selectedLayer.set(null, x, y, false);
+										}
+									}
+								}
+							}
+						}
+						moveSelection(last_x, last_y, e.getX(), e.getY(), true);
+					}
+				}
 
 				last_x = e.getX();
 				last_y = e.getY();
@@ -82,12 +134,20 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (SwingUtilities.isRightMouseButton(e) && tool != Tools.BUCKET) select(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BRUSH) set(e.getX(), e.getY(), false);
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.ERASER) remove(e.getX(), e.getY());
-				else if (SwingUtilities.isLeftMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
-				else if (SwingUtilities.isRightMouseButton(e) && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
-				else if (SwingUtilities.isMiddleMouseButton(e)) {
+				requestFocus();
+				grabFocus();
+
+				if (e.getButton() == 3 && tool != Tools.BUCKET && tool != Tools.SELECT) select(e.getX(), e.getY());
+				else if (e.getButton() == 1 && tool == Tools.BRUSH) set(e.getX(), e.getY(), false);
+				else if (e.getButton() == 1 && tool == Tools.ERASER) remove(e.getX(), e.getY());
+				else if (e.getButton() == 1 && tool == Tools.BUCKET) fill(e.getX(), e.getY(), false);
+				else if (e.getButton() == 3 && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
+				else if(e.getButton() == 1 && tool == Tools.SELECT) startClick = getBlockLocation(e.getX(), e.getY());
+				else if(e.getButton() == 3 && tool == Tools.SELECT) {
+					selection = null;
+					startClick = null;
+				}
+				else if (e.getButton() == 2) {
 					//Save clicked position
 					midX = e.getX();
 					midY = e.getY();
@@ -99,17 +159,168 @@ public class MapViewer extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				//when the difference on middle mouse click and middle mouse release is smaller than than => swap between erasing and drawgin
-				if (SwingUtilities.isMiddleMouseButton(e) && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) {
-					tool = tool.next();
+				if (e.getButton() == 2 && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) {
+					if(!e.isShiftDown()) {
+						tool = tool.next();
+						if(tool == Tools.MOVE && selection == null) tool = tool.next();
+					}
+					else {
+						tool = tool.pre();
+						if(tool == Tools.MOVE && selection == null) tool = tool.pre();
+					}
+					tb.update(tool);
+					startClick = null;
+					mergeCopyLayer();
+				}
+
+				if(e.getButton() == 1 && tool == Tools.SELECT && startClick != null) {
+					Location last = getBlockLocation(e.getX(), e.getY());
+					int x = (int)(Math.min(last.x, startClick.x));
+					int y = (int)(Math.min(last.y, startClick.y));
+
+					if(x < 0) x = 0;
+					if(y < 0) y = 0;
+
+					int w = (int)(Math.max(last.x, startClick.x)) -x+1;
+					int h = (int)(Math.max(last.y, startClick.y)) -y+1;
+
+					if(w < 0 || h < 0 || x > map.getWidth() || y > map.getWidth()) {
+						startClick = null;
+						selection = null;
+						return;
+					}
+					if(x + w > map.getWidth()) w = map.getWidth()-x;
+					if(y + h > map.getHeight()) h = map.getHeight()-y;
+
+					Rectangle r = new Rectangle(x * map.getTileSize(), y * map.getTileSize(), w * map.getTileSize(),h * map.getTileSize());
+
+					if(selection == null || (!e.isShiftDown() && !e.isControlDown())) {
+						selection = new Selection();
+						selection.add(r);
+					} else if(e.isShiftDown() && !e.isControlDown()) selection.add(r);
+					else if(!e.isShiftDown() && e.isControlDown()) selection.subtract(r);
+					startClick = null;
+				}
+
+				if(e.getButton() == 1 && tool == Tools.MOVE) {
+					if(selection != null) selection.roundPosition(map.getTileSize());
+				}
+
+				if(e.getButton() == 3 && tool == Tools.MOVE) {
+					if(selection != null) selection.roundPosition(map.getTileSize());
+					if(copyLayer != null) copyLayer.roundAll(map.getTileSize());
+				}
+
+				if(didAction) {
+					addAction();
+				}
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			}
+		});
+
+		this.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				System.out.println(e.getKeyChar() + " " + e.getKeyCode() + e.isControlDown());
+				if(selection!= null) {
+				}
+
+				if (e.getKeyCode() == 521 && (e.getKeyChar() != '+' || e.isControlDown())) {   								   // +
+					camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
+				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    						   // -
+					camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
+				} else if (e.getKeyCode() == 67 && ((e.getKeyChar() != 'c' && e.getKeyChar() != 'C') || e.isControlDown())) {    // c
+					if(selection == null || !(layerPane.getSelectedLayer() instanceof TileLayer)) return;
+					if(copyLayer != null) mergeCopyLayer();
+
+					String copiedMap = "";
+					TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
+					for(int x = 0;  x < map.getWidth(); x++) {
+						boolean hadInSel = false;
+						for(int y = 0;  y < map.getHeight(); y++) {
+							if(selection.getArea().contains(x*map.getTileSize(), y*map.getTileSize())) {
+								copiedMap += (selectedLayer.getTileNames()[y][x] == null? "[x]": selectedLayer.getTileNames()[y][x]) + " ";
+								hadInSel = true;
+							}
+						}
+						if(hadInSel) copiedMap += "\n";
+					}
+					ClipBoardUtil.StringToClip(copiedMap);
+				} else if (e.getKeyCode() == 86 && ((e.getKeyChar() != 'v' && e.getKeyChar() != 'V') || e.isControlDown())) {    // v
+					if(copyLayer != null) mergeCopyLayer();
+					tool = Tools.MOVE;
+					tb.update(tool);
+
+					copyLayer = new FreeLayer(0.5f, map.getWidth(), map.getHeight(), map.getTileSize());
+
+					String in = ClipBoardUtil.ClipToString();
+					String[] lines = in.split("\n");
+					int lineC = lines.length;
+					int textureC = 0;
+					//TODO: Warning when textures not existing or invalid copy
+
+					Location l = getBlockLocation(0, 0);
+
+					if(lineC == 0) return;
+					for(int x = 0; x < lineC; x++) {
+						String[] textures = in.split("\n")[x].split(" ");
+						textureC = textures.length;
+						for(int y = 0; y < textureC; y++) {
+							String texture = textures[y];
+							if(!texture.equalsIgnoreCase("[x]")) copyLayer.set(texture, x+l.x, y+l.y, false);
+						}
+					}
+
+					selection = new Selection();
+					selection.add(new Rectangle(Math.round(l.x* map.getTileSize()), Math.round(l.y* map.getTileSize()), lineC*map.getTileSize(), textureC *map.getTileSize()));
+				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
+					if(actions == 1) return;
+					actions--;
+					updateTitle();
+					window.setMap(prevActions.get(actions-1).clone(), false);
+				} else if (e.getKeyCode() == 89 && ((e.getKeyChar() != 'y' && e.getKeyChar() != 'Y') || e.isControlDown())) {    // y
+					if(actions == maxAction) return;
+					actions++;
+					updateTitle();
+					window.setMap(prevActions.get(actions-1).clone(), false);
+				} else if (e.getKeyCode() == 65 && ((e.getKeyChar() != 'a' && e.getKeyChar() != 'A') || e.isControlDown())) {    // a
+					if(selection != null) selection = null;
+					 else {
+					 	selection = new Selection();
+					 	selection.add(new Rectangle(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize()));
+					}
+					startClick = null;
+				} else if (e.getKeyCode() == 83 && ((e.getKeyChar() != 's' && e.getKeyChar() != 'S') || e.isControlDown())) {    // s
+					mb.save();
+				}
+
+				if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
+					int toolIndex = e.getKeyCode() - 48;
+					tool = Tools.get(toolIndex - 1);
 					tb.update(tool);
 				}
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
 			}
 		});
 	}
 
-	public void setGameMap(GameMap map) {
+	public void setGameMap(GameMap map, boolean isNewMap) {
 		this.map = map;
-		centerCamera();
+		if(isNewMap) {
+			centerCamera();
+			actions = 0;
+			addAction();
+		}
 	}
 
 	/**
@@ -135,7 +346,10 @@ public class MapViewer extends JPanel {
 		}
 
 		Location pos = getBlockLocation(x, y);
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
+
+		didAction = true;
 	}
 
 	/**
@@ -151,19 +365,26 @@ public class MapViewer extends JPanel {
 		}
 
 		Location pos = getBlockLocation(x, y);
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.remove(pos.x, pos.y);
+
+		didAction = true;
 	}
 
 	private void fill(int x, int y, boolean rem) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
+		if (selectedLayer == null || selectedTexture == null || !(selectedLayer instanceof TileLayer) || layerPane.isHidden(selectedLayer)) {
 			sendErrorMessage();
 			return;
 		}
 
+		TileLayer tl = (TileLayer) selectedLayer;
 		Location pos = getBlockLocation(x, y);
-		selectedLayer.fill(rem? null: selectedTexture, pos.x, pos.y);
+		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
+		tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
+
+		didAction = true;
 	}
 
 	/**
@@ -203,6 +424,7 @@ public class MapViewer extends JPanel {
 		Location pos1 = getBlockLocation(x, y);
 		Location pos2 = getBlockLocation(targetX, targetY);
 		selectedLayer.drag(pos1.x, pos1.y, pos2.x, pos2.y);
+		didAction = true;
 	}
 
 	/**
@@ -284,12 +506,80 @@ public class MapViewer extends JPanel {
 			}
 		}
 
+		if(copyLayer != null) {
+			copyLayer.draw(g2);
+		}
+
+		//Draws selection
+		g2.setStroke(new BasicStroke(2 / camera.zoom));
+		if(selection != null) {
+			Color c = Tools.SELECT.getColor();
+			g2.setColor(c);
+			g2.draw(selection.getArea());
+			g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 60));
+			g2.fill(selection.getArea());
+		}
+		if(startClick != null) {
+			g2.setColor(Tools.SELECT.getColor().brighter());
+			Location last = getBlockLocation(last_x, last_y);
+			int x = (int)(Math.min(last.x, startClick.x));
+			int y = (int)(Math.min(last.y, startClick.y));
+			int w = (int)(Math.max(last.x, startClick.x)) -x+1;
+			int h = (int)(Math.max(last.y, startClick.y)) -y+1;
+			Rectangle r = new Rectangle(x * map.getTileSize(), y * map.getTileSize(), w * map.getTileSize(),h * map.getTileSize());
+			g2.draw(new Area(r));
+		}
+
 		g.drawImage(img, 0, 0, null);
 	}
 
+	private void moveSelection(int x1, int y1, int x2, int y2, boolean isRight) {
+		Location from = getBlockLocation(x1, y1);
+		Location to = getBlockLocation(x2, y2);
+		selection.translate(Math.round((float)map.getTileSize() * (to.x-from.x)), Math.round((float)map.getTileSize()*(to.y-from.y)));
+		if(isRight && copyLayer != null) copyLayer.moveAll((to.x-from.x), (to.y-from.y));
+	}
+
 	public void setTool(Tools t) {
+		mergeCopyLayer();
+
 		this.tool = t;
 		tb.update(tool);
+	}
+
+	public void addAction() {
+		actions++;
+		maxAction = actions;
+		didAction = false;
+
+		updateTitle();
+
+		prevActions.add(maxAction-1, map.clone());
+		while(prevActions.size() > maxAction) prevActions.remove(prevActions.size()-1);
+		System.out.println(maxAction + " " + prevActions.size());
+	}
+
+	private void updateTitle() {
+		String title = new StringBuilder("LevelEditor - ").append(mb.getFileName()).append(savedAction == actions? "": " (*)").toString();
+		window.setTitle(title);
+	}
+
+	private void mergeCopyLayer() {
+		if(copyLayer != null) {		//TODO: SelectedLayer could be other Layer
+			if(layerPane.getSelectedLayer() instanceof TileLayer) {
+				TileLayer layer = (TileLayer) layerPane.getSelectedLayer();
+				for(GO g: copyLayer.getImages()) {
+					layer.set(g.name, (int)g.x, (int)g.y, false);
+				}
+			}
+			addAction();
+		}
+		copyLayer = null;
+	}
+
+	public void saveAction() {
+		savedAction = actions;
+		updateTitle();
 	}
 
 	private void sendErrorMessage() {

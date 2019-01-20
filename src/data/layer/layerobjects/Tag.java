@@ -49,6 +49,11 @@ public class Tag {
 	}
 
 	@Override
+	public Tag clone() {
+		return new Tag(name, action);
+	}
+
+	@Override
 	public boolean equals(Object b) {
 		if(b instanceof Tag) {
 			Tag t = (Tag) b;

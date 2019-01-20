@@ -7,16 +7,14 @@ public class Main {
 	public static void main(String[] args) {
 		/*	TODO:
 			More Important:
-			-STRG+Z
+			-Strg LC => copy Texture (color picker)
+			-selection => delete....
+
 			-Improved Save-Directory
 			-presets
 			-change layer settings
 			-open last/ view last edited files
-
-			Less Important
 			-view used ressources (?)
-			-copy paste
-			-selection => move copy, delete....
 			-settings (?)
 		 */
 
@@ -30,5 +28,4 @@ public class Main {
 			}
 		}
 	}
-
 }

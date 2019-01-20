@@ -77,9 +77,6 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public void fill(String name, float x, float y) { }
-
-	@Override
 	public GO select(float x, float y) {
 		GO go = find(x, y);
 		if (go != null) {
@@ -89,6 +86,29 @@ public class FreeLayer implements Layer {
 			}
 		}
 		return go;
+	}
+
+	public void moveAll(float dx, float dy) {
+		for(int i = 0; i < images.size(); i++) {
+			GO go = images.get(i);
+
+			go.move(dx, dy);
+			if (go.x < 0 || go.x + go.width > this.width || go.y < 0 || go.y + go.height > this.height)
+				go.move(-dx, -dy);
+		}
+	}
+
+	public void roundAll(int tileSize) {
+		float smallestX = Integer.MAX_VALUE,
+			smallestY = Integer.MAX_VALUE;
+
+		for(int i = 0; i < images.size(); i++) {
+			GO r = images.get(i);
+			if(smallestX > r.x) smallestX = r.x;
+			if(smallestY > r.y) smallestY = r.y;
+		}
+
+		moveAll(-(smallestX%1), -(smallestY%1));
 	}
 
 	/**
@@ -141,6 +161,13 @@ public class FreeLayer implements Layer {
 		float smallestY = Integer.MIN_VALUE;
 		for(GO g: images) if(g.y > smallestY) smallestY = g.y;
 		return smallestY == Integer.MIN_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public FreeLayer clone() {
+		FreeLayer out = new FreeLayer(depth, width, height, tileSize);
+		for(int i = 0; i < images.size(); i++) out.images.add(images.get(i).clone());
+		return out;
 	}
 
 	@Override

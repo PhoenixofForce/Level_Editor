@@ -120,9 +120,6 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public void fill(String name, float x, float y) { }
-
-	@Override
 	public void draw(Graphics g) {
 		for (Area a: areas) {
 			g.setColor(a.getColor());
@@ -158,6 +155,13 @@ public class AreaLayer implements Layer {
 		float smallestY = Integer.MIN_VALUE;
 		for(Area a: areas) if(a.getBiggerY() > smallestY) smallestY = a.getBiggerX();
 		return smallestY == Integer.MIN_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public AreaLayer clone() {
+		AreaLayer out = new AreaLayer(depth, width, height, tileSize);
+		for(int i = 0; i < areas.size(); i++) out.areas.add(areas.get(i).clone());
+		return out;
 	}
 
 	@Override

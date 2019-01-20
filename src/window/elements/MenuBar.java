@@ -12,11 +12,15 @@ import data.layer.layerobjects.Tag;
 import window.UserInputs;
 import window.Window;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,10 +35,9 @@ public class MenuBar extends JMenuBar {
 	private List<File> imports;
 	private File lastExport, lastSave, lastOpen, lastImport;
 	private Window w;
-	private MainToolBar toolBar;
 	private ImageList list;
 
-	public MenuBar(Window w, MainToolBar bar, ImageList list) {
+	public MenuBar(Window w, ImageList list) {
 
 		imports = new ArrayList<>();
 
@@ -62,7 +65,6 @@ public class MenuBar extends JMenuBar {
 		this.add(res);
 
 		this.w = w;
-		this.toolBar = bar;
 		this.list = list;
 		addActions();
 	}
@@ -85,18 +87,12 @@ public class MenuBar extends JMenuBar {
 			int returnVal = chooser.showDialog(new JFrame(), "Open Map");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File f = chooser.getSelectedFile();
-
-				open(f);
+				open(f, true);
 			}
 		});
 
 		saveFile.addActionListener(e -> {
-
-			if(lastSave == null) {
-				saveAs(w);
-			} else {
-				writeToFile(w, lastSave);
-			}
+			save();
 		});
 
 		saveFileAs.addActionListener(e -> {
@@ -107,7 +103,7 @@ public class MenuBar extends JMenuBar {
 			JFileChooser chooser = new JFileChooser(){
 				public void approveSelection() {
 					File f = getSelectedFile();
-					if(!f.getName().endsWith(".map")) setSelectedFile( new File(f.getAbsolutePath() + ".map"));
+					if(!f.getName().endsWith(".map") && !f.getName().endsWith(".png")) setSelectedFile( new File(f.getAbsolutePath() + getFileFilter().getDescription()));
 					f = getSelectedFile();
 
 					if(f.exists()) {
@@ -122,28 +118,37 @@ public class MenuBar extends JMenuBar {
 			chooser.setOpaque(true);
 
 			chooser.setAcceptAllFileFilterUsed(false);
-			chooser.addChoosableFileFilter(new FileFilter() {
-				@Override
-				public boolean accept(File f) {
-					return f.isDirectory();
-				}
-
-				@Override
-				public String getDescription() {
-					return ".map files";
-				}
-			});
+			chooser.addChoosableFileFilter(new FileNameExtensionFilter(".map", "map"));
+			chooser.addChoosableFileFilter(new FileNameExtensionFilter(".png", "png"));
 
 			int returnVal = chooser.showDialog(new JButton(""), "Export File");
 			if(returnVal == JFileChooser.APPROVE_OPTION){
 				File f = chooser.getSelectedFile();
 				lastExport = f;
-				try {
-					PrintWriter wr = new PrintWriter(f);
-					wr.write(w.getMap().toMapFormat(true));
-					wr.close();
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
+
+				if(f.getName().endsWith(".map")) {
+					try {
+						PrintWriter wr = new PrintWriter(f);
+						wr.write(w.getMap().toMapFormat(true));
+						wr.close();
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
+				} else if(f.getName().endsWith(".png")) {
+					int[] bounds = w.getMap().getBounds();
+					BufferedImage img = new BufferedImage(w.getMap().getWidth()*w.getMap().getTileSize(), w.getMap().getHeight()*w.getMap().getTileSize(), BufferedImage.TYPE_INT_ARGB);
+					Graphics2D g2 = (Graphics2D) img.getGraphics();
+
+					//draws layer by their drawing depth
+					w.getMap().getLayers().values().stream()
+							.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
+							.forEach(l -> l.draw(g2));
+					try {
+						System.out.println(Arrays.toString(bounds));
+						ImageIO.write(img.getSubimage(bounds[0]*w.getMap().getTileSize(), bounds[1]*w.getMap().getTileSize(), (1+bounds[2]-bounds[0])*w.getMap().getTileSize(), (1+bounds[3]-bounds[1])*w.getMap().getTileSize()), "PNG", f);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				}
 
 			}
@@ -181,10 +186,11 @@ public class MenuBar extends JMenuBar {
 		updateRes.addActionListener(e -> reimport());
 	}
 
-	public void open(File f) {
-		lastSave = f;
-		lastOpen = f;
-
+	public void open(File f, boolean isNewMap) {
+		if(isNewMap) {
+			lastSave = f;
+			lastOpen = f;
+		}
 		try {
 			BufferedReader r = new BufferedReader(new FileReader(f));
 
@@ -202,7 +208,7 @@ public class MenuBar extends JMenuBar {
 
 					if (text.exists() && image.exists()) {
 						TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 4), text.getAbsolutePath());
-						list.update();
+						if(isNewMap) list.update();
 					} else {
 						JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
 					}
@@ -333,7 +339,7 @@ public class MenuBar extends JMenuBar {
 				map.addTag(new Tag(tag, mapTags.get(tag)));
 			}
 
-			w.setMap(map);
+			w.setMap(map, isNewMap);
 			r.close();
 		} catch (Exception e1) {
 			lastSave = null;
@@ -341,7 +347,16 @@ public class MenuBar extends JMenuBar {
 		}
 	}
 
-	private void saveAs(Window w) {
+	public void save() {
+		if(lastSave == null) {
+			if(!saveAs(w)) return;
+		} else {
+			writeToFile(w, lastSave);
+		}
+		w.getMapViewer().saveAction();
+	}
+
+	private boolean saveAs(Window w) {
 		JFileChooser chooser = new JFileChooser(){
 			public void approveSelection() {
 				File f = getSelectedFile();
@@ -377,10 +392,16 @@ public class MenuBar extends JMenuBar {
 			File f = chooser.getSelectedFile();
 			lastSave = f;
 			writeToFile(w, f);
+			return true;
 		}
+		return false;
 	}
 
 	private void writeToFile(Window w, File f) {
+		writeToFile(w.getMap(), f);
+	}
+
+	private void writeToFile(GameMap map, File f) {
 		try {
 			PrintWriter wr = new PrintWriter(f);
 
@@ -388,7 +409,6 @@ public class MenuBar extends JMenuBar {
 				wr.write("i: " + i.getAbsolutePath() + "\n");
 			}
 
-			GameMap map = w.getMap();
 			wr.write("w: " + map.getWidth() + "\n");
 			wr.write("h: " + map.getHeight() + "\n");
 			wr.write("t: " + map.getTileSize() + "\n");
@@ -409,6 +429,11 @@ public class MenuBar extends JMenuBar {
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	public String getFileName() {
+		if(lastSave == null) return "Untitled";
+		return lastSave.getName().substring(0, lastSave.getName().length()-5);
 	}
 
 	public void reimport() {

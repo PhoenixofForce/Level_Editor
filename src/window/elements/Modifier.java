@@ -16,6 +16,8 @@ import java.awt.*;
  */
 public class Modifier extends JPanel{
 
+	private Window w;
+
 	private TagObject object;			//Object which tags are beeing edited
 	private JLabel goStats;				//Label which shows texture name and coordinate of object
 	private JButton add, remove;			//Buttons to add and remove tags
@@ -27,7 +29,7 @@ public class Modifier extends JPanel{
 	private DocumentListener dc;			//Listener that saves all changes
 
 	public Modifier(Window w) {
-
+		this.w = w;
 		this.setLayout(new BorderLayout());
 
 		goStats = new JLabel();
@@ -39,17 +41,26 @@ public class Modifier extends JPanel{
 		dc = new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
+					object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+					//w.getMapViewer().addAction();
+				}
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
+					object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+					//w.getMapViewer().addAction();
+				}
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
+					object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
+					//w.getMapViewer().addAction();
+				}
 			}
 		};
 
@@ -153,5 +164,7 @@ public class Modifier extends JPanel{
 
 		//Set label text to tagObject information
 		goStats.setText(obj.getText());
+
+		w.getMapViewer().addAction();
 	}
 }

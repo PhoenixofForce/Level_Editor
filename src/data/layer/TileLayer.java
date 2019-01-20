@@ -7,7 +7,7 @@ import data.TextureHandler;
 
 import java.awt.Graphics;
 
-import java.util.ArrayList;
+import java.awt.geom.Area;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -51,7 +51,7 @@ public class TileLayer implements Layer {
 	}
 
 	private void update(int x, int y, boolean center) {
-		if(!map.getAutoTile()) return;
+		if(map != null && !map.getAutoTile()) return;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String name = tileNames[y][x];
 			if (name == null) {
@@ -78,7 +78,7 @@ public class TileLayer implements Layer {
 					out += 1;
 				if (x != height-1&&tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet+"_block_"+blockName+"_"))
 					out += 8;
-				
+
 				switch (out) {
 					case 0:
 						name = spriteSheet+"_block_"+blockName+"_" + "0";
@@ -177,8 +177,7 @@ public class TileLayer implements Layer {
 		return false;
 	}
 
-	@Override
-	public void fill(String name, float x2, float y2) {
+	public void fill(Area sel, String name, float x2, float y2) {
 		int x = (int) x2;
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
@@ -193,7 +192,30 @@ public class TileLayer implements Layer {
 			while (!stack.isEmpty()) {
 				Location i = stack.pop();
 
-				if (check(oldName, i.x, i.y)) {
+				if (check(oldName, i.x, i.y) && (sel == null || (sel != null && sel.contains(i.x*map.getTileSize(), i.y*map.getTileSize())))) {
+					set(name, i.x, i.y, false);
+
+					if (i.x > 0) stack.push(new Location(i.x - 1, i.y));
+					if (i.y > 0) stack.push(new Location(i.x, i.y - 1));
+					if (i.x < width - 1) stack.push(new Location(i.x + 1, i.y));
+					if (i.y < height - 1) stack.push(new Location(i.x, i.y + 1));
+				}
+			}
+		}
+	}
+
+	public void fill(Area sel, String name) {
+		int x = sel.getBounds().x+1;
+		int y = sel.getBounds().y+1;
+		if (x >= 0 && y >= 0 && x < width && y < height) {
+
+			Stack<Location> stack = new Stack<>();
+			stack.push(new Location(x, y));
+
+			while (!stack.isEmpty()) {
+				Location i = stack.pop();
+
+				if ((sel == null || (sel != null && sel.contains(i.x*map.getTileSize(), i.y*map.getTileSize())))) {
 					set(name, i.x, i.y, false);
 
 					if (i.x > 0) stack.push(new Location(i.x - 1, i.y));
@@ -216,6 +238,10 @@ public class TileLayer implements Layer {
 	@Override
 	public GO select(float x, float y) {
 		return null;
+	}
+
+	public void setMap(GameMap map) {
+		this.map = map;
 	}
 
 	/**
@@ -286,6 +312,17 @@ public class TileLayer implements Layer {
 			}
 		}
 		return smallestY == Integer.MIN_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public TileLayer clone() {
+		TileLayer out = new TileLayer(null, depth, width, height, tileSize);
+		for(int y = 0; y < height; y++) {
+			for(int x = 0; x < width; x++) {
+				out.tileNames[y][x] = tileNames[y][x];
+			}
+		}
+		return out;
 	}
 
 	@Override

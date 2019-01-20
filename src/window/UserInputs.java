@@ -217,7 +217,7 @@ public class UserInputs {
 		frame.add(create);
 		create.setBounds(5, 95, 100, 25);
 		create.addActionListener(e -> {
-			window.setMap(new GameMap(Integer.parseInt(mapWidthIn.getText()), Integer.valueOf(mapHeightIn.getText()), Integer.parseInt(tileSizeIn.getText())));
+			window.setMap(new GameMap(Integer.parseInt(mapWidthIn.getText()), Integer.valueOf(mapHeightIn.getText()), Integer.parseInt(tileSizeIn.getText())), true);
 
 			window.setEnabled(true);
 			window.toFront();
