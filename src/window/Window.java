@@ -26,7 +26,7 @@ public class Window extends JFrame {
 
 	public Window() {
 		//setting window attributes
-		this.setTitle("Level Editor");
+		this.setTitle("Level Editor - Untitled");
 		this.setLayout(new BorderLayout());
 		this.setMinimumSize(new Dimension(800, 600));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -43,7 +43,7 @@ public class Window extends JFrame {
 		buttons = new MainToolBar(this, images);
 		this.add(buttons, BorderLayout.PAGE_START);
 
-		this.menu = new MenuBar(this, buttons, images);
+		this.menu = new MenuBar(this, images);
 		this.setJMenuBar(menu);
 
 		layerPane = new LayerPane(this, map);

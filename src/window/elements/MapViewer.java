@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 public class MapViewer extends JPanel {
 	private static final boolean TILE_HIGHLIGHT = true;		//true if tiles should be highlighted
 
+	private Window window;
 	private ImageList imageList;							//the ImageList => get selected Image
 	private LayerPane layerPane;							//the LayerPane => get selected Layer
 	private FreeLayer copyLayer;
@@ -43,11 +44,13 @@ public class MapViewer extends JPanel {
 	private boolean didAction = false;
 	private int actions = 0;
 	private int maxAction = 0;
+	private int savedAction = 1;
 
 	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
 		requestFocus();
 		grabFocus();
 
+		this.window = window;
 		this.layerPane = layerPane;
 		this.imageList = imageList;
 		this.mb = mb;
@@ -157,7 +160,14 @@ public class MapViewer extends JPanel {
 			public void mouseReleased(MouseEvent e) {
 				//when the difference on middle mouse click and middle mouse release is smaller than than => swap between erasing and drawgin
 				if (e.getButton() == 2 && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) {
-					tool = tool.next();
+					if(!e.isShiftDown()) {
+						tool = tool.next();
+						if(tool == Tools.MOVE && selection == null) tool = tool.next();
+					}
+					else {
+						tool = tool.pre();
+						if(tool == Tools.MOVE && selection == null) tool = tool.pre();
+					}
 					tb.update(tool);
 					startClick = null;
 					mergeCopyLayer();
@@ -254,7 +264,7 @@ public class MapViewer extends JPanel {
 					String[] lines = in.split("\n");
 					int lineC = lines.length;
 					int textureC = 0;
-					//TODO: Warning when textures not existing
+					//TODO: Warning when textures not existing or invalid copy
 
 					Location l = getBlockLocation(0, 0);
 
@@ -273,14 +283,22 @@ public class MapViewer extends JPanel {
 				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
 					if(actions == 1) return;
 					actions--;
+					updateTitle();
 					window.setMap(prevActions.get(actions-1).clone(), false);
 				} else if (e.getKeyCode() == 89 && ((e.getKeyChar() != 'y' && e.getKeyChar() != 'Y') || e.isControlDown())) {    // y
 					if(actions == maxAction) return;
 					actions++;
+					updateTitle();
 					window.setMap(prevActions.get(actions-1).clone(), false);
 				} else if (e.getKeyCode() == 65 && ((e.getKeyChar() != 'a' && e.getKeyChar() != 'A') || e.isControlDown())) {    // a
-					selection = null;
+					if(selection != null) selection = null;
+					 else {
+					 	selection = new Selection();
+					 	selection.add(new Rectangle(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize()));
+					}
 					startClick = null;
+				} else if (e.getKeyCode() == 83 && ((e.getKeyChar() != 's' && e.getKeyChar() != 'S') || e.isControlDown())) {    // s
+					mb.save();
 				}
 
 				if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
@@ -534,9 +552,16 @@ public class MapViewer extends JPanel {
 		maxAction = actions;
 		didAction = false;
 
+		updateTitle();
+
 		prevActions.add(maxAction-1, map.clone());
 		while(prevActions.size() > maxAction) prevActions.remove(prevActions.size()-1);
 		System.out.println(maxAction + " " + prevActions.size());
+	}
+
+	private void updateTitle() {
+		String title = new StringBuilder("LevelEditor - ").append(mb.getFileName()).append(savedAction == actions? "": " (*)").toString();
+		window.setTitle(title);
 	}
 
 	private void mergeCopyLayer() {
@@ -550,6 +575,11 @@ public class MapViewer extends JPanel {
 			addAction();
 		}
 		copyLayer = null;
+	}
+
+	public void saveAction() {
+		savedAction = actions;
+		updateTitle();
 	}
 
 	private void sendErrorMessage() {

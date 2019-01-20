@@ -135,12 +135,17 @@ public class GameMap extends TagObject {
 		//finding biggest and smalles coordinates
 		float sx = -1, sy = -1, bx = -1, by = -1;
 		if(expo) {
-			sx = Integer.MAX_VALUE;
-			sy = Integer.MAX_VALUE;
-			bx = Integer.MIN_VALUE;
-			by = Integer.MIN_VALUE;
+			//sx = Integer.MAX_VALUE;
+			//sy = Integer.MAX_VALUE;
+			//bx = Integer.MIN_VALUE;
+			//by = Integer.MIN_VALUE;
 
-			for(TileLayer l: tiles) {
+			int[] bounds = getBounds();
+			sx = bounds[0];
+			sy = bounds[1];
+			bx = bounds[2];
+			by = bounds[3];
+			/*for(TileLayer l: tiles) {
 				float csx = l.smallestX(), csy = l.smallestY(), cbx = l.biggestX(), cby = l.biggestY();
 				if(csx < sx) sx = csx;
 				if(csy < sy) sy = csy;
@@ -186,6 +191,25 @@ public class GameMap extends TagObject {
 
 
 		return repl + out;
+	}
+
+	public int[] getBounds() {
+		int sx = Integer.MAX_VALUE,
+		sy = Integer.MAX_VALUE,
+		bx = Integer.MIN_VALUE,
+		by = Integer.MIN_VALUE;
+
+		for(String s: layers.keySet()) {
+			Layer l = layers.get(s);
+			float csx = l.smallestX(), csy = l.smallestY(), cbx = l.biggestX(), cby = l.biggestY();
+			if(csx < sx && csx != -1) sx = (int)Math.floor(csx);
+			if(csy < sy && csy != -1) sy = (int)Math.floor(csy);
+			if(cbx > bx) bx = (int)Math.ceil(cbx);
+			if(cby > by) by = (int)Math.ceil(cby);
+
+		}
+
+		return new int[]{sx, sy, bx, by};
 	}
 
 	@Override

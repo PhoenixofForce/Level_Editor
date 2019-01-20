@@ -15,6 +15,13 @@ public enum Tools {
 	public Tools next() {
 		return Tools.values()[(pos+1)%Tools.values().length];
 	}
+
+	public Tools pre() {
+		int npos = (pos-1);
+		while(npos < 0) npos += Tools.values().length;
+		return Tools.values()[npos];
+	}
+
 	public Color getColor() {
 		return c;
 	}
