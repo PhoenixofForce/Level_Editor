@@ -111,6 +111,13 @@ public class Area extends TagObject {
 		this.color = color;
 	}
 
+	@Override
+	public Area clone() {
+		Area a =  new Area(x1, y1, x2, y2, color);
+		for(int i = 0; i < getTags().size(); i++) a.addTag(getTags().get(i).clone());
+		return a;
+	}
+
 	/**
 	 * converts class to saveable text-format
 	 * @return

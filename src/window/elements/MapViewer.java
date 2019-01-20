@@ -6,14 +6,17 @@ import data.layer.layerobjects.GO;
 import data.layer.layerobjects.TagObject;
 import window.ClipBoardUtil;
 import window.Tools;
+import window.Window;
 import window.elements.layer.LayerPane;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 public class MapViewer extends JPanel {
 	private static final boolean TILE_HIGHLIGHT = true;		//true if tiles should be highlighted
@@ -36,11 +39,12 @@ public class MapViewer extends JPanel {
 
 	private GameMap map;									//the game map
 
+	private List<GameMap> prevActions;
 	private boolean didAction = false;
 	private int actions = 0;
 	private int maxAction = 0;
 
-	public MapViewer(MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
+	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map) {
 		requestFocus();
 		grabFocus();
 
@@ -50,6 +54,7 @@ public class MapViewer extends JPanel {
 		this.tb = tb;
 		this.map = map;
 
+		prevActions = new ArrayList<>();
 		addAction();
 
 		tool = Tools.BRUSH;
@@ -249,7 +254,9 @@ public class MapViewer extends JPanel {
 					String[] lines = in.split("\n");
 					int lineC = lines.length;
 					int textureC = 0;
-					//TODO: BetterPositioning, Warning when textures not existing
+					//TODO: Warning when textures not existing
+
+					Location l = getBlockLocation(0, 0);
 
 					if(lineC == 0) return;
 					for(int x = 0; x < lineC; x++) {
@@ -257,24 +264,20 @@ public class MapViewer extends JPanel {
 						textureC = textures.length;
 						for(int y = 0; y < textureC; y++) {
 							String texture = textures[y];
-							if(!texture.equalsIgnoreCase("[x]")) copyLayer.set(texture, x, y, false);
+							if(!texture.equalsIgnoreCase("[x]")) copyLayer.set(texture, x+l.x, y+l.y, false);
 						}
 					}
 
 					selection = new Selection();
-					selection.add(new Rectangle(0, 0, lineC*map.getTileSize(), textureC *map.getTileSize()));
+					selection.add(new Rectangle(Math.round(l.x* map.getTileSize()), Math.round(l.y* map.getTileSize()), lineC*map.getTileSize(), textureC *map.getTileSize()));
 				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
-					if(actions == 0) return;
+					if(actions == 1) return;
 					actions--;
-					String tempFolder = System.getProperty("java.io.tmpdir") + "\\";
-					String fileName = "save_" + actions + ".umap";
-					mb.open(new File(tempFolder + fileName), false);
+					window.setMap(prevActions.get(actions-1).clone(), false);
 				} else if (e.getKeyCode() == 89 && ((e.getKeyChar() != 'y' && e.getKeyChar() != 'Y') || e.isControlDown())) {    // y
 					if(actions == maxAction) return;
 					actions++;
-					String tempFolder = System.getProperty("java.io.tmpdir") + "\\";
-					String fileName = "save_" + actions + ".umap";
-					mb.open(new File(tempFolder + fileName), false);
+					window.setMap(prevActions.get(actions-1).clone(), false);
 				} else if (e.getKeyCode() == 65 && ((e.getKeyChar() != 'a' && e.getKeyChar() != 'A') || e.isControlDown())) {    // a
 					selection = null;
 					startClick = null;
@@ -295,7 +298,11 @@ public class MapViewer extends JPanel {
 
 	public void setGameMap(GameMap map, boolean isNewMap) {
 		this.map = map;
-		if(isNewMap) centerCamera();
+		if(isNewMap) {
+			centerCamera();
+			actions = 0;
+			addAction();
+		}
 	}
 
 	/**
@@ -524,13 +531,12 @@ public class MapViewer extends JPanel {
 
 	public void addAction() {
 		actions++;
-		String tempFolder = System.getProperty("java.io.tmpdir") + "\\";
-		String fileName = "save_" + actions + ".umap";
 		maxAction = actions;
 		didAction = false;
-		File f = new File(tempFolder + fileName);
-		f.deleteOnExit();
-		mb.writeToFile(map, f);
+
+		prevActions.add(maxAction-1, map.clone());
+		while(prevActions.size() > maxAction) prevActions.remove(prevActions.size()-1);
+		System.out.println(maxAction + " " + prevActions.size());
 	}
 
 	private void mergeCopyLayer() {

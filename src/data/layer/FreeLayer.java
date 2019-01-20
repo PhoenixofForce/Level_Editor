@@ -164,6 +164,13 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
+	public FreeLayer clone() {
+		FreeLayer out = new FreeLayer(depth, width, height, tileSize);
+		for(int i = 0; i < images.size(); i++) out.images.add(images.get(i).clone());
+		return out;
+	}
+
+	@Override
 	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
 		String out = "";
 

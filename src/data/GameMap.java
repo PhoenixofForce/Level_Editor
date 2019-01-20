@@ -197,6 +197,33 @@ public class GameMap extends TagObject {
 		this.autoTile = at;
 	}
 
+	@Override
+	public GameMap clone() {
+		GameMap out = new GameMap(width, height, tileSize);
+		ArrayList<java.util.Map.Entry<String, Layer>> listOfEntry = new ArrayList<>(layers.entrySet());
+		for(java.util.Map.Entry<String, Layer> e: listOfEntry) {
+			Layer l = e.getValue();
+			if(l instanceof TileLayer) {
+				TileLayer tl = (TileLayer) l;
+				tl.setMap(out);
+				out.addLayer(e.getKey(), tl.clone());
+				continue;
+			}
+			if(l instanceof FreeLayer) {
+				FreeLayer tl = (FreeLayer) l;
+				out.addLayer(e.getKey(), tl.clone());
+				continue;
+			}
+			if(l instanceof AreaLayer) {
+				AreaLayer tl = (AreaLayer) l;
+				out.addLayer(e.getKey(), tl.clone());
+				continue;
+			}
+		}
+		out.setAutoTile(autoTile);
+		return out;
+	}
+
 	public boolean getAutoTile() {
 		return autoTile;
 	}

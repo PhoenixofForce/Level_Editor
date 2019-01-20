@@ -30,7 +30,6 @@ public class Window extends JFrame {
 		this.setLayout(new BorderLayout());
 		this.setMinimumSize(new Dimension(800, 600));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		this.setVisible(true);
 
 		//creating new standart map
 		setMap(new GameMap(100,100,16), true);
@@ -51,7 +50,7 @@ public class Window extends JFrame {
 		this.add(layerPane, BorderLayout.LINE_START);
 		layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-		mapViewer = new MapViewer(menu, buttons, images, layerPane, map);
+		mapViewer = new MapViewer(this, menu, buttons, images, layerPane, map);
 		this.add(mapViewer, BorderLayout.CENTER);
 		mapViewer.setFocusable(true);
 
@@ -83,6 +82,8 @@ public class Window extends JFrame {
 					layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight() - buttons.getHeight());
 			}
 		});
+
+		this.setVisible(true);
 		//setting window size to trigger resize
 		this.setSize(this.getWidth() + 1, this.getHeight());
 	}

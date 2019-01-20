@@ -26,6 +26,13 @@ public class GO extends TagObject {
 		y += dy;
 	}
 
+	@Override
+	public GO clone() {
+		GO g =  new GO(name, x, y, width, height);
+		for(int i = 0; i < getTags().size(); i++) g.addTag(getTags().get(i).clone());
+		return g;
+	}
+
 	/**
 	 * converts class to saveable text-format
 	 * @return

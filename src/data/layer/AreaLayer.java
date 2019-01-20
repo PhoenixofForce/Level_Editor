@@ -158,6 +158,13 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
+	public AreaLayer clone() {
+		AreaLayer out = new AreaLayer(depth, width, height, tileSize);
+		for(int i = 0; i < areas.size(); i++) out.areas.add(areas.get(i).clone());
+		return out;
+	}
+
+	@Override
 	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
 		String out = "";
 

@@ -51,7 +51,7 @@ public class TileLayer implements Layer {
 	}
 
 	private void update(int x, int y, boolean center) {
-		if(!map.getAutoTile()) return;
+		if(map != null && !map.getAutoTile()) return;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String name = tileNames[y][x];
 			if (name == null) {
@@ -240,6 +240,10 @@ public class TileLayer implements Layer {
 		return null;
 	}
 
+	public void setMap(GameMap map) {
+		this.map = map;
+	}
+
 	/**
 	 * @return the tile grid
 	 */
@@ -308,6 +312,17 @@ public class TileLayer implements Layer {
 			}
 		}
 		return smallestY == Integer.MIN_VALUE? -1: smallestY;
+	}
+
+	@Override
+	public TileLayer clone() {
+		TileLayer out = new TileLayer(null, depth, width, height, tileSize);
+		for(int y = 0; y < height; y++) {
+			for(int x = 0; x < width; x++) {
+				out.tileNames[y][x] = tileNames[y][x];
+			}
+		}
+		return out;
 	}
 
 	@Override
