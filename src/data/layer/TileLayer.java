@@ -17,6 +17,19 @@ import java.util.Stack;
  */
 public class TileLayer implements Layer {
 
+	private static final int[] MAPPING = new int[]{   0,  16,   24,   8,
+													 64, 208,  248, 104,
+													 66, 214,  255, 107,
+													  2,  22,   31,  11,
+													 75,  80,   88,  72,
+													106,  82,   90,  74,
+													 86,  18,   26,  10,
+													210, 218,  250, 122,
+													219, 222,   -1, 123,
+													126,  94,   95,  91,
+													120, 216,  127, 223,
+													 27,  30,  251, 254};
+
 	private float depth;					//the drawing depth
 	private String[][] tileNames;			//the texture grid
 
@@ -51,7 +64,7 @@ public class TileLayer implements Layer {
 	}
 
 	private void update(int x, int y, boolean center) {
-		if(map != null && !map.getAutoTile()) return;
+		if(map != null && 2==map.getAutoTile()) return;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String name = tileNames[y][x];
 			if (name == null) {
@@ -60,6 +73,12 @@ public class TileLayer implements Layer {
 					update(x-1, y, false);
 					update(x, y-1, false);
 					update(x, y+1, false);
+					if(map.getAutoTile() == 8) {
+						update(x + 1, y - 1, false);
+						update(x - 1, y + 1, false);
+						update(x - 1, y - 1, false);
+						update(x + 1, y + 1, false);
+					}
 				}
 				return;
 			}
@@ -70,65 +89,42 @@ public class TileLayer implements Layer {
 				String blockPart = parts[3];
 
 				int out = 0;
-				if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(spriteSheet+"_block_"+blockName+"_"))
-					out += 2;
-				if (y != width-1&&tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(spriteSheet+"_block_"+blockName+"_"))
-					out += 4;
-				if (x !=0 &&tileNames[y][x - 1] != null && tileNames[y][x - 1].startsWith(spriteSheet+"_block_"+blockName+"_"))
-					out += 1;
-				if (x != height-1&&tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet+"_block_"+blockName+"_"))
-					out += 8;
+				if(map.getAutoTile() == 4) {
+					if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= 12;
+					if (y != height - 1 && tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= 4;
+					if (x != 0 && tileNames[y][x - 1] != null && tileNames[y][x - 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= 3;
+					if (x != width - 1 && tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= 1;
+				} else if(map.getAutoTile() == 8) {
 
-				switch (out) {
-					case 0:
-						name = spriteSheet+"_block_"+blockName+"_" + "0";
-						break;
-					case 1:
-						name = spriteSheet+"_block_"+blockName+"_" + "3";
-						break;
-					case 2:
-						name = spriteSheet+"_block_"+blockName+"_" + "12";
-						break;
-					case 3:
-						name = spriteSheet+"_block_"+blockName+"_" + "15";
-						break;
-					case 4:
-						name = spriteSheet+"_block_"+blockName+"_" + "4";
-						break;
-					case 5:
-						name = spriteSheet+"_block_"+blockName+"_" + "7";
-						break;
-					case 6:
-						name = spriteSheet+"_block_"+blockName+"_" + "8";
-						break;
-					case 7:
-						name = spriteSheet+"_block_"+blockName+"_" + "11";
-						break;
-					case 8:
-						name = spriteSheet+"_block_"+blockName+"_" + "1";
-						break;
-					case 9:
-						name = spriteSheet+"_block_"+blockName+"_" + "2";
-						break;
-					case 10:
-						name = spriteSheet+"_block_"+blockName+"_" + "13";
-						break;
-					case 11:
-						name = spriteSheet+"_block_"+blockName+"_" + "14";
-						break;
-					case 12:
-						name = spriteSheet+"_block_"+blockName+"_" + "5";
-						break;
-					case 13:
-						name = spriteSheet+"_block_"+blockName+"_" + "6";
-						break;
-					case 14:
-						name = spriteSheet+"_block_"+blockName+"_" + "9";
-						break;
-					case 15:
-						name = spriteSheet+"_block_"+blockName+"_" + "10";
-						break;
+					if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= 2;
+					if (y != height - 1 && tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= 64;
+					if (x != 0 && tileNames[y][x - 1] != null && tileNames[y][x - 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= 8;
+					if (x != width - 1 && tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= 16;
+
+					boolean w = (out&8)!=0, n = (out&2)!=0, e = (out&16)!=0, s = (out&64)!=0;
+					if (x!= 0 && y != 0 && tileNames[y - 1][x-1] != null && tileNames[y - 1][x-1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= w && n? 1: 0;
+					if (x!= width-1 && y != 0 && tileNames[y - 1][x+1] != null && tileNames[y - 1][x+1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= e && n? 4: 0;
+
+					if (x!= 0 && y != height-1 && tileNames[y + 1][x-1] != null && tileNames[y + 1][x-1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= w && s? 32: 0;
+					if (x!= width-1 && y != height-1 && tileNames[y + 1][x+1] != null && tileNames[y + 1][x+1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+						out ^= e && s? 128: 0;
+
+
+					out = find(MAPPING, out);
 				}
+
+				name = spriteSheet+"_block_"+blockName+"_" + out;
 
 				if(blockPart.equalsIgnoreCase(name.split("_")[3])) {
 					if(center) {
@@ -136,6 +132,12 @@ public class TileLayer implements Layer {
 						update(x-1, y, false);
 						update(x, y-1, false);
 						update(x, y+1, false);
+						if(map.getAutoTile() == 8) {
+							update(x + 1, y - 1, false);
+							update(x - 1, y + 1, false);
+							update(x - 1, y - 1, false);
+							update(x + 1, y + 1, false);
+						}
 					}
 					return;
 				}
@@ -153,6 +155,12 @@ public class TileLayer implements Layer {
 			update(x-1, y, false);
 			update(x, y-1, false);
 			update(x, y+1, false);
+			if(map.getAutoTile() == 8) {
+				update(x + 1, y - 1, false);
+				update(x - 1, y + 1, false);
+				update(x - 1, y - 1, false);
+				update(x + 1, y + 1, false);
+			}
 		}
 	}
 
@@ -231,7 +239,7 @@ public class TileLayer implements Layer {
 		String name = tileNames[(int)x][(int)y];
 		boolean bool1 = (oldName == null && name == null);
 		boolean bool2 = ((name != null && oldName != null) && name.equals(oldName));
-		boolean bool3 = (map.getAutoTile() && oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
+		boolean bool3 = (map.getAutoTile() > 2 && oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
 		return bool1 || bool2 || bool3;
 	}
 
@@ -349,5 +357,12 @@ public class TileLayer implements Layer {
 		}
 
 		return out + "]\n";
+	}
+
+	private static int find(int[] a, int f) {
+		for(int i = 0; i < a.length; i++) {
+			if(a[i]==f) return i;
+		}
+		return -1;
 	}
 }

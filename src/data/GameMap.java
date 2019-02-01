@@ -17,7 +17,7 @@ public class GameMap extends TagObject {
 	private int width, height, tileSize;		//width, height and tileSize of the map
 	private Map<String, Layer> layers;			//Layers saved to their name
 
-	private boolean autoTile = true;
+	private int autoTile = 4;
 
 	public GameMap(int width, int height, int tileSize) {
 		this(width, height, tileSize, true);
@@ -217,7 +217,7 @@ public class GameMap extends TagObject {
 		return "MAP";
 	}
 
-	public void setAutoTile(boolean at) {
+	public void setAutoTile(int at) {
 		this.autoTile = at;
 	}
 
@@ -259,7 +259,7 @@ public class GameMap extends TagObject {
 		}
 	}
 
-	public boolean getAutoTile() {
+	public int getAutoTile() {
 		return autoTile;
 	}
 }
