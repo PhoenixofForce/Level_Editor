@@ -97,7 +97,7 @@ public class LayerPane extends JPanel {
 				layer = new AreaLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
 				break;
 			case 0:
-				layer = new TileLayer(window.getMap(), depth, map.getWidth(), map.getHeight(), map.getTileSize());
+				layer = new TileLayer(window, depth, map.getWidth(), map.getHeight(), map.getTileSize());
 				break;
 			default:
 				return;

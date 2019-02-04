@@ -249,7 +249,7 @@ public class MenuBar extends JMenuBar {
 						}
 					}
 
-					TileLayer l = new TileLayer(w.getMap(), depth, names, tileSize);
+					TileLayer l = new TileLayer(w, depth, names, tileSize);
 					if(map != null) map.addLayer(name, l);
 				}
 
@@ -329,7 +329,7 @@ public class MenuBar extends JMenuBar {
 				}
 
 				if(width > 0 && height > 0 && tileSize > 0 && map == null) {
-					map = new GameMap(width, height, tileSize, false);
+					map = new GameMap(w, width, height, tileSize, false);
 				}
 
 				line = r.readLine();

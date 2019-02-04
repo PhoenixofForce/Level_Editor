@@ -6,10 +6,7 @@ import window.elements.layer.LayerPane;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 
 /**
  * used to allow the user to make better inputs
@@ -25,10 +22,17 @@ public class UserInputs {
 
 		JFrame frame = new JFrame("Adding layer");
 		JTextField nameInput = new JTextField("name");
-		JSlider layerType = new JSlider(JSlider.HORIZONTAL, 0, 2, 2);
-		JLabel layerText = new JLabel("Tile - Area - Pixel");
+		JComboBox<String> layerType = new JComboBox<>();
+		layerType.addItem("Tile");
+		layerType.addItem("Area");
+		layerType.addItem("Pixel");
+
 		JButton create = new JButton("Create");
 		JTextField depthInput = new JTextField("depth");
+
+		addSelectOnClick(nameInput);
+		addSelectOnClick(depthInput);
+
 		//allow float only
 		depthInput.setInputVerifier(new InputVerifier() {
 			@Override
@@ -68,7 +72,7 @@ public class UserInputs {
 		frame.setLayout(null);
 		frame.setVisible(true);
 		Insets i = frame.getInsets();
-		frame.setSize(250 + i.left + i.right, 150 + i.top + i.bottom);
+		frame.setSize(250 + i.left + i.right, 135 + i.top + i.bottom);
 		frame.setAlwaysOnTop(true);
 		frame.setLocationRelativeTo(window);
 
@@ -77,25 +81,23 @@ public class UserInputs {
 
 		frame.add(layerType);
 		layerType.setBounds(5, 35, 100, 25);
-		layerType.setMinimum(0);
-		layerType.setMaximum(2);
-		layerType.setMajorTickSpacing(1);
-
-		frame.add(layerText);
-		layerText.setBounds(5, 60, 100, 25);
 
 		frame.add(depthInput);
-		depthInput.setBounds(5, 90, 100, 25);
+		depthInput.setBounds(5, 65, 100, 25);
 
 		frame.add(create);
-		create.setBounds(5, 120, 100, 25);
-		create.addActionListener(e -> {
+		create.setBounds(5, 105, 100, 25);
+
+		ActionListener a = e->{
 			String name = nameInput.getText();
-			layerPane.addLayer(name, layerType.getValue(), Float.parseFloat(depthInput.getText()));
+			layerPane.addLayer(name, layerType.getSelectedIndex(), Float.parseFloat(depthInput.getText()));
 			window.setEnabled(true);
 			window.toFront();
 			frame.dispose();
-		});
+		};
+
+		create.addActionListener(a);
+		depthInput.addActionListener(a);
 	}
 	
 	/** Creates window so the user can set the settings of the new tag
@@ -109,6 +111,7 @@ public class UserInputs {
 		JTextField nameIN = new JTextField("Name");
 		JButton create = new JButton("Create");
 
+		addSelectOnClick(nameIN);
 
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -140,12 +143,16 @@ public class UserInputs {
 
 		frame.add(create);
 		create.setBounds(5, 35, 100, 25);
-		create.addActionListener(e -> {
+
+		ActionListener a = e->{
 			mod.add(nameIN.getText());
 			window.setEnabled(true);
 			window.toFront();
 			frame.dispose();
-		});
+		};
+
+		create.addActionListener(a);
+		nameIN.addActionListener(a);
 	}
 
 	/** Creates window so the user can set the settings of the new map
@@ -159,6 +166,10 @@ public class UserInputs {
 		JButton create = new JButton("Create");
 		JTextField mapWidthIn = new JTextField("Map width");
 		JTextField mapHeightIn = new JTextField("Map height");
+
+		addSelectOnClick(tileSizeIn);
+		addSelectOnClick(mapHeightIn);
+		addSelectOnClick(mapWidthIn);
 
 		InputVerifier inputVerifier = new InputVerifier() {
 
@@ -216,13 +227,17 @@ public class UserInputs {
 
 		frame.add(create);
 		create.setBounds(5, 95, 100, 25);
-		create.addActionListener(e -> {
-			window.setMap(new GameMap(Integer.parseInt(mapWidthIn.getText()), Integer.valueOf(mapHeightIn.getText()), Integer.parseInt(tileSizeIn.getText())), true);
 
-			window.setEnabled(true);
-			window.toFront();
-			frame.dispose();
-		});
+
+		ActionListener a = e-> {
+				window.setMap(new GameMap(window, Integer.parseInt(mapWidthIn.getText()), Integer.valueOf(mapHeightIn.getText()), Integer.parseInt(tileSizeIn.getText())), true);
+
+				window.setEnabled(true);
+				window.toFront();
+				frame.dispose();
+		};
+		create.addActionListener(a);
+		mapHeightIn.addActionListener(a);
 	}
 
 	/** Creates window so the user can confirm his action
@@ -282,6 +297,27 @@ public class UserInputs {
 			frame.dispose();
 
 			actionListener.actionPerformed(new ActionEvent(window, 0, null));
+		});
+	}
+
+
+
+
+
+
+
+
+	private static void addSelectOnClick(JTextField textField) {
+		textField.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				textField.selectAll();
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+
+			}
 		});
 	}
 }

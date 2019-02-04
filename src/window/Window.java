@@ -32,7 +32,7 @@ public class Window extends JFrame {
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		//creating new standart map
-		setMap(new GameMap(100,100,16), true);
+		setMap(new GameMap(this, 100,100,16), true);
 
 		//creating objects and adding them to the window
 		images = new ImageList(this);
@@ -92,7 +92,7 @@ public class Window extends JFrame {
 	*/
 	public void setMap(GameMap map, boolean isNewMap) {
 		this.map = map;
-		if(buttons != null) buttons.mapUpdate(this);
+		if(buttons != null) buttons.mapUpdate(this, isNewMap);
 		if(menu != null && isNewMap) menu.reset();
 		if (mapViewer != null) mapViewer.setGameMap(map, isNewMap);
 		if (images != null && isNewMap) images.getModifier().setTagObject(null);
@@ -109,5 +109,9 @@ public class Window extends JFrame {
 
 	public MapViewer getMapViewer() {
 		return mapViewer;
+	}
+
+	public int getAutoTile() {
+		return buttons.getAutoTile();
 	}
 }

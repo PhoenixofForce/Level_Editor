@@ -31,12 +31,8 @@ public class MainToolBar extends JToolBar {
 		toggleAutoTile.addItem("No Autotile");
 		toggleAutoTile.addItem("4Bit Autotile");
 		toggleAutoTile.addItem("8Bit Autotile");
-		toggleAutoTile.addActionListener(e -> {
-			w.getMap().setAutoTile((int)Math.pow(2, 1+toggleAutoTile.getSelectedIndex()));
 
-		});
-		toggleAutoTile.setSelectedIndex(binlog(w.getMap().getAutoTile())-1);
-
+		toggleAutoTile.setSelectedIndex(1);
 		this.add(toggleAutoTile);
 
 		this.addSeparator();
@@ -50,8 +46,8 @@ public class MainToolBar extends JToolBar {
 		}
 	}
 
-	public void mapUpdate(Window w) {
-		toggleAutoTile.setSelectedIndex(binlog(w.getMap().getAutoTile())-1);
+	public void mapUpdate(Window w, boolean newMap) {
+		toggleAutoTile.setSelectedIndex(1);
 	}
 
 	protected void update(Tools t) {
@@ -60,12 +56,7 @@ public class MainToolBar extends JToolBar {
 		}
 	}
 
-	private static int binlog( int bits ) {
-		int log = 0;
-		if( ( bits & 0xffff0000 ) != 0 ) { bits >>>= 16; log = 16; }
-		if( bits >= 256 ) { bits >>>= 8; log += 8; }
-		if( bits >= 16  ) { bits >>>= 4; log += 4; }
-		if( bits >= 4   ) { bits >>>= 2; log += 2; }
-		return log + ( bits >>> 1 );
+	public int getAutoTile() {
+		return toggleAutoTile.getSelectedIndex();
 	}
 }

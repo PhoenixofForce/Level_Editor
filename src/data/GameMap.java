@@ -4,6 +4,7 @@ import data.layer.*;
 import data.layer.layerobjects.GO;
 import data.layer.layerobjects.Tag;
 import data.layer.layerobjects.TagObject;
+import window.Window;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,13 +15,13 @@ import java.util.Map;
  * the map contains all layers
  */
 public class GameMap extends TagObject {
+	private Window w;
+
 	private int width, height, tileSize;		//width, height and tileSize of the map
 	private Map<String, Layer> layers;			//Layers saved to their name
 
-	private int autoTile = 4;
-
-	public GameMap(int width, int height, int tileSize) {
-		this(width, height, tileSize, true);
+	public GameMap(Window w, int width, int height, int tileSize) {
+		this(w, width, height, tileSize, true);
 	}
 
 	/**
@@ -30,7 +31,9 @@ public class GameMap extends TagObject {
 	 * @param tileSize tilesize of the map
 	 * @param b true if the default layers should be added
 	 */
-	public GameMap(int width, int height, int tileSize, boolean b) {
+	public GameMap(Window w, int width, int height, int tileSize, boolean b) {
+		this.w = w;
+
 		layers = new HashMap<>();
 		this.width = width;
 		this.height = height;
@@ -40,7 +43,7 @@ public class GameMap extends TagObject {
 
 		if(b) {
 			addLayer("Background", new FreeLayer(1.0f, width, height, tileSize));
-			addLayer("Tile", new TileLayer(this, 0.5f, width, height, tileSize));
+			addLayer("Tile", new TileLayer(w, 0.5f, width, height, tileSize));
 			addLayer("Object", new FreeLayer(0.0f, width, height, tileSize));
 			addLayer("Camera", new AreaLayer(-1.0f, width, height, tileSize));
 		}
@@ -217,20 +220,14 @@ public class GameMap extends TagObject {
 		return "MAP";
 	}
 
-	public void setAutoTile(int at) {
-		this.autoTile = at;
-	}
-
 	@Override
 	public GameMap clone() {
-		GameMap out = new GameMap(width, height, tileSize);
-		out.setAutoTile(autoTile);
+		GameMap out = new GameMap(w, width, height, tileSize);
 		ArrayList<java.util.Map.Entry<String, Layer>> listOfEntry = new ArrayList<>(layers.entrySet());
 		for(java.util.Map.Entry<String, Layer> e: listOfEntry) {
 			Layer l = e.getValue();
 			if(l instanceof TileLayer) {
 				TileLayer tl = (TileLayer) l;
-				tl.setMap(out);
 				out.addLayer(e.getKey(), tl.clone());
 				continue;
 			}
@@ -246,20 +243,5 @@ public class GameMap extends TagObject {
 			}
 		}
 		return out;
-	}
-
-	public void updateMap() {
-		ArrayList<java.util.Map.Entry<String, Layer>> listOfEntry = new ArrayList<>(layers.entrySet());
-		for(java.util.Map.Entry<String, Layer> e: listOfEntry) {
-			Layer l = e.getValue();
-			if (l instanceof TileLayer) {
-				TileLayer tl = (TileLayer) l;
-				tl.setMap(this);
-			}
-		}
-	}
-
-	public int getAutoTile() {
-		return autoTile;
 	}
 }

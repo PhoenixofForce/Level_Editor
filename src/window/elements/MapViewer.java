@@ -321,7 +321,6 @@ public class MapViewer extends JPanel {
 
 	public void setGameMap(GameMap map, boolean isNewMap) {
 		this.map = map;
-		this.map.updateMap();
 		if(isNewMap) {
 			centerCamera();
 			prevActions = new ArrayList<>();

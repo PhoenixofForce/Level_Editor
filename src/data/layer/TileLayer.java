@@ -4,6 +4,7 @@ import data.GameMap;
 import data.Location;
 import data.layer.layerobjects.GO;
 import data.TextureHandler;
+import window.Window;
 
 import java.awt.Graphics;
 
@@ -36,20 +37,20 @@ public class TileLayer implements Layer {
 	private int width, height, tileSize;	//width, height and tilesize of the map
 	private Random r;
 
-	private GameMap map;
+	private Window w;
 
-	public TileLayer(GameMap map, float depth, String[][] tiles, int tileSize) {
+	public TileLayer(Window w, float depth, String[][] tiles, int tileSize) {
 		this.depth = depth;
 		this.tileNames = tiles;
 		this.tileSize = tileSize;
 		this.width = tiles[0].length;
 		this.height = tiles.length;
 		r = new Random();
-		this.map = map;
+		this.w = w;
 	}
 
-	public TileLayer(GameMap map, float depth, int width, int height, int tileSize) {
-		this(map, depth, new String[height][width], tileSize);
+	public TileLayer(Window w, float depth, int width, int height, int tileSize) {
+		this(w, depth, new String[height][width], tileSize);
 	}
 
 	@Override
@@ -64,7 +65,7 @@ public class TileLayer implements Layer {
 	}
 
 	private void update(int x, int y, boolean center) {
-		if(map != null && 2==map.getAutoTile()) return;
+		if(0==w.getAutoTile()) return;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String name = tileNames[y][x];
 			if (name == null) {
@@ -73,7 +74,7 @@ public class TileLayer implements Layer {
 					update(x-1, y, false);
 					update(x, y-1, false);
 					update(x, y+1, false);
-					if(map.getAutoTile() == 8) {
+					if(w.getAutoTile() == 2) {
 						update(x + 1, y - 1, false);
 						update(x - 1, y + 1, false);
 						update(x - 1, y - 1, false);
@@ -89,7 +90,7 @@ public class TileLayer implements Layer {
 				String blockPart = parts[3];
 
 				int out = 0;
-				if(map.getAutoTile() == 4) {
+				if(w.getAutoTile() == 1) {
 					if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
 						out ^= 12;
 					if (y != height - 1 && tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
@@ -98,7 +99,7 @@ public class TileLayer implements Layer {
 						out ^= 3;
 					if (x != width - 1 && tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
 						out ^= 1;
-				} else if(map.getAutoTile() == 8) {
+				} else if(w.getAutoTile() == 2) {
 
 					if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
 						out ^= 2;
@@ -132,7 +133,7 @@ public class TileLayer implements Layer {
 						update(x-1, y, false);
 						update(x, y-1, false);
 						update(x, y+1, false);
-						if(map.getAutoTile() == 8) {
+						if(w.getAutoTile() == 2) {
 							update(x + 1, y - 1, false);
 							update(x - 1, y + 1, false);
 							update(x - 1, y - 1, false);
@@ -155,7 +156,7 @@ public class TileLayer implements Layer {
 			update(x-1, y, false);
 			update(x, y-1, false);
 			update(x, y+1, false);
-			if(map.getAutoTile() == 8) {
+			if(w.getAutoTile() == 2) {
 				update(x + 1, y - 1, false);
 				update(x - 1, y + 1, false);
 				update(x - 1, y - 1, false);
@@ -180,6 +181,12 @@ public class TileLayer implements Layer {
 			update(x-1, y, false);
 			update(x, y-1, false);
 			update(x, y+1, false);
+			if(w.getAutoTile() == 2) {
+				update(x + 1, y - 1, false);
+				update(x - 1, y + 1, false);
+				update(x - 1, y - 1, false);
+				update(x + 1, y + 1, false);
+			}
 			return true;
 		}
 		return false;
@@ -200,7 +207,7 @@ public class TileLayer implements Layer {
 			while (!stack.isEmpty()) {
 				Location i = stack.pop();
 
-				if (check(oldName, i.x, i.y) && (sel == null || (sel != null && sel.contains(i.x*map.getTileSize(), i.y*map.getTileSize())))) {
+				if (check(oldName, i.x, i.y) && (sel == null || (sel != null && sel.contains(i.x*w.getMap().getTileSize(), i.y*w.getMap().getTileSize())))) {
 					set(name, i.x, i.y, false);
 
 					if (i.x > 0) stack.push(new Location(i.x - 1, i.y));
@@ -223,7 +230,7 @@ public class TileLayer implements Layer {
 			while (!stack.isEmpty()) {
 				Location i = stack.pop();
 
-				if ((sel == null || (sel != null && sel.contains(i.x*map.getTileSize(), i.y*map.getTileSize())))) {
+				if ((sel == null || (sel != null && sel.contains(i.x*w.getMap().getTileSize(), i.y*w.getMap().getTileSize())))) {
 					set(name, i.x, i.y, false);
 
 					if (i.x > 0) stack.push(new Location(i.x - 1, i.y));
@@ -239,17 +246,13 @@ public class TileLayer implements Layer {
 		String name = tileNames[(int)x][(int)y];
 		boolean bool1 = (oldName == null && name == null);
 		boolean bool2 = ((name != null && oldName != null) && name.equals(oldName));
-		boolean bool3 = (map.getAutoTile() > 2 && oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
+		boolean bool3 = (w.getAutoTile() > 0 && oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
 		return bool1 || bool2 || bool3;
 	}
 
 	@Override
 	public GO select(float x, float y) {
 		return null;
-	}
-
-	public void setMap(GameMap map) {
-		this.map = map;
 	}
 
 	/**
