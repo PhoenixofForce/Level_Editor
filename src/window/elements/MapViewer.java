@@ -356,6 +356,7 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
+		//new SetCommand(selectedLayer, selectedTexture, pos, drag).redo();
 
 		didAction = true;
 	}

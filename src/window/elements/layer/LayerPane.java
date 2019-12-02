@@ -70,6 +70,15 @@ public class LayerPane extends JPanel {
 		return map.getLayer(listModel.get(jList.getSelectedIndex()));
 	}
 
+	public int getSelectedLayerIndex() {
+		return jList.getSelectedIndex();
+	}
+
+	public Layer getLayer(int i) {
+		return map.getLayer(listModel.get(i));
+	}
+
+
 	/**
 	 * adds a layer to the map
 	 * @param name name of the layer

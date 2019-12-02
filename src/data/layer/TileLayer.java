@@ -1,6 +1,5 @@
 package data.layer;
 
-import data.GameMap;
 import data.Location;
 import data.layer.layerobjects.GO;
 import data.TextureHandler;
@@ -148,7 +147,9 @@ public class TileLayer implements Layer {
 					int random = r.nextInt(count);
 					name += "_"+random;
 				}
-				tileNames[y][x] = TextureHandler.existsImagePng(name)? name: "error_"+tileSize;
+				String tile = TextureHandler.existsImagePng(name)? name: "error_"+tileSize;
+				if(!tile.equals(name)) System.err.println("MSSING TEXTURE: " + name);
+				tileNames[y][x] = tile;
 			}
 		}
 		if(center) {
@@ -327,7 +328,7 @@ public class TileLayer implements Layer {
 
 	@Override
 	public TileLayer clone() {
-		TileLayer out = new TileLayer(null, depth, width, height, tileSize);
+		TileLayer out = new TileLayer(w, depth, width, height, tileSize);
 		for(int y = 0; y < height; y++) {
 			for(int x = 0; x < width; x++) {
 				out.tileNames[y][x] = tileNames[y][x];

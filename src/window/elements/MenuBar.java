@@ -77,7 +77,6 @@ public class MenuBar extends JMenuBar {
 
 		openFile.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();
-
 			if(lastOpen != null) chooser.setCurrentDirectory(lastOpen);
 			//chooser.setOpaque(true);
 

@@ -123,9 +123,9 @@ public class AreaLayer implements Layer {
 	public void draw(Graphics g) {
 		for (Area a: areas) {
 			g.setColor(a.getColor());
-			g.fillRect((int) (a.getSmallerX() * tileSize), (int) (a.getSmallerY() * tileSize), (int) ((a.getBiggerX()-a.getSmallerX())*tileSize) + 1, (int) ((a.getBiggerY() - a.getSmallerY())*tileSize) + 1);
-			g.fillRect((int) (a.getX1() * tileSize), (int) (a.getY1() * tileSize), 1, 1);
-			g.fillRect((int) (a.getX2() * tileSize), (int) (a.getY2() * tileSize), 1, 1);
+			g.fillRect((int) Math.floor(a.getSmallerX() * tileSize), (int) Math.floor(a.getSmallerY() * tileSize), (int) Math.round((a.getBiggerX()-a.getSmallerX())*tileSize) + 1, (int) Math.round((a.getBiggerY() - a.getSmallerY())*tileSize) + 1);
+			g.fillRect((int) Math.floor(a.getX1() * tileSize), (int) Math.floor(a.getY1() * tileSize), 1, 1);
+			g.fillRect((int) Math.floor(a.getX2() * tileSize), (int) Math.floor(a.getY2() * tileSize), 1, 1);
 		}
 	}
 

@@ -1,5 +1,6 @@
 import window.Window;
 
+import javax.swing.*;
 import java.io.File;
 
 public class Main {
@@ -18,6 +19,12 @@ public class Main {
 			-settings (?)
 		 */
 
+		/*try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}*/
+
 		Window window = new Window();
 
 		if (args.length > 0) {
@@ -26,6 +33,8 @@ public class Main {
 			} catch (Exception e) {
 				System.err.println("Could not open file " + args[0]);
 			}
+		} else {
+			//Load Preset
 		}
 	}
 }
