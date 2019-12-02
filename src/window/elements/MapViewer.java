@@ -7,6 +7,9 @@ import data.layer.layerobjects.TagObject;
 import window.ClipBoardUtil;
 import window.Tools;
 import window.Window;
+import window.commands.Command;
+import window.commands.History;
+import window.commands.SetCommand;
 import window.elements.layer.LayerPane;
 
 import java.util.ArrayList;
@@ -40,11 +43,7 @@ public class MapViewer extends JPanel {
 
 	private GameMap map;									//the game map
 
-	private List<GameMap> prevActions;
-	private boolean didAction = false;
-	private int actions = 0;
-	private int maxAction = 0;
-	private int savedAction = 1;
+	private History prevActions;
 
 	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map2) {
 		requestFocus();
@@ -57,8 +56,7 @@ public class MapViewer extends JPanel {
 		this.tb = tb;
 		this.map = map2;
 
-		prevActions = new ArrayList<>();
-		addAction();
+		prevActions = new History();
 
 		tool = Tools.BRUSH;
 		tb.update(tool);
@@ -97,7 +95,7 @@ public class MapViewer extends JPanel {
 					if(selection != null && layerPane.getSelectedLayer() instanceof TileLayer) {
 						TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
 						if(copyLayer == null) {
-							addAction();
+							//TODO: addAction();
 							//COPY selectedLayer into copyLayer and clear the copied space
 
 							copyLayer = new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize());
@@ -213,10 +211,6 @@ public class MapViewer extends JPanel {
 					if(selection != null) selection.roundPosition(map.getTileSize());
 					if(copyLayer != null) copyLayer.roundAll(map.getTileSize());
 				}
-
-				if(didAction) {
-					addAction();
-				}
 			}
 
 			@Override
@@ -286,15 +280,11 @@ public class MapViewer extends JPanel {
 					selection.roundPosition(map.getTileSize());
 					copyLayer.roundAll(map.getTileSize());
 				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
-					if(actions == 1) return;
-					actions--;
 					updateTitle();
-					window.setMap(prevActions.get(actions-1).clone(), false);
+					prevActions.undo();
 				} else if (e.getKeyCode() == 89 && ((e.getKeyChar() != 'y' && e.getKeyChar() != 'Y') || e.isControlDown())) {    // y
-					if(actions == maxAction) return;
-					actions++;
 					updateTitle();
-					window.setMap(prevActions.get(actions-1).clone(), false);
+					prevActions.redo();
 				} else if (e.getKeyCode() == 65 && ((e.getKeyChar() != 'a' && e.getKeyChar() != 'A') || e.isControlDown())) {    // a
 					if(selection != null) selection = null;
 					 else {
@@ -323,11 +313,7 @@ public class MapViewer extends JPanel {
 		this.map = map;
 		if(isNewMap) {
 			centerCamera();
-			prevActions = new ArrayList<>();
-			savedAction = 1;
-			didAction = false;
-			actions = 0;
-			addAction();
+			prevActions = new History();
 		}
 	}
 
@@ -355,10 +341,8 @@ public class MapViewer extends JPanel {
 
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
-		selectedLayer.set(selectedTexture, pos.x, pos.y, drag);
-		//new SetCommand(selectedLayer, selectedTexture, pos, drag).redo();
-
-		didAction = true;
+		Command c = new SetCommand(selectedLayer, selectedTexture, pos, drag, tb.getAutoTile());
+		c.execute(prevActions);
 	}
 
 	/**
@@ -376,8 +360,6 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		selectedLayer.remove(pos.x, pos.y);
-
-		didAction = true;
 	}
 
 	private void fill(int x, int y, boolean rem) {
@@ -392,8 +374,6 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
-
-		didAction = true;
 	}
 
 	/**
@@ -433,7 +413,6 @@ public class MapViewer extends JPanel {
 		Location pos1 = getBlockLocation(x, y);
 		Location pos2 = getBlockLocation(targetX, targetY);
 		selectedLayer.drag(pos1.x, pos1.y, pos2.x, pos2.y);
-		didAction = true;
 	}
 
 	/**
@@ -559,20 +538,9 @@ public class MapViewer extends JPanel {
 		tb.update(tool);
 	}
 
-	public void addAction() {
-		actions++;
-		maxAction = actions;
-		didAction = false;
-
-		updateTitle();
-
-		prevActions.add(maxAction-1, map.clone());
-		while(prevActions.size() > maxAction) prevActions.remove(prevActions.size()-1);
-		System.out.println(maxAction + " " + prevActions.size());
-	}
-
 	private void updateTitle() {
-		String title = new StringBuilder("LevelEditor - ").append(mb.getFileName()).append(savedAction == actions? "": " (*)").toString();
+		//TODO: Mark changes in title
+		String title = new StringBuilder("LevelEditor - ").append(mb.getFileName()).append(true? "": " (*)").toString();
 		window.setTitle(title);
 	}
 
@@ -584,13 +552,13 @@ public class MapViewer extends JPanel {
 					layer.set(g.name, (int)g.x, (int)g.y, false);
 				}
 			}
-			addAction();
+			//TODO: COPY addAction();
 		}
 		copyLayer = null;
 	}
 
 	public void saveAction() {
-		savedAction = actions;
+		//TODO: Save
 		updateTitle();
 	}
 

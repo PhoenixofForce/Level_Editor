@@ -114,7 +114,7 @@ public class LayerPane extends JPanel {
 
 		//Adds layer to map and to listModel at the position fitting to its depth
 		map.addLayer(name, layer);
-		window.getMapViewer().addAction();
+		//TODO: window.getMapViewer().addAction();
 		int index = 0;
 		while (index < listModel.size() && map.getLayer(listModel.get(index)).depth() > layer.depth()) index++;
 		listModel.add(index, name);
@@ -129,7 +129,7 @@ public class LayerPane extends JPanel {
 		int sel = jList.getSelectedIndex();
 		String name = listModel.get(sel);
 		map.removeLayer(name);
-		window.getMapViewer().addAction();
+		//TODO: window.getMapViewer().addAction();
 		listModel.remove(sel);
 		if (sel == 0) jList.setSelectedIndex(0);
 		else jList.setSelectedIndex(sel - 1);
