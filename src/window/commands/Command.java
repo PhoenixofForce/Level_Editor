@@ -2,7 +2,7 @@ package window.commands;
 
 public interface Command {
 
-	void execute(History history);
+	void execute(CommandHistory commandHistory);
 	void redo();
 	void undo();
 }

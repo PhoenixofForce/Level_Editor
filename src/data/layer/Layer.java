@@ -1,5 +1,6 @@
 package data.layer;
 
+import data.Location;
 import data.layer.layerobjects.TagObject;
 
 import java.awt.Graphics;
@@ -52,7 +53,7 @@ public interface Layer {
 	 * draws the layer
 	 * @param g the graphics object which should draw the layer
 	 */
-	void draw(Graphics g);
+	void draw(Graphics g, Location topLeft, Location downRight);
 
 	/**
 	 * @return the smallest x value in this layer

@@ -1,5 +1,6 @@
 package data.layer;
 
+import data.Location;
 import data.layer.layerobjects.Area;
 import data.layer.layerobjects.Tag;
 
@@ -120,7 +121,7 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public void draw(Graphics g) {
+	public void draw(Graphics g, Location l1, Location l2) {
 		for (Area a: areas) {
 			g.setColor(a.getColor());
 			g.fillRect((int) Math.floor(a.getSmallerX() * tileSize), (int) Math.floor(a.getSmallerY() * tileSize), (int) Math.round((a.getBiggerX()-a.getSmallerX())*tileSize) + 1, (int) Math.round((a.getBiggerY() - a.getSmallerY())*tileSize) + 1);

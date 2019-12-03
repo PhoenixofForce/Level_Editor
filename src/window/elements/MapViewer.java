@@ -8,7 +8,8 @@ import window.ClipBoardUtil;
 import window.Tools;
 import window.Window;
 import window.commands.Command;
-import window.commands.History;
+import window.commands.CommandHistory;
+import window.commands.FillCommand;
 import window.commands.SetCommand;
 import window.elements.layer.LayerPane;
 
@@ -43,7 +44,7 @@ public class MapViewer extends JPanel {
 
 	private GameMap map;									//the game map
 
-	private History prevActions;
+	private CommandHistory prevActions;
 
 	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map2) {
 		requestFocus();
@@ -56,7 +57,7 @@ public class MapViewer extends JPanel {
 		this.tb = tb;
 		this.map = map2;
 
-		prevActions = new History();
+		prevActions = new CommandHistory();
 
 		tool = Tools.BRUSH;
 		tb.update(tool);
@@ -313,7 +314,7 @@ public class MapViewer extends JPanel {
 		this.map = map;
 		if(isNewMap) {
 			centerCamera();
-			prevActions = new History();
+			prevActions = new CommandHistory();
 		}
 	}
 
@@ -373,7 +374,8 @@ public class MapViewer extends JPanel {
 		TileLayer tl = (TileLayer) selectedLayer;
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
-		tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
+		//tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
+		new FillCommand(tl, rem? null: selectedTexture, pos, selection == null? null: selection.getArea(), tb.getAutoTile()).execute(prevActions);
 	}
 
 	/**
@@ -478,7 +480,7 @@ public class MapViewer extends JPanel {
 		map.getLayers().values().stream()
 				.filter(l -> !layerPane.isHidden(l))
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
-				.forEach(l -> l.draw(g2));
+				.forEach(l -> l.draw(g2, getBlockLocation(0, 0), getBlockLocation(this.getWidth(), this.getHeight())));
 
 		//Draws a highlighter (in size of tile => tilelayer, of selected texture => freelayer, of area corner => arealayer) in green(drawing) or red(erasing)
 		if (mouseEntered && TILE_HIGHLIGHT) {
@@ -495,7 +497,7 @@ public class MapViewer extends JPanel {
 		}
 
 		if(copyLayer != null) {
-			copyLayer.draw(g2);
+			copyLayer.draw(g2, null, null);
 		}
 
 		//Draws selection

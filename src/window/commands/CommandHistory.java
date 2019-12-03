@@ -2,12 +2,12 @@ package window.commands;
 
 import java.util.Stack;
 
-public class History {
+public class CommandHistory {
 
 	private Stack<Command> commandHistory;
 	private Stack<Command> commandFuture;
 
-	public History() {
+	public CommandHistory() {
 		commandHistory = new Stack<>();
 		commandFuture = new Stack<>();
 	}

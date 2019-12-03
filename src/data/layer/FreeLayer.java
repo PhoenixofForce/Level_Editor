@@ -1,5 +1,6 @@
 package data.layer;
 
+import data.Location;
 import data.layer.layerobjects.GO;
 import data.layer.layerobjects.Tag;
 import data.TextureHandler;
@@ -129,7 +130,7 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public void draw(Graphics g) {
+	public void draw(Graphics g, Location l1, Location l2) {
 		synchronized (images) {
 			for (GO go: images) {
 				g.drawImage(TextureHandler.getImagePng(go.name), (int) (go.x * tileSize), (int) (go.y * tileSize), null);

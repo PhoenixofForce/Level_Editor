@@ -1,6 +1,7 @@
 package window.commands;
 
 import data.Location;
+import data.Util;
 import data.layer.Layer;
 import data.layer.TileLayer;
 
@@ -24,40 +25,18 @@ public class SetCommand implements Command {
 	}
 
 	@Override
-	public void execute(History history) {
+	public void execute(CommandHistory commandHistory) {
 		if(layer instanceof TileLayer) {
 
-			//Normal compare
-			if(prevTexture == null || (!(autoTile > 0 && prevTexture.split("_")[1].equals("block") && nextTexture.split("_")[1].equals("block"))
-					&& nextTexture!= null && (!prevTexture.equals(nextTexture)))) {
-
+			if(!Util.textureEquals(autoTile, prevTexture, nextTexture)) {
 				redo();
-				history.addCommand(this);
-
-				return;
-			}
-
-			//Autotile compare
-			else if(autoTile > 0) {
-				if(prevTexture != null && nextTexture != null) {
-					String[] prevParts = prevTexture.split("_");
-					String[] nextParts = nextTexture.split("_");
-
-					if(prevParts[1].equals("block") && nextParts[1].equals("block") && prevParts.length == nextParts.length) {
-						for(int i = 2; i < nextParts.length-1; i++) {
-							if (!prevParts[i].equals(nextParts[i])) {
-								redo();
-								history.addCommand(this);
-
-								return;
-							}
-						}
-					}
-				}
+				commandHistory.addCommand(this);
+			} else {
+				redo();			//To trigger the TileLayer.update
 			}
 		} else {
 			redo();
-			history.addCommand(this);
+			commandHistory.addCommand(this);
 		}
 	}
 

@@ -141,7 +141,7 @@ public class MenuBar extends JMenuBar {
 					//draws layer by their drawing depth
 					w.getMap().getLayers().values().stream()
 							.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
-							.forEach(l -> l.draw(g2));
+							.forEach(l -> l.draw(g2, null, null));
 					try {
 						System.out.println(Arrays.toString(bounds));
 						ImageIO.write(img.getSubimage(bounds[0]*w.getMap().getTileSize(), bounds[1]*w.getMap().getTileSize(), (1+bounds[2]-bounds[0])*w.getMap().getTileSize(), (1+bounds[3]-bounds[1])*w.getMap().getTileSize()), "PNG", f);

@@ -1,6 +1,7 @@
 package data.layer;
 
 import data.Location;
+import data.Util;
 import data.layer.layerobjects.GO;
 import data.TextureHandler;
 import window.Window;
@@ -8,6 +9,7 @@ import window.Window;
 import java.awt.Graphics;
 
 import java.awt.geom.Area;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -90,34 +92,34 @@ public class TileLayer implements Layer {
 
 				int out = 0;
 				if(w.getAutoTile() == 1) {
-					if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (y != 0 && tileNames[y - 1][x] != null && Util.textureEquals(w.getAutoTile(), tileNames[y - 1][x], name))
 						out ^= 12;
-					if (y != height - 1 && tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (y != height - 1 && tileNames[y + 1][x] != null && Util.textureEquals(w.getAutoTile(), tileNames[y + 1][x], name))
 						out ^= 4;
-					if (x != 0 && tileNames[y][x - 1] != null && tileNames[y][x - 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (x != 0 && tileNames[y][x - 1] != null && Util.textureEquals(w.getAutoTile(), tileNames[y][x - 1], name))
 						out ^= 3;
-					if (x != width - 1 && tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (x != width - 1 && tileNames[y][x + 1] != null && Util.textureEquals(w.getAutoTile(), tileNames[y][x + 1], name))
 						out ^= 1;
 				} else if(w.getAutoTile() == 2) {
 
-					if (y != 0 && tileNames[y - 1][x] != null && tileNames[y - 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (y != 0 && tileNames[y - 1][x] != null && Util.textureEquals(w.getAutoTile(), tileNames[y - 1][x], name))
 						out ^= 2;
-					if (y != height - 1 && tileNames[y + 1][x] != null && tileNames[y + 1][x].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (y != height - 1 && tileNames[y + 1][x] != null && Util.textureEquals(w.getAutoTile(), tileNames[y + 1][x], name))
 						out ^= 64;
-					if (x != 0 && tileNames[y][x - 1] != null && tileNames[y][x - 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (x != 0 && tileNames[y][x - 1] != null && Util.textureEquals(w.getAutoTile(), tileNames[y][x - 1], name))
 						out ^= 8;
-					if (x != width - 1 && tileNames[y][x + 1] != null && tileNames[y][x + 1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (x != width - 1 && tileNames[y][x + 1] != null && Util.textureEquals(w.getAutoTile(), tileNames[y][x + 1], name))
 						out ^= 16;
 
 					boolean w = (out&8)!=0, n = (out&2)!=0, e = (out&16)!=0, s = (out&64)!=0;
-					if (x!= 0 && y != 0 && tileNames[y - 1][x-1] != null && tileNames[y - 1][x-1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (x!= 0 && y != 0 && tileNames[y - 1][x-1] != null && Util.textureEquals(this.w.getAutoTile(), tileNames[y - 1][x - 1], name))
 						out ^= w && n? 1: 0;
-					if (x!= width-1 && y != 0 && tileNames[y - 1][x+1] != null && tileNames[y - 1][x+1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (x!= width-1 && y != 0 && tileNames[y - 1][x+1] != null && Util.textureEquals(this.w.getAutoTile(), tileNames[y - 1][x + 1], name))
 						out ^= e && n? 4: 0;
 
-					if (x!= 0 && y != height-1 && tileNames[y + 1][x-1] != null && tileNames[y + 1][x-1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (x!= 0 && y != height-1 && tileNames[y + 1][x-1] != null && Util.textureEquals(this.w.getAutoTile(), tileNames[y + 1][x - 1], name))
 						out ^= w && s? 32: 0;
-					if (x!= width-1 && y != height-1 && tileNames[y + 1][x+1] != null && tileNames[y + 1][x+1].startsWith(spriteSheet + "_block_" + blockName + "_"))
+					if (x!= width-1 && y != height-1 && tileNames[y + 1][x+1] != null && Util.textureEquals(this.w.getAutoTile(), tileNames[y + 1][x + 1], name))
 						out ^= e && s? 128: 0;
 
 
@@ -193,15 +195,16 @@ public class TileLayer implements Layer {
 		return false;
 	}
 
-	public void fill(Area sel, String name, float x2, float y2) {
+	public List<Location> fill(Area sel, String name, float x2, float y2) {
 		int x = (int) x2;
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String oldName = tileNames[y][x];
 			boolean bool1 = check(name, x, y);
 			boolean bool2 = (oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
-			if(bool1 || bool2) return;
+			if(bool1 || bool2) return null;
 
+			List<Location> out = new ArrayList<>();
 			Stack<Location> stack = new Stack<>();
 			stack.push(new Location(x, y));
 
@@ -210,6 +213,7 @@ public class TileLayer implements Layer {
 
 				if (check(oldName, i.x, i.y) && (sel == null || (sel != null && sel.contains(i.x*w.getMap().getTileSize(), i.y*w.getMap().getTileSize())))) {
 					set(name, i.x, i.y, false);
+					out.add(i);
 
 					if (i.x > 0) stack.push(new Location(i.x - 1, i.y));
 					if (i.y > 0) stack.push(new Location(i.x, i.y - 1));
@@ -217,7 +221,11 @@ public class TileLayer implements Layer {
 					if (i.y < height - 1) stack.push(new Location(i.x, i.y + 1));
 				}
 			}
+
+			return out;
 		}
+
+		return null;
 	}
 
 	public void fill(Area sel, String name) {
@@ -243,11 +251,12 @@ public class TileLayer implements Layer {
 		}
 	}
 
+	//TODO: test if equal to Util.onlyMethod()
 	private boolean check(String oldName, float y, float x) {
 		String name = tileNames[(int)x][(int)y];
 		boolean bool1 = (oldName == null && name == null);
 		boolean bool2 = ((name != null && oldName != null) && name.equals(oldName));
-		boolean bool3 = (w.getAutoTile() > 0 && oldName != null && name != null && name.contains("block") && oldName.contains("block") && name.split("_")[2].equalsIgnoreCase(oldName.split("_")[2]));
+		boolean bool3 = (w.getAutoTile() > 0 && Util.textureEquals(w.getAutoTile(), oldName, name));
 		return bool1 || bool2 || bool3;
 	}
 
@@ -269,9 +278,14 @@ public class TileLayer implements Layer {
 	}
 
 	@Override
-	public void draw(Graphics g) {
-		for (int x = 0; x < tileNames[0].length; x++) {
-			for (int y = 0; y < tileNames.length; y++) {
+	public void draw(Graphics g, Location topLeft, Location downRight) {
+		int startX = (int) Math.max(0,  topLeft == null? 0: Math.floor(topLeft.x));
+		int endX = (int) Math.min(tileNames[0].length,  downRight == null? 0: Math.ceil(downRight.x));
+		int startY = (int) Math.max(0,  topLeft == null? 0: Math.floor(topLeft.y));
+		int endY = (int) Math.min(tileNames.length,  downRight == null? 0: Math.ceil(downRight.y));
+
+		for (int x = startX; x < endX; x++) {
+			for (int y = startY; y < endY; y++) {
 				if (tileNames[y][x] == null) continue;
 				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), x * tileSize, y * tileSize, null);
 			}
