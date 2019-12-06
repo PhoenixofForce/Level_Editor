@@ -9,7 +9,9 @@ import window.Tools;
 import window.Window;
 import window.commands.Command;
 import window.commands.CommandHistory;
+import window.commands.DragCommand;
 import window.commands.FillCommand;
+import window.commands.RemoveCommand;
 import window.commands.SetCommand;
 import window.elements.layer.LayerPane;
 
@@ -44,6 +46,7 @@ public class MapViewer extends JPanel {
 
 	private GameMap map;									//the game map
 
+	private Command bulkCommand;
 	private CommandHistory prevActions;
 
 	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map2) {
@@ -212,6 +215,12 @@ public class MapViewer extends JPanel {
 					if(selection != null) selection.roundPosition(map.getTileSize());
 					if(copyLayer != null) copyLayer.roundAll(map.getTileSize());
 				}
+				
+				if(bulkCommand != null) {
+					System.out.println("asdasd");
+					prevActions.addCommand(bulkCommand);
+					bulkCommand = null;
+				}
 			}
 
 			@Override
@@ -342,7 +351,7 @@ public class MapViewer extends JPanel {
 
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
-		Command c = new SetCommand(selectedLayer, selectedTexture, pos, drag, tb.getAutoTile());
+		Command c = new SetCommand(imageList.getModifier(), selectedLayer, selectedTexture, pos, drag, tb.getAutoTile());
 		c.execute(prevActions);
 	}
 
@@ -360,7 +369,7 @@ public class MapViewer extends JPanel {
 
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
-		selectedLayer.remove(pos.x, pos.y);
+		new RemoveCommand(imageList.getModifier(), selectedLayer, pos).execute(prevActions);  
 	}
 
 	private void fill(int x, int y, boolean rem) {
@@ -414,7 +423,16 @@ public class MapViewer extends JPanel {
 
 		Location pos1 = getBlockLocation(x, y);
 		Location pos2 = getBlockLocation(targetX, targetY);
-		selectedLayer.drag(pos1.x, pos1.y, pos2.x, pos2.y);
+		boolean success = selectedLayer.drag(pos1.x, pos1.y, pos2.x, pos2.y);
+		
+		if(success) {
+			if(bulkCommand == null) {
+				bulkCommand = new DragCommand(selectedLayer, pos1, pos2);
+			} else {
+				DragCommand dc = (DragCommand) bulkCommand;
+				dc.setTo(pos1, pos2);
+			}
+		}
 	}
 
 	/**

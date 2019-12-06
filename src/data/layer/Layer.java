@@ -39,15 +39,17 @@ public interface Layer {
 	 * @param targetX x coordinate of the point where the dragging stopped
 	 * @param targetY y coordinate of the point where the dragging stopped
 	 */
-	void drag(float x, float y, float targetX, float targetY);
+	boolean drag(float x, float y, float targetX, float targetY);
 
+	void add(TagObject to);
+	
 	/**
 	 * removes a gameobject at a given
 	 * @param x x coordinate of the point clicked
 	 * @param y y coordinate of the point clicked
-	 * @return if the remove was successfull
+	 * @return the deleted object
 	 */
-	boolean remove(float x, float y);
+	TagObject remove(float x, float y);
 
 	/**
 	 * draws the layer

@@ -3,6 +3,7 @@ package data.layer;
 import data.Location;
 import data.Util;
 import data.layer.layerobjects.GO;
+import data.layer.layerobjects.TagObject;
 import data.TextureHandler;
 import window.Window;
 
@@ -169,15 +170,16 @@ public class TileLayer implements Layer {
 	}
 
 	@Override
-	public void drag(float x, float y, float targetX, float targetY) {
-
+	public boolean drag(float x, float y, float targetX, float targetY) {
+		return false;
 	}
 
 	@Override
-	public boolean remove(float x2, float y2) {
+	public TagObject remove(float x2, float y2) {
 		int x = (int) x2;
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
+			String oldName = tileNames[y][x];
 			tileNames[y][x] = null;
 
 			update(x+1, y, false);
@@ -190,9 +192,9 @@ public class TileLayer implements Layer {
 				update(x - 1, y - 1, false);
 				update(x + 1, y + 1, false);
 			}
-			return true;
+			return oldName == null? null: new GO(oldName, x, y, 1, 1);
 		}
-		return false;
+		return null;
 	}
 
 	public List<Location> fill(Area sel, String name, float x2, float y2) {
@@ -382,5 +384,13 @@ public class TileLayer implements Layer {
 			if(a[i]==f) return i;
 		}
 		return -1;
+	}
+
+	@Override
+	public void add(TagObject to) {
+		if(to instanceof GO) {
+			GO go = (GO) to;
+			this.set(go.name, go.x, go.y, false);
+		}
 	}
 }

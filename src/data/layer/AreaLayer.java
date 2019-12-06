@@ -3,6 +3,7 @@ package data.layer;
 import data.Location;
 import data.layer.layerobjects.Area;
 import data.layer.layerobjects.Tag;
+import data.layer.layerobjects.TagObject;
 
 import java.awt.Graphics;
 import java.awt.Color;
@@ -80,8 +81,8 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public void drag(float x, float y, float targetX, float targetY) {
-		if (targetX < 0 || targetY < 0 || targetX >= width || targetY >= height) return;
+	public boolean drag(float x, float y, float targetX, float targetY) {
+		if (targetX < 0 || targetY < 0 || targetX >= width || targetY >= height) return false;
 		Area area = selected;
 
 		if (area != null) {
@@ -89,35 +90,43 @@ public class AreaLayer implements Layer {
 			if (area.equalsSecondPoint(x, y)) {
 				area.setX2(targetX);
 				area.setY2(targetY);
+				
+				return true;
 			}
 			//Move first point
 			else if(area.equalsFirstPoint(x, y)){
 				area.setX1(targetX);
 				area.setY1(targetY);
+				
+				return true;
 			}
 			//Moves whole area
 			else {
-				if (area.getX1() + (targetX-x) < 0 || area.getY1() + (targetY-y) < 0 || area.getX1() + (targetX-x) >= width || area.getY1() + (targetY-y) >= height) return;
-				if (area.getX2() + (targetX-x) < 0 || area.getY2() + (targetY-y) < 0 || area.getX2() + (targetX-x) >= width || area.getY2() + (targetY-y) >= height) return;
+				if (area.getX1() + (targetX-x) < 0 || area.getY1() + (targetY-y) < 0 || area.getX1() + (targetX-x) >= width || area.getY1() + (targetY-y) >= height) return false;
+				if (area.getX2() + (targetX-x) < 0 || area.getY2() + (targetY-y) < 0 || area.getX2() + (targetX-x) >= width || area.getY2() + (targetY-y) >= height) return false;
 
 				area.setX1(area.getX1() + (targetX-x));
 				area.setX2(area.getX2() + (targetX-x));
 				area.setY1(area.getY1() + (targetY-y));
 				area.setY2(area.getY2() + (targetY-y));
+				
+				return true;
 			}
 		}
+		
+		return false;
 	}
 
 	@Override
-	public boolean remove(float x, float y) {
+	public TagObject remove(float x, float y) {
 		Area area = find(x, y, true);
 
 		if (area != null) {
 			areas.remove(area);
-			return true;
+			return area;
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
@@ -179,5 +188,14 @@ public class AreaLayer implements Layer {
 		}
 
 		return out;
+	}
+
+	@Override
+	public void add(TagObject to) {
+		if(to instanceof Area) {
+			synchronized (areas) {
+				areas.add((Area) to);
+			}
+		}
 	}
 }

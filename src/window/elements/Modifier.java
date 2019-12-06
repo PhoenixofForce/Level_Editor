@@ -68,7 +68,7 @@ public class Modifier extends JPanel{
 		scrollPane.setPreferredSize(new Dimension(0, 200));
 		this.add(scrollPane, BorderLayout.PAGE_END);
 
-		attChooser = new JComboBox();
+		attChooser = new JComboBox<>();
 		this.add(attChooser, BorderLayout.CENTER);
 		attChooser.addActionListener(e -> {
 			Tag t = object.getTag((String) attChooser.getSelectedItem());

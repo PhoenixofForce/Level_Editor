@@ -3,6 +3,7 @@ package data.layer;
 import data.Location;
 import data.layer.layerobjects.GO;
 import data.layer.layerobjects.Tag;
+import data.layer.layerobjects.TagObject;
 import data.TextureHandler;
 
 import java.awt.Graphics;
@@ -57,24 +58,28 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public void drag(float x, float y, float targetX, float targetY) {
+	public boolean drag(float x, float y, float targetX, float targetY) {
 		GO go = select(x, y);
-		if (go == null) return;
+		if (go == null) return false;
 		go.move(targetX - x, targetY - y);
-		if (go.x < 0 || go.x + go.width > this.width || go.y < 0 || go.y + go.height > this.height)
+		if (go.x < 0 || go.x + go.width > this.width || go.y < 0 || go.y + go.height > this.height) {
 			go.move(x - targetX, y - targetY);
+			return false;
+		}
+		
+		return true;
 	}
 
 	@Override
-	public boolean remove(float x, float y) {
+	public TagObject remove(float x, float y) {
 		GO go = find(x, y);
-		if(go == null) return false;
+		if(go == null) return null;
 
 		synchronized (images) {
 			images.remove(go);
 		}
 
-		return true;
+		return go;
 	}
 
 	@Override
@@ -189,5 +194,14 @@ public class FreeLayer implements Layer {
 		}
 
 		return out;
+	}
+
+	@Override
+	public void add(TagObject to) {
+		if(to instanceof GO) {
+			synchronized (images) {
+				images.add((GO) to);
+			}
+		}
 	}
 }

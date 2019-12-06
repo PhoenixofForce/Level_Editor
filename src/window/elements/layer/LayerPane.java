@@ -36,6 +36,7 @@ public class LayerPane extends JPanel {
 		jList.setLayoutOrientation(JList.VERTICAL);
 
 		//change layer names depending on the layer beeing hidden
+		//TODO: Use Spinner?
 		jList.setCellRenderer(new DefaultListCellRenderer() {
 
 			@Override
@@ -47,7 +48,7 @@ public class LayerPane extends JPanel {
 
 				if (hidden) setForeground(Color.RED);
 
-				setText((hidden ? "✕" : "✓") + getText());
+				setText((hidden ? "✕ " : "✓ ") + getText());
 				setText(getText() + " " + "(" + map.getLayer(layerName).depth() + ")");
 
 				return c;

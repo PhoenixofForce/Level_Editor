@@ -24,7 +24,7 @@ public class MainToolBar extends JToolBar {
 		});
 		this.add(editMapTags);
 
-		toggleAutoTile = new JComboBox();
+		toggleAutoTile = new JComboBox<>();
 		toggleAutoTile.setPreferredSize(new Dimension(100, -1));
 		toggleAutoTile.setMaximumSize(new Dimension(100, 100));
 

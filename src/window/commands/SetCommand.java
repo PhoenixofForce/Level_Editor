@@ -4,16 +4,19 @@ import data.Location;
 import data.Util;
 import data.layer.Layer;
 import data.layer.TileLayer;
+import window.elements.Modifier;
 
 public class SetCommand implements Command {
 
+	private Modifier mod;
 	private Layer layer;
 	private String prevTexture, nextTexture;
 	private Location pos;
 	private boolean drag;
 	private int autoTile;
 
-	public SetCommand(Layer layer, String texture, Location position, boolean drag, int autoTile) {
+	public SetCommand(Modifier mod, Layer layer, String texture, Location position, boolean drag, int autoTile) {
+		this.mod = mod;
 		this.layer = layer;
 		if(layer instanceof TileLayer) {
 			prevTexture = ((TileLayer) layer).getTileNames()[(int)position.y][(int)position.x];
@@ -26,16 +29,12 @@ public class SetCommand implements Command {
 
 	@Override
 	public void execute(CommandHistory commandHistory) {
+		redo();
 		if(layer instanceof TileLayer) {
-
 			if(!Util.textureEquals(autoTile, prevTexture, nextTexture)) {
-				redo();
 				commandHistory.addCommand(this);
-			} else {
-				redo();			//To trigger the TileLayer.update
-			}
+			} 
 		} else {
-			redo();
 			commandHistory.addCommand(this);
 		}
 	}
@@ -51,6 +50,7 @@ public class SetCommand implements Command {
 			layer.set(prevTexture, pos.x, pos.y, drag);
 		} else {
 			layer.remove(pos.x, pos.y);
+			mod.setTagObject(null);
 		}
 	}
 
