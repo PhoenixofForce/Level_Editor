@@ -47,6 +47,11 @@ public class DragCommand implements Command {
 	}
 
 	@Override
+	public boolean isWorthy(Command lastCommand) {
+		return !equals(lastCommand);
+	}
+
+	@Override
 	public boolean equals(Object o2) {
 		if(o2 instanceof DragCommand) {
 			return  false/*fc.layer.equals(layer) &&

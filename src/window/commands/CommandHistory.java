@@ -13,10 +13,10 @@ public class CommandHistory {
 	}
 
 	public void addCommand(Command c) {
-		if(canUndo() && commandHistory.peek().equals(c)) return;
+		if(canUndo() && !c.isWorthy(commandHistory.peek())) return;
 
 		commandHistory.push(c);
-		commandFuture = new Stack<>();
+		commandFuture.clear();
 	}
 
 	public void undo() {

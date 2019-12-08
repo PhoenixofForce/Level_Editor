@@ -7,12 +7,7 @@ import data.layer.layerobjects.TagObject;
 import window.ClipBoardUtil;
 import window.Tools;
 import window.Window;
-import window.commands.Command;
-import window.commands.CommandHistory;
-import window.commands.DragCommand;
-import window.commands.FillCommand;
-import window.commands.RemoveCommand;
-import window.commands.SetCommand;
+import window.commands.*;
 import window.elements.layer.LayerPane;
 
 import java.util.ArrayList;
@@ -100,7 +95,7 @@ public class MapViewer extends JPanel {
 						TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
 						if(copyLayer == null) {
 							//TODO: addAction();
-							//COPY selectedLayer into copyLayer and clear the copied space
+							//COPY selectedLayer into copyLayer and clear the copied space to avoid changes because of autotiling
 
 							copyLayer = new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize());
 							List<int[]> resetPositions = new ArrayList<>();
@@ -149,7 +144,7 @@ public class MapViewer extends JPanel {
 				else if (e.getButton() == 3 && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
 				else if(e.getButton() == 1 && tool == Tools.SELECT) startClick = getBlockLocation(e.getX(), e.getY());
 				else if(e.getButton() == 3 && tool == Tools.SELECT) {
-					selection = null;
+					new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(prevActions);
 					startClick = null;
 				}
 				else if (e.getButton() == 2) {
@@ -191,7 +186,7 @@ public class MapViewer extends JPanel {
 
 					if(w < 0 || h < 0 || x > map.getWidth() || y > map.getWidth()) {
 						startClick = null;
-						selection = null;
+						new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(prevActions);
 						return;
 					}
 					if(x + w > map.getWidth()) w = map.getWidth()-x;
@@ -200,24 +195,54 @@ public class MapViewer extends JPanel {
 					Rectangle r = new Rectangle(x * map.getTileSize(), y * map.getTileSize(), w * map.getTileSize(),h * map.getTileSize());
 
 					if(selection == null || (!e.isShiftDown() && !e.isControlDown())) {
-						selection = new Selection();
-						selection.add(r);
-					} else if(e.isShiftDown() && !e.isControlDown()) selection.add(r);
-					else if(!e.isShiftDown() && e.isControlDown()) selection.subtract(r);
+						Selection newSelection = new Selection();
+						newSelection.add(r);
+
+						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(prevActions);
+					} else if(e.isShiftDown() && !e.isControlDown()) {
+						Selection newSelection = selection.clone();
+						newSelection.add(r);
+
+						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(prevActions);
+					}
+					else if(!e.isShiftDown() && e.isControlDown()) {
+						Selection newSelection = selection.clone();
+						newSelection.subtract(r);
+
+						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(prevActions);
+					}
 					startClick = null;
 				}
 
 				if(e.getButton() == 1 && tool == Tools.MOVE) {
-					if(selection != null) selection.roundPosition(map.getTileSize());
+					if(selection != null) {
+						if(bulkCommand == null) {
+							bulkCommand = new SelectionMoveCommand(map.getTileSize(), selection);
+							SelectionMoveCommand smc = (SelectionMoveCommand) bulkCommand;
+							smc.round();
+						} else {
+							SelectionMoveCommand smc = (SelectionMoveCommand) bulkCommand;
+							smc.round();
+						}
+					}
 				}
 
 				if(e.getButton() == 3 && tool == Tools.MOVE) {
-					if(selection != null) selection.roundPosition(map.getTileSize());
+					if(selection != null) {
+						if(bulkCommand == null) {
+							bulkCommand = new SelectionMoveCommand(map.getTileSize(), selection);
+							SelectionMoveCommand smc = (SelectionMoveCommand) bulkCommand;
+							smc.round();
+						} else {
+							SelectionMoveCommand smc = (SelectionMoveCommand) bulkCommand;
+							smc.round();
+						}
+					}
 					if(copyLayer != null) copyLayer.roundAll(map.getTileSize());
 				}
 				
 				if(bulkCommand != null) {
-					System.out.println("asdasd");
+					System.out.println("Save bulked Command");
 					prevActions.addCommand(bulkCommand);
 					bulkCommand = null;
 				}
@@ -285,9 +310,15 @@ public class MapViewer extends JPanel {
 						}
 					}
 
-					selection = new Selection();
-					selection.add(new Rectangle(Math.round(l.x* map.getTileSize()), Math.round(l.y* map.getTileSize()), lineC*map.getTileSize(), textureC *map.getTileSize()));
-					selection.roundPosition(map.getTileSize());
+					Selection newSelection = new Selection();
+					newSelection.add(new Rectangle(Math.round(l.x* map.getTileSize()), Math.round(l.y* map.getTileSize()), lineC*map.getTileSize(), textureC *map.getTileSize()));
+
+					prevActions.addCommand(new SelectionChangeCommand(window.getMapViewer(), selection, newSelection));
+					SelectionMoveCommand smc = new SelectionMoveCommand(map.getTileSize(), newSelection);
+					smc.round();
+
+					prevActions.addCommand(smc);
+
 					copyLayer.roundAll(map.getTileSize());
 				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
 					updateTitle();
@@ -296,10 +327,12 @@ public class MapViewer extends JPanel {
 					updateTitle();
 					prevActions.redo();
 				} else if (e.getKeyCode() == 65 && ((e.getKeyChar() != 'a' && e.getKeyChar() != 'A') || e.isControlDown())) {    // a
-					if(selection != null) selection = null;
+					if(selection != null) new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(prevActions);
 					 else {
-					 	selection = new Selection();
-					 	selection.add(new Rectangle(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize()));
+					 	Selection newSelection = new Selection();
+					 	newSelection.add(new Rectangle(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize()));
+
+					 	new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(prevActions);
 					}
 					startClick = null;
 				} else if (e.getKeyCode() == 83 && ((e.getKeyChar() != 's' && e.getKeyChar() != 'S') || e.isControlDown())) {    // s
@@ -351,8 +384,12 @@ public class MapViewer extends JPanel {
 
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
-		Command c = new SetCommand(imageList.getModifier(), selectedLayer, selectedTexture, pos, drag, tb.getAutoTile());
-		c.execute(prevActions);
+		if(bulkCommand == null) {
+			bulkCommand = new SetCommand(imageList.getModifier(), selectedLayer, selectedTexture, pos, drag, tb.getAutoTile());
+		} else {
+			SetCommand sc = (SetCommand) bulkCommand;
+			sc.add(pos, selectedTexture);
+		}
 	}
 
 	/**
@@ -369,7 +406,13 @@ public class MapViewer extends JPanel {
 
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
-		new RemoveCommand(imageList.getModifier(), selectedLayer, pos).execute(prevActions);  
+
+		if(bulkCommand == null) {
+			bulkCommand = new RemoveCommand(imageList.getModifier(), selectedLayer, pos);
+		} else {
+			RemoveCommand rc = (RemoveCommand) bulkCommand;
+			rc.add(pos);
+		}
 	}
 
 	private void fill(int x, int y, boolean rem) {
@@ -541,10 +584,21 @@ public class MapViewer extends JPanel {
 		g.drawImage(img, 0, 0, null);
 	}
 
+	public void setSelection(Selection toSet) {
+		this.selection = toSet;
+	}
+
 	private void moveSelection(int x1, int y1, int x2, int y2, boolean isRight) {
 		Location from = getBlockLocation(x1, y1);
 		Location to = getBlockLocation(x2, y2);
-		selection.translate(Math.round((float)map.getTileSize() * (to.x-from.x)), Math.round((float)map.getTileSize()*(to.y-from.y)));
+
+		if(bulkCommand == null) {
+			bulkCommand = new SelectionMoveCommand(map.getTileSize(), selection, from, to);
+		} else {
+			SelectionMoveCommand smc = (SelectionMoveCommand) bulkCommand;
+			smc.add(from, to);
+		}
+
 		if(isRight && copyLayer != null) copyLayer.moveAll((to.x-from.x), (to.y-from.y));
 		else {
 			mergeCopyLayer();

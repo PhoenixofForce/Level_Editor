@@ -85,21 +85,22 @@ public class AreaLayer implements Layer {
 		if (targetX < 0 || targetY < 0 || targetX >= width || targetY >= height) return false;
 		Area area = selected;
 
+
 		if (area != null) {
+			//Doent work with tileSize=3 :(
+
 			//Move second point
 			if (area.equalsSecondPoint(x, y)) {
 				area.setX2(targetX);
 				area.setY2(targetY);
-				
-				return true;
 			}
+
 			//Move first point
 			else if(area.equalsFirstPoint(x, y)){
 				area.setX1(targetX);
 				area.setY1(targetY);
-				
-				return true;
 			}
+
 			//Moves whole area
 			else {
 				if (area.getX1() + (targetX-x) < 0 || area.getY1() + (targetY-y) < 0 || area.getX1() + (targetX-x) >= width || area.getY1() + (targetY-y) >= height) return false;
@@ -109,9 +110,9 @@ public class AreaLayer implements Layer {
 				area.setX2(area.getX2() + (targetX-x));
 				area.setY1(area.getY1() + (targetY-y));
 				area.setY2(area.getY2() + (targetY-y));
-				
-				return true;
 			}
+
+			return true;
 		}
 		
 		return false;

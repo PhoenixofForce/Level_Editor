@@ -52,6 +52,11 @@ public class FillCommand implements Command {
 	}
 
 	@Override
+	public boolean isWorthy(Command lastCommand) {
+		return !equals(lastCommand);
+	}
+
+	@Override
 	public boolean equals(Object o2) {
 		if(o2 instanceof FillCommand) {
 			FillCommand fc = (FillCommand) o2;

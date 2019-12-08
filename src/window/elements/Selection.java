@@ -1,5 +1,7 @@
 package window.elements;
 
+import data.Location;
+
 import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
@@ -45,7 +47,7 @@ public class Selection {
 		toArea();
 	}
 
-	public void roundPosition(int tileSize) {
+	public Location roundPosition(int tileSize) {
 		int smallestX = Integer.MAX_VALUE,
 			smallestY = Integer.MAX_VALUE;
 
@@ -57,7 +59,12 @@ public class Selection {
 
 		int dx = smallestX%tileSize,
 			dy = smallestY%tileSize;
-		translate(dx < tileSize/2.0? -dx: tileSize-dx, dy < tileSize/2.0f? -dy: tileSize-dy);
+
+		dx = dx < tileSize/2.0? -dx: tileSize-dx;
+		dy = dy < tileSize/2.0f? -dy: tileSize-dy;
+		translate(dx, dy);
+
+		return new Location(dx, dy);
 	}
 
 	public Area getArea() {
@@ -118,6 +125,38 @@ public class Selection {
 		}
 
 		return new Rectangle(x2, y2, x1-x2, y1-y2);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Selection) {
+			Selection s2 = (Selection) obj;
+			if(s2.rectangles.size() == rectangles.size()) {
+				for(int i = 0; i < rectangles.size(); i++) {
+					Pair thisPair = rectangles.get(i);
+					Pair otherPair = s2.rectangles.get(i);
+
+					if(!(thisPair.a == otherPair.a && thisPair.r.equals(otherPair.r))) {
+						return false;
+					}
+
+				}
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public Selection clone() {
+		Selection clone = new Selection();
+		for(int i = 0; i < rectangles.size(); i++) {
+			clone.rectangles.add(new Pair((Rectangle) rectangles.get(i).r.clone(), rectangles.get(i).a));
+		}
+		clone.toArea();
+		return clone;
 	}
 
 	public enum Action {
