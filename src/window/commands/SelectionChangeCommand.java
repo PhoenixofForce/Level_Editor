@@ -31,6 +31,6 @@ public class SelectionChangeCommand implements Command {
 
 	@Override
 	public boolean isWorthy(Command lastCommand) {
-		return (oldSelection == null && newSelection == null) || (oldSelection != null && newSelection != null && !oldSelection.equals(newSelection));
+		return (!(oldSelection == null && newSelection == null)) || (oldSelection != null && newSelection != null && !oldSelection.equals(newSelection));
 	}
 }

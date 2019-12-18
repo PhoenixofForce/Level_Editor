@@ -52,6 +52,8 @@ public class SetCommand implements Command {
 	}
 
 	public void add(Location position, String texture) {
+		if(!(layer instanceof  TileLayer)) return;
+
 		if(layer instanceof TileLayer) {
 			if(position.x >= 0 && position.x < ((TileLayer) layer).getTileNames()[0].length &&
 					position.y >= 0 && position.y < ((TileLayer) layer).getTileNames().length) {

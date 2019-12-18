@@ -26,6 +26,8 @@ public class CommandHistory {
 		if(c != null) {
 			c.undo();
 			commandFuture.push(c);
+
+			if(c instanceof MergeCopyLayerCommand) undo();
 		}
 	}
 
@@ -36,6 +38,8 @@ public class CommandHistory {
 		if(c != null) {
 			c.redo();
 			commandHistory.push(c);
+
+			if(c instanceof MergeCopyLayerCommand) redo();
 		}
 	}
 
