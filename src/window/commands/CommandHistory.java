@@ -39,7 +39,7 @@ public class CommandHistory {
 			c.redo();
 			commandHistory.push(c);
 
-			if(c instanceof MergeCopyLayerCommand) redo();
+			if(canRedo() && commandFuture.peek() instanceof MergeCopyLayerCommand) redo();
 		}
 	}
 

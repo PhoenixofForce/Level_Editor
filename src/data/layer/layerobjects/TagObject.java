@@ -38,13 +38,15 @@ public abstract class TagObject {
 		this.tags.add(t);
 	}
 
-	public void removeTag(String name) {
+	public Tag removeTag(String name) {
 		for(Tag t: tags) {
 			if(t.getName().equals(name)) {
 				tags.remove(t);
-				return;
+				return t;
 			}
 		}
+
+		return null;
 	}
 
 	public abstract String getText();

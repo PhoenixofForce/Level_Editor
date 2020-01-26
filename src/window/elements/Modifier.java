@@ -1,10 +1,14 @@
 package window.elements;
 
+import data.Debouncer;
 import data.layer.layerobjects.Tag;
 
 import data.layer.layerobjects.TagObject;
 import window.UserInputs;
 import window.Window;
+import window.commands.TagAddCommand;
+import window.commands.TagChangeCommand;
+import window.commands.TagRemoveCommand;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -17,6 +21,7 @@ import java.awt.*;
 public class Modifier extends JPanel{
 
 	private Window w;
+	private Modifier instance;
 
 	private TagObject object;			//Object which tags are beeing edited
 	private JLabel goStats;				//Label which shows texture name and coordinate of object
@@ -29,6 +34,8 @@ public class Modifier extends JPanel{
 	private DocumentListener dc;			//Listener that saves all changes
 
 	public Modifier(Window w) {
+		instance = this;
+
 		this.w = w;
 		this.setLayout(new BorderLayout());
 
@@ -42,24 +49,45 @@ public class Modifier extends JPanel{
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
-					object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
-					//w.getMapViewer().addAction();
+					TagObject tagObject = object;
+					int chooserIndex = attChooser.getSelectedIndex();
+					String tagName = attChooser.getItemAt(chooserIndex);
+					String newTagContent = input.getText();
+					String oldTagConent = object.getTag(tagName).getAction();
+
+					Debouncer.debounce("modifier_input_input", () -> {
+						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(w.getMapViewer().getCommandHistory());
+					}, 250);
 				}
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
-					object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
-					//w.getMapViewer().addAction();
+					TagObject tagObject = object;
+					int chooserIndex = attChooser.getSelectedIndex();
+					String tagName = attChooser.getItemAt(chooserIndex);
+					String newTagContent = input.getText();
+					String oldTagConent = object.getTag(tagName).getAction();
+
+					Debouncer.debounce("modifier_input_input", () -> {
+						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(w.getMapViewer().getCommandHistory());
+					}, 250);
 				}
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
-					object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())).setAction(input.getText());
-					//w.getMapViewer().addAction();
+					TagObject tagObject = object;
+					int chooserIndex = attChooser.getSelectedIndex();
+					String tagName = attChooser.getItemAt(chooserIndex);
+					String newTagContent = input.getText();
+					String oldTagConent = object.getTag(tagName).getAction();
+
+					Debouncer.debounce("modifier_input_input", () -> {
+						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(w.getMapViewer().getCommandHistory());
+					}, 250);
 				}
 			}
 		};
@@ -86,7 +114,7 @@ public class Modifier extends JPanel{
 		remove = new JButton("-");
 		this.add(remove, BorderLayout.LINE_END);
 		remove.addActionListener(e -> {
-			object.removeTag((String) attChooser.getSelectedItem());
+			new TagRemoveCommand(instance, object, (String) attChooser.getSelectedItem()).execute(w.getMapViewer().getCommandHistory());
 			attChooser.removeItem(attChooser.getSelectedItem());
 			if(attChooser.getItemCount() == 0) input.setText("");
 		});
@@ -106,7 +134,7 @@ public class Modifier extends JPanel{
 			input.getDocument().addDocumentListener(dc);
 		}
 		//Adds Tag to object
-		object.addTag(new Tag(name));
+		new TagAddCommand(instance, object, name).execute(w.getMapViewer().getCommandHistory());
 
 		//Adds TagName to ComboBox and selects it
 		attChooser.addItem(name);
@@ -165,6 +193,6 @@ public class Modifier extends JPanel{
 		//Set label text to tagObject information
 		goStats.setText(obj.getText());
 
-		//TODO: w.getMapViewer().addAction();
+		//TODO: w.getMapViewer().addAction(); ?
 	}
 }

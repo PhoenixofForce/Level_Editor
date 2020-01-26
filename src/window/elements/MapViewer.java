@@ -2,7 +2,6 @@ package window.elements;
 
 import data.*;
 import data.layer.*;
-import data.layer.layerobjects.GO;
 import data.layer.layerobjects.TagObject;
 import window.ClipBoardUtil;
 import window.Tools;
@@ -39,7 +38,7 @@ public class MapViewer extends JPanel {
 	private GameMap map;									//the game map
 
 	private Command bulkCommand;
-	private CommandHistory prevActions;
+	private CommandHistory commandHistory;
 
 	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map2) {
 		requestFocus();
@@ -52,7 +51,7 @@ public class MapViewer extends JPanel {
 		this.tb = tb;
 		this.map = map2;
 
-		prevActions = new CommandHistory();
+		commandHistory = new CommandHistory();
 
 		tool = Tools.BRUSH;
 		tb.update(tool);
@@ -93,7 +92,7 @@ public class MapViewer extends JPanel {
 						if(copyLayer == null) {
 
 							copyLayer = new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize());
-							prevActions.addCommand(new SelectedTilesMoveCommand(window.getMapViewer(), selectedLayer, selection, map.getTileSize()));
+							commandHistory.addCommand(new SelectedTilesMoveCommand(window.getMapViewer(), selectedLayer, selection, map.getTileSize()));
 						}
 						moveSelection(last_x, last_y, e.getX(), e.getY(), true);
 					}
@@ -127,7 +126,7 @@ public class MapViewer extends JPanel {
 				else if (e.getButton() == 3 && tool == Tools.BUCKET) fill(e.getX(), e.getY(), true);
 				else if(e.getButton() == 1 && tool == Tools.SELECT) startClick = getBlockLocation(e.getX(), e.getY());
 				else if(e.getButton() == 3 && tool == Tools.SELECT) {
-					new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(prevActions);
+					new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(commandHistory);
 					startClick = null;
 				}
 				else if (e.getButton() == 2) {
@@ -153,7 +152,7 @@ public class MapViewer extends JPanel {
 					}
 					tb.update(tool);
 					startClick = null;
-					if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(prevActions);
+					if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 				}
 
 				if(e.getButton() == 1 && tool == Tools.SELECT && startClick != null) {
@@ -169,7 +168,7 @@ public class MapViewer extends JPanel {
 
 					if(w < 0 || h < 0 || x > map.getWidth() || y > map.getWidth()) {
 						startClick = null;
-						new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(prevActions);
+						new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(commandHistory);
 						return;
 					}
 					if(x + w > map.getWidth()) w = map.getWidth()-x;
@@ -181,18 +180,18 @@ public class MapViewer extends JPanel {
 						Selection newSelection = new Selection();
 						newSelection.add(r);
 
-						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(prevActions);
+						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(commandHistory);
 					} else if(e.isShiftDown() && !e.isControlDown()) {
 						Selection newSelection = selection.clone();
 						newSelection.add(r);
 
-						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(prevActions);
+						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(commandHistory);
 					}
 					else if(!e.isShiftDown() && e.isControlDown()) {
 						Selection newSelection = selection.clone();
 						newSelection.subtract(r);
 
-						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(prevActions);
+						new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(commandHistory);
 					}
 					startClick = null;
 				}
@@ -226,7 +225,7 @@ public class MapViewer extends JPanel {
 				
 				if(bulkCommand != null) {
 					System.out.println("Save bulked Command");
-					prevActions.addCommand(bulkCommand);
+					commandHistory.addCommand(bulkCommand);
 					bulkCommand = null;
 				}
 			}
@@ -253,7 +252,7 @@ public class MapViewer extends JPanel {
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
 				} else if (e.getKeyCode() == 67 && ((e.getKeyChar() != 'c' && e.getKeyChar() != 'C') || e.isControlDown())) {    // c
 					if(selection == null || !(layerPane.getSelectedLayer() instanceof TileLayer)) return;
-					if(copyLayer != null) if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(prevActions);
+					if(copyLayer != null) if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 
 					String copiedMap = "";
 					TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
@@ -269,27 +268,27 @@ public class MapViewer extends JPanel {
 					}
 					ClipBoardUtil.StringToClip(copiedMap);
 				} else if (e.getKeyCode() == 86 && ((e.getKeyChar() != 'v' && e.getKeyChar() != 'V') || e.isControlDown())) {    // v
-					if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(prevActions);
+					if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 					tool = Tools.MOVE;
 					tb.update(tool);
 
 					copyLayer = new FreeLayer(0.5f, map.getWidth(), map.getHeight(), map.getTileSize());
 
-					new PasteCommand(window.getMapViewer(), copyLayer, getBlockLocation(getWidth()/2, getHeight()/2), selection, map.getTileSize()).execute(prevActions);
+					new PasteCommand(window.getMapViewer(), copyLayer, getBlockLocation(getWidth()/2, getHeight()/2), selection, map.getTileSize()).execute(commandHistory);
 
 				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
 					updateTitle();
-					prevActions.undo();
+					commandHistory.undo();
 				} else if (e.getKeyCode() == 89 && ((e.getKeyChar() != 'y' && e.getKeyChar() != 'Y') || e.isControlDown())) {    // y
 					updateTitle();
-					prevActions.redo();
+					commandHistory.redo();
 				} else if (e.getKeyCode() == 65 && ((e.getKeyChar() != 'a' && e.getKeyChar() != 'A') || e.isControlDown())) {    // a
-					if(selection != null) new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(prevActions);
+					if(selection != null) new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(commandHistory);
 					 else {
 					 	Selection newSelection = new Selection();
 					 	newSelection.add(new Rectangle(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize()));
 
-					 	new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(prevActions);
+					 	new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(commandHistory);
 					}
 					startClick = null;
 				} else if (e.getKeyCode() == 83 && ((e.getKeyChar() != 's' && e.getKeyChar() != 'S') || e.isControlDown())) {    // s
@@ -313,7 +312,7 @@ public class MapViewer extends JPanel {
 		this.map = map;
 		if(isNewMap) {
 			centerCamera();
-			prevActions = new CommandHistory();
+			commandHistory = new CommandHistory();
 		}
 	}
 
@@ -384,7 +383,7 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		//tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
-		new FillCommand(tl, rem? null: selectedTexture, pos, selection == null? null: selection.getArea(), tb.getAutoTile()).execute(prevActions);
+		new FillCommand(tl, rem? null: selectedTexture, pos, selection == null? null: selection.getArea(), tb.getAutoTile()).execute(commandHistory);
 	}
 
 	/**
@@ -561,13 +560,13 @@ public class MapViewer extends JPanel {
 		}
 
 		if(!(isRight && copyLayer != null)) {
-			if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(this, (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(prevActions);
+			if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(this, (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 		}
 
 	}
 
 	public void setTool(Tools t) {
-		if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(this, (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(prevActions);
+		if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(this, (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 
 		this.tool = t;
 		tb.update(tool);
@@ -586,5 +585,9 @@ public class MapViewer extends JPanel {
 
 	private void sendErrorMessage() {
 		camera.addScreenshake(10f);
+	}
+
+	public CommandHistory getCommandHistory() {
+		return commandHistory;
 	}
 }
