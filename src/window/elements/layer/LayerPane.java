@@ -3,6 +3,8 @@ package window.elements.layer;
 import data.*;
 import data.layer.*;
 import window.Window;
+import window.commands.LayerAddCommand;
+import window.commands.LayerRemoveCommand;
 
 import javax.swing.*;
 import java.awt.*;
@@ -86,7 +88,7 @@ public class LayerPane extends JPanel {
 	 * @param type type of the layer 0-TileLayer, 1 - AreaLayer, 2-FreeLayer
 	 * @param depth drawing depth
 	 */
-	public void addLayer(String name, int type, float depth) {
+	public void createLayer(String name, int type, float depth) {
 		//renames layer if name already exist
 		int i = 1;
 		while (map.getLayers().keySet().contains(name)) {
@@ -114,8 +116,10 @@ public class LayerPane extends JPanel {
 		}
 
 		//Adds layer to map and to listModel at the position fitting to its depth
-		map.addLayer(name, layer);
-		//TODO: window.getMapViewer().addAction();
+		new LayerAddCommand(this, map, layer, name).execute(window.getMapViewer().getCommandHistory());
+	}
+
+	public void addLayer(String name, Layer layer) {
 		int index = 0;
 		while (index < listModel.size() && map.getLayer(listModel.get(index)).depth() > layer.depth()) index++;
 		listModel.add(index, name);
@@ -123,17 +127,26 @@ public class LayerPane extends JPanel {
 	}
 
 	/**
-	 * removes a layer
+	 * removes the selected layer
 	 */
 	public void removeLayer() {
 		if (jList.getSelectedIndex() < 0) return;
 		int sel = jList.getSelectedIndex();
 		String name = listModel.get(sel);
-		map.removeLayer(name);
-		//TODO: window.getMapViewer().addAction();
-		listModel.remove(sel);
-		if (sel == 0) jList.setSelectedIndex(0);
-		else jList.setSelectedIndex(sel - 1);
+
+		new LayerRemoveCommand(this, map, name).execute(window.getMapViewer().getCommandHistory());
+	}
+
+	public void removeLayer(String name) {
+		for(int i = 0; i < listModel.getSize(); i++) {
+			if(listModel.get(i).equals(name)) {
+				listModel.remove(i);
+				if (i == 0) jList.setSelectedIndex(0);
+				else jList.setSelectedIndex(i - 1);
+
+				return;
+			}
+		}
 	}
 
 	/**

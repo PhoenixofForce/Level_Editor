@@ -70,8 +70,10 @@ public class GameMap extends TagObject {
 	 * removes a layer
 	 * @param name name of the layer to remove
 	 */
-	public void removeLayer(String name) {
+	public Layer removeLayer(String name) {
+		Layer out = layers.get(name);
 		layers.remove(name);
+		return out;
 	}
 
 	/**

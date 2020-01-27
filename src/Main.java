@@ -1,7 +1,5 @@
 import window.Window;
-
-import javax.swing.*;
-import java.io.File;
+import java.io.*;
 
 public class Main {
 

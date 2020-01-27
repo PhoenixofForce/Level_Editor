@@ -90,7 +90,7 @@ public class UserInputs {
 
 		ActionListener a = e->{
 			String name = nameInput.getText();
-			layerPane.addLayer(name, layerType.getSelectedIndex(), Float.parseFloat(depthInput.getText()));
+			layerPane.createLayer(name, layerType.getSelectedIndex(), Float.parseFloat(depthInput.getText()));
 			window.setEnabled(true);
 			window.toFront();
 			frame.dispose();
