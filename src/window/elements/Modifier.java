@@ -192,7 +192,5 @@ public class Modifier extends JPanel{
 
 		//Set label text to tagObject information
 		goStats.setText(obj.getText());
-
-		//TODO: w.getMapViewer().addAction(); ?
 	}
 }

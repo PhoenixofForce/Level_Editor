@@ -1,13 +1,20 @@
 package window.commands;
 
+import window.elements.MapViewer;
+
 import java.util.Stack;
 
 public class CommandHistory {
 
+	private MapViewer mapViewer;
+
+	private int historySaveIndex = 0;
 	private Stack<Command> commandHistory;
 	private Stack<Command> commandFuture;
 
-	public CommandHistory() {
+	public CommandHistory(MapViewer mapViewer) {
+		this.mapViewer = mapViewer;
+
 		commandHistory = new Stack<>();
 		commandFuture = new Stack<>();
 	}
@@ -15,8 +22,11 @@ public class CommandHistory {
 	public void addCommand(Command c) {
 		if(canUndo() && !c.isWorthy(commandHistory.peek())) return;
 
+		if(commandHistory.size() < historySaveIndex) historySaveIndex = 0;
 		commandHistory.push(c);
 		commandFuture.clear();
+
+		mapViewer.updateTitle();
 	}
 
 	public void undo() {
@@ -26,6 +36,7 @@ public class CommandHistory {
 		if(c != null) {
 			c.undo();
 			commandFuture.push(c);
+			mapViewer.updateTitle();
 
 			if(c instanceof MergeCopyLayerCommand) undo();
 		}
@@ -38,6 +49,7 @@ public class CommandHistory {
 		if(c != null) {
 			c.redo();
 			commandHistory.push(c);
+			mapViewer.updateTitle();
 
 			if(canRedo() && commandFuture.peek() instanceof MergeCopyLayerCommand) redo();
 		}
@@ -49,5 +61,13 @@ public class CommandHistory {
 
 	private boolean canRedo() {
 		return commandFuture.size() > 0;
+	}
+
+	public boolean isCurrentlySaved() {
+		return historySaveIndex == commandHistory.size();
+	}
+
+	public void save() {
+		historySaveIndex = commandHistory.size();
 	}
 }

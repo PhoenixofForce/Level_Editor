@@ -51,7 +51,7 @@ public class MapViewer extends JPanel {
 		this.tb = tb;
 		this.map = map2;
 
-		commandHistory = new CommandHistory();
+		commandHistory = new CommandHistory(this);
 
 		tool = Tools.BRUSH;
 		tb.update(tool);
@@ -277,10 +277,8 @@ public class MapViewer extends JPanel {
 					new PasteCommand(window.getMapViewer(), copyLayer, getBlockLocation(getWidth()/2, getHeight()/2), selection, map.getTileSize()).execute(commandHistory);
 
 				} else if (e.getKeyCode() == 90 && ((e.getKeyChar() != 'z' && e.getKeyChar() != 'Z') || e.isControlDown())) {    // z
-					updateTitle();
 					commandHistory.undo();
 				} else if (e.getKeyCode() == 89 && ((e.getKeyChar() != 'y' && e.getKeyChar() != 'Y') || e.isControlDown())) {    // y
-					updateTitle();
 					commandHistory.redo();
 				} else if (e.getKeyCode() == 65 && ((e.getKeyChar() != 'a' && e.getKeyChar() != 'A') || e.isControlDown())) {    // a
 					if(selection != null) new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(commandHistory);
@@ -312,7 +310,7 @@ public class MapViewer extends JPanel {
 		this.map = map;
 		if(isNewMap) {
 			centerCamera();
-			commandHistory = new CommandHistory();
+			commandHistory = new CommandHistory(this);
 		}
 	}
 
@@ -572,14 +570,14 @@ public class MapViewer extends JPanel {
 		tb.update(tool);
 	}
 
-	private void updateTitle() {
-		//TODO: Mark changes in title
-		String title = new StringBuilder("LevelEditor - ").append(mb.getFileName()).append(true? "": " (*)").toString();
+	public void updateTitle() {
+		System.out.println(commandHistory.isCurrentlySaved());
+		String title = new StringBuilder("LevelEditor - ").append(mb.getFileName()).append(commandHistory.isCurrentlySaved()? "": " (*)").toString();
 		window.setTitle(title);
 	}
 
 	public void saveAction() {
-		//TODO: Save
+		commandHistory.save();
 		updateTitle();
 	}
 

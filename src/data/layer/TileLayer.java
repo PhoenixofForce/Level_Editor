@@ -282,9 +282,9 @@ public class TileLayer implements Layer {
 	@Override
 	public void draw(Graphics g, Location topLeft, Location downRight) {
 		int startX = (int) Math.max(0,  topLeft == null? 0: Math.floor(topLeft.x));
-		int endX = (int) Math.min(tileNames[0].length,  downRight == null? 0: Math.ceil(downRight.x));
+		int endX = (int) Math.min(tileNames[0].length,  downRight == null? tileNames[0].length: Math.ceil(downRight.x));
 		int startY = (int) Math.max(0,  topLeft == null? 0: Math.floor(topLeft.y));
-		int endY = (int) Math.min(tileNames.length,  downRight == null? 0: Math.ceil(downRight.y));
+		int endY = (int) Math.min(tileNames.length,  downRight == null? tileNames.length: Math.ceil(downRight.y));
 
 		for (int x = startX; x < endX; x++) {
 			for (int y = startY; y < endY; y++) {
