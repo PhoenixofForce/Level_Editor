@@ -1,5 +1,6 @@
 package data.layer;
 
+import data.exporter.Exporter;
 import data.Location;
 import data.layer.layerobjects.GO;
 import data.layer.layerobjects.Tag;
@@ -179,29 +180,26 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
-		String out = "";
-
-		synchronized (images) {
-			for(GO g: getImages()) {
-				String tags = "";
-				for(int i = 0; i < g.getTags().size(); i++) {
-					Tag t = g.getTags().get(i);
-					tags += t.toMapFormat() + (i < g.getTags().size()-1? "; ": "");
-				}
-				out += "[put; " + depth + "; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + (g.x-(sx==-1? 0: sx)) + "; " + (g.y-(sy==-1? 0: sy)) + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
-			}
-		}
-
-		return out;
-	}
-
-	@Override
 	public void add(TagObject to) {
 		if(to instanceof GO) {
 			synchronized (images) {
 				images.add((GO) to);
 			}
 		}
+	}
+
+	@Override
+	public String accept(Exporter exporter, Object o2) {
+		Object[] args = (Object[]) o2;
+
+		String out = "";
+		synchronized (images) {
+			for(GO g: getImages()) {
+
+				out += exporter.export(g, new Object[]{args[0], args[1], args[2], depth});
+			}
+		}
+
+		return out;
 	}
 }

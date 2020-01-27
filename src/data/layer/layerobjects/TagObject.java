@@ -1,12 +1,14 @@
 package data.layer.layerobjects;
 
+import data.exporter.Exporter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * an object which has tags
  */
-public abstract class TagObject {
+public abstract class TagObject implements Exporter.Exportable {
 	private List<Tag> tags;			//list of applied tags
 
 	public TagObject() {

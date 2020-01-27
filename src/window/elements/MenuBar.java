@@ -2,6 +2,7 @@ package window.elements;
 
 import data.GameMap;
 import data.TextureHandler;
+import data.exporter.MapExporter;
 import data.layer.AreaLayer;
 import data.layer.FreeLayer;
 import data.layer.Layer;
@@ -128,7 +129,7 @@ public class MenuBar extends JMenuBar {
 				if(f.getName().endsWith(".map")) {
 					try {
 						PrintWriter wr = new PrintWriter(f);
-						wr.write(w.getMap().toMapFormat(true));
+						wr.write(MapExporter.getInstance().export(w.getMap()));
 						wr.close();
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
@@ -143,7 +144,6 @@ public class MenuBar extends JMenuBar {
 							.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
 							.forEach(l -> l.draw(g2, null, null));
 					try {
-						System.out.println(Arrays.toString(bounds));
 						ImageIO.write(img.getSubimage(bounds[0]*w.getMap().getTileSize(), bounds[1]*w.getMap().getTileSize(), (1+bounds[2]-bounds[0])*w.getMap().getTileSize(), (1+bounds[3]-bounds[1])*w.getMap().getTileSize()), "PNG", f);
 					} catch (IOException e1) {
 						e1.printStackTrace();
@@ -275,12 +275,8 @@ public class MenuBar extends JMenuBar {
 
 							String data = s.substring(s.indexOf("; [tag", last));
 
-							System.out.print(data);
-
 							data = data.substring(3, data.length()-1);
 							last = s.indexOf("; [tag", last)+1;
-
-							System.out.println( " " + data);
 
 							if(data.length() == 0) continue;
 							go.addTag(new Tag(data.split(";")[1].trim(), data.substring(data.indexOf(";",data.indexOf(";")+1), data.indexOf("; [tag") == -1? data.length(): data.indexOf("; [tag")-1).trim().substring(2)));
@@ -415,13 +411,13 @@ public class MenuBar extends JMenuBar {
 			String tags = "";
 			for(int i = 0; i < map.getTags().size(); i++) {
 				Tag t = map.getTags().get(i);
-				tags += t.toMapFormat() + (i < map.getTags().size()-1? "; ": "");
+				tags += t.accept(MapExporter.getInstance(), null) + (i < map.getTags().size()-1? "; ": "");
 			}
 			wr.write("tags: " + tags + "\n");
 
 			for(String s: map.getLayers().keySet()) {
 				Layer l = map.getLayer(s);
-				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + l.toMapFormat(null, -1, -1, -1, -1).replaceAll("\n", "") + "\n");
+				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + l.accept(MapExporter.getInstance(), new Object[]{null, new float[]{-1, -1, -1, -1}, map.getTileSize()}).replaceAll("\n", "") + "\n");
 			}
 
 			wr.close();

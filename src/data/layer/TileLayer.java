@@ -1,5 +1,6 @@
 package data.layer;
 
+import data.exporter.Exporter;
 import data.Location;
 import data.Util;
 import data.layer.layerobjects.GO;
@@ -353,32 +354,6 @@ public class TileLayer implements Layer {
 		return out;
 	}
 
-	@Override
-	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
-		int startX = Math.max(0, (int) Math.floor(sx));
-		int startY = Math.max(0, (int) Math.floor(sy));
-		int endX = bx == -1? tileNames[0].length: Math.min(tileNames[0].length, (int) Math.ceil(bx))+1;
-		int endY = by == -1? tileNames.length: Math.min(tileNames.length, (int) Math.ceil(by)+1);
-
-		int width = endX - startX;
-		int height = endY - startY;
-
-		String out = "[layer; " + depth + "; " + width + "; " + height + "; ";
-
-		System.out.println(startX + " " + startY);
-		System.out.println(endX + " " + endY);
-
-		for (int x = startX; x < endX; x++) {
-			for (int y = startY; y < endY; y++) {
-				out += (names != null? names.indexOf(tileNames[y][x])+1: tileNames[y][x]) + (y < tileNames.length-1? ", ": "");
-			}
-
-			if(x < tileNames[0].length-1) out += "; ";
-		}
-
-		return out + "]\n";
-	}
-
 	private static int find(int[] a, int f) {
 		for(int i = 0; i < a.length; i++) {
 			if(a[i]==f) return i;
@@ -392,5 +367,10 @@ public class TileLayer implements Layer {
 			GO go = (GO) to;
 			this.set(go.name, go.x, go.y, false);
 		}
+	}
+
+	@Override
+	public String accept(Exporter exporter, Object o2) {
+		return exporter.export(this, o2);
 	}
 }

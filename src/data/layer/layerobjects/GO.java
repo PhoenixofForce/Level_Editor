@@ -1,5 +1,7 @@
 package data.layer.layerobjects;
 
+import data.exporter.Exporter;
+
 /**
  * A GameObject that has a position with width and height, it can have tags and must have a texture
  */
@@ -40,5 +42,10 @@ public class GO extends TagObject {
 	@Override
 	public String getText() {
 		return name + " (" + x + " | " + y + ")";
+	}
+
+	@Override
+	public String accept(Exporter exporter, Object o2) {
+		return exporter.export(this, o2);
 	}
 }

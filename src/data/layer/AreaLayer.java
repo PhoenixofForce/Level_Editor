@@ -1,5 +1,6 @@
 package data.layer;
 
+import data.exporter.Exporter;
 import data.Location;
 import data.layer.layerobjects.Area;
 import data.layer.layerobjects.Tag;
@@ -176,27 +177,20 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
-		String out = "";
-
-		for(Area a: areas) {
-			String tags = "";
-			for(int i = 0; i < a.getTags().size(); i++) {
-				Tag t = a.getTags().get(i);
-				tags += t.toMapFormat() + (i < a.getTags().size()-1? "; ": "");
-			}
-			out += "[area; " + (a.getSmallerX() - (sx==-1? 0: sx)) + "; " + (a.getSmallerY() - (sy==-1? 0: sy)) + "; " + ((a.getBiggerX() + 1.0f/tileSize) - (sx==-1? 0: sx)) + "; " + ((a.getBiggerY() + 1.0f/tileSize) - (sy==-1? 0: sy)) + (a.getTags().size() > 0? "; " + tags: "") + "]\n";
-		}
-
-		return out;
-	}
-
-	@Override
 	public void add(TagObject to) {
 		if(to instanceof Area) {
 			synchronized (areas) {
 				areas.add((Area) to);
 			}
 		}
+	}
+
+	@Override
+	public String accept(Exporter exporter, Object o2) {
+		String out = "";
+		for(int i = 0; i < areas.size(); i++) {
+			out += areas.get(i).accept(exporter, o2);
+		}
+		return out;
 	}
 }

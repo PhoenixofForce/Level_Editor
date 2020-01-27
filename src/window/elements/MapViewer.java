@@ -224,7 +224,6 @@ public class MapViewer extends JPanel {
 				}
 				
 				if(bulkCommand != null) {
-					System.out.println("Save bulked Command");
 					commandHistory.addCommand(bulkCommand);
 					bulkCommand = null;
 				}
@@ -242,7 +241,7 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				System.out.println(e.getKeyChar() + " " + e.getKeyCode() + e.isControlDown());
+				System.out.println(e.getKeyChar() + " " + e.getKeyCode() + " ctr: " + e.isControlDown());
 				if(selection!= null) {
 				}
 
@@ -571,7 +570,6 @@ public class MapViewer extends JPanel {
 	}
 
 	public void updateTitle() {
-		System.out.println(commandHistory.isCurrentlySaved());
 		String title = new StringBuilder("LevelEditor - ").append(mb.getFileName()).append(commandHistory.isCurrentlySaved()? "": " (*)").toString();
 		window.setTitle(title);
 	}
