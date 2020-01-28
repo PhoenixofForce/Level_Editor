@@ -69,7 +69,7 @@ public class Window extends JFrame {
 		}).start();
 
 		this.addWindowStateListener(e -> {
-				layerPane.updateUI();
+			layerPane.updateUI();
 		});
 
 		//resizing components on window resize
@@ -89,7 +89,7 @@ public class Window extends JFrame {
 	}
 
 	/** Setting new map and resetting controll objects
-	*/
+	 */
 	public void setMap(GameMap map, boolean isNewMap) {
 		this.map = map;
 		if(buttons != null) buttons.mapUpdate(this, isNewMap);
@@ -98,7 +98,7 @@ public class Window extends JFrame {
 		if (images != null && isNewMap) images.getModifier().setTagObject(null);
 		if (layerPane != null) layerPane.updateGameMap(map, isNewMap);
 	}
-	
+
 	public GameMap getMap() {
 		return map;
 	}
@@ -113,5 +113,13 @@ public class Window extends JFrame {
 
 	public int getAutoTile() {
 		return buttons.getAutoTile();
+	}
+
+	public MenuBar getMyMenuBar() {
+		return menu;
+	}
+
+	public ImageList getImageList() {
+		return images;
 	}
 }

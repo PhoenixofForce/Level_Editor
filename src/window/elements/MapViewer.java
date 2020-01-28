@@ -242,16 +242,13 @@ public class MapViewer extends JPanel {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				System.out.println(e.getKeyChar() + " " + e.getKeyCode() + " ctr: " + e.isControlDown());
-				if(selection!= null) {
-				}
-
 				if (e.getKeyCode() == 521 && (e.getKeyChar() != '+' || e.isControlDown())) {   								   // +
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, 1));
 				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    						   // -
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
 				} else if (e.getKeyCode() == 67 && ((e.getKeyChar() != 'c' && e.getKeyChar() != 'C') || e.isControlDown())) {    // c
 					if(selection == null || !(layerPane.getSelectedLayer() instanceof TileLayer)) return;
-					if(copyLayer != null) if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
+					if(copyLayer != null) if(layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 
 					String copiedMap = "";
 					TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
@@ -371,14 +368,14 @@ public class MapViewer extends JPanel {
 	private void fill(int x, int y, boolean rem) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || selectedTexture == null || !(selectedLayer instanceof TileLayer) || layerPane.isHidden(selectedLayer)) {
+		if ( selectedTexture == null || !(selectedLayer instanceof TileLayer) || layerPane.isHidden(selectedLayer)) {
 			sendErrorMessage();
 			return;
 		}
 
 		TileLayer tl = (TileLayer) selectedLayer;
 		Location pos = getBlockLocation(x, y);
-		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
+		if((selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		//tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
 		new FillCommand(tl, rem? null: selectedTexture, pos, selection == null? null: selection.getArea(), tb.getAutoTile()).execute(commandHistory);
 	}

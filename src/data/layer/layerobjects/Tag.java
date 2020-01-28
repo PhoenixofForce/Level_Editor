@@ -23,7 +23,7 @@ public class Tag implements Exporter.Exportable {
 	 */
 	public Tag(String n, String a) {
 		this.name = n;
-		this.action = a.replaceAll("δ", ";");
+		this.action = a;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class Tag implements Exporter.Exportable {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object o2) {
+	public String accept(Exporter exporter, Object...   o2) {
 		return exporter.export(this, o2);
 	}
 }

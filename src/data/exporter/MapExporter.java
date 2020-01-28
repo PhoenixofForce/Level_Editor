@@ -9,14 +9,38 @@ import data.layer.layerobjects.Area;
 import data.layer.layerobjects.GO;
 import data.layer.layerobjects.Tag;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MapExporter implements Exporter {
 
 	private static final MapExporter INSTANCE = new MapExporter();
 
-	private MapExporter() {}
+	private FileNameExtensionFilter fileFilter;
+
+	private MapExporter() {
+		fileFilter = new FileNameExtensionFilter(".map", "map");
+	}
+
+	@Override
+	public boolean exportToFile(GameMap map, File file) {
+		try {
+			PrintWriter wr = new PrintWriter(file);
+			wr.write(export(map));
+			wr.close();
+
+			return true;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
 
 	@Override
 	public String export(GameMap map) {
@@ -52,7 +76,6 @@ public class MapExporter implements Exporter {
 			else if(l instanceof AreaLayer) {
 				AreaLayer a = (AreaLayer) l;
 				areas.add(a);
-
 			}
 		}
 
@@ -66,17 +89,15 @@ public class MapExporter implements Exporter {
 
 
 		//Adding the map formats from every layer to the output string
-		Object[] args = new Object[]{names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize()};
-
-		for(TileLayer l: tiles) out += l.accept(this, args);
-		for(FreeLayer f: frees) out += f.accept(this, args);
-		for(AreaLayer a: areas) out += a.accept(this, args);
+		for(TileLayer l: tiles) out += l.accept(this, names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize());
+		for(FreeLayer f: frees) out += f.accept(this, names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize());
+		for(AreaLayer a: areas) out += a.accept(this, names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize());
 
 		//Adding the map tags
 		String tags = "";
 		for(int i = 0; i < map.getTags().size(); i++) {
 			Tag t = map.getTags().get(i);
-			tags += t.accept(this, null) + (i < map.getTags().size()-1? "; ": "");
+			tags += t.accept(this) + (i < map.getTags().size()-1? "; ": "");
 		}
 
 		//replacing the texture names with numbers
@@ -90,9 +111,9 @@ public class MapExporter implements Exporter {
 	}
 
 	@Override
-	public String export(TileLayer tileLayer, Object o2) {
-		float[] sxsybxby = (float[]) ((Object[])o2)[1];
-		List<String> names = (List<String>) ((Object[])o2)[0];
+	public String export(TileLayer tileLayer, Object... o2) {
+		float[] sxsybxby = (float[]) o2[1];
+		List<String> names = (List<String>) o2[0];
 
 		String[][]tileNames = tileLayer.getTileNames();
 
@@ -118,31 +139,31 @@ public class MapExporter implements Exporter {
 	}
 
 	@Override
-	public String export(AreaLayer areaLayer, Object o2) {
-		return areaLayer.accept(this, o2);
+	public String export(AreaLayer areaLayer, Object... o2) {
+		return "";
 	}
 
 	@Override
-	public String export(FreeLayer freeLayer, Object o2) {
-		return freeLayer.accept(this, o2);
+	public String export(FreeLayer freeLayer, Object... o2) {
+		return "";
 	}
 
 	@Override
-	public String export(Tag tag, Object o2) {
-		return String.format("[tag; %s; %s]", tag.getName(), tag.getAction().replaceAll(";", "δ").replaceAll("\n", ""));
+	public String export(Tag tag, Object... o2) {
+		return String.format("[tag; %s; %s]", tag.getName(), tag.getAction().replaceAll("\n", ""));
 	}
 
 	@Override
-	public String export(Area area, Object o2) {
-		float[] sxsybxby = (float[]) ((Object[])o2)[1];
-		int tileSize = (int) ((Object[])o2)[2];
+	public String export(Area area, Object... o2) {
+		float[] sxsybxby = (float[]) o2[1];
+		int tileSize = (int) o2[2];
 
 		String out = "";
 
 		String tags = "";
 		for(int i = 0; i < area.getTags().size(); i++) {
 			Tag t = area.getTags().get(i);
-			tags += t.accept(this, null) + (i < area.getTags().size()-1? "; ": "");
+			tags += t.accept(this) + (i < area.getTags().size()-1? "; ": "");
 		}
 		out += "[area; " + (area.getSmallerX() - (sxsybxby[0]==-1? 0: sxsybxby[0])) + "; " + (area.getSmallerY() - (sxsybxby[1]==-1? 0: sxsybxby[1])) + "; " + ((area.getBiggerX() + 1.0f/tileSize) - (sxsybxby[0]==-1? 0: sxsybxby[0])) + "; " + ((area.getBiggerY() + 1.0f/tileSize) - (sxsybxby[1]==-1? 0: sxsybxby[1])) + (area.getTags().size() > 0? "; " + tags: "") + "]\n";
 
@@ -151,17 +172,22 @@ public class MapExporter implements Exporter {
 	}
 
 	@Override
-	public String export(GO go, Object o2) {
-		List<String> names = (List<String>) ((Object[])o2)[0];
-		float[] sxsybxby = (float[]) ((Object[])o2)[1];
-		float depth = (float) ((Object[])o2)[3];
+	public String export(GO go, Object... o2) {
+		List<String> names = (List<String>) o2[0];
+		float[] sxsybxby = (float[]) o2[1];
+		float depth = (float) o2[3];
 
 		String tags = "";
 		for(int i = 0; i < go.getTags().size(); i++) {
 			Tag t = go.getTags().get(i);
-			tags += t.accept(this, null) + (i < go.getTags().size()-1? "; ": "");
+			tags += t.accept(this) + (i < go.getTags().size()-1? "; ": "");
 		}
 		return "[put; " + depth + "; " + (names != null? names.indexOf(go.name)+1: go.name) + "; " + (go.x-(sxsybxby[0]==-1? 0: sxsybxby[1])) + "; " + (go.y-(sxsybxby[1]==-1? 0: sxsybxby[1])) + (go.getTags().size() > 0? "; " + tags: "") + "]\n";
+	}
+
+	@Override
+	public FileNameExtensionFilter getFileFilter() {
+		return fileFilter;
 	}
 
 	public static MapExporter getInstance() {

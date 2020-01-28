@@ -45,7 +45,7 @@ public class GO extends TagObject {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object o2) {
+	public String accept(Exporter exporter, Object... o2) {
 		return exporter.export(this, o2);
 	}
 }

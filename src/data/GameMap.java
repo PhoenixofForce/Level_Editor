@@ -2,14 +2,11 @@ package data;
 
 import data.exporter.Exporter;
 import data.layer.*;
-import data.layer.layerobjects.GO;
-import data.layer.layerobjects.Tag;
 import data.layer.layerobjects.TagObject;
 import window.Window;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -98,9 +95,9 @@ public class GameMap extends TagObject {
 
 	public int[] getBounds() {
 		int sx = Integer.MAX_VALUE,
-		sy = Integer.MAX_VALUE,
-		bx = Integer.MIN_VALUE,
-		by = Integer.MIN_VALUE;
+				sy = Integer.MAX_VALUE,
+				bx = Integer.MIN_VALUE,
+				by = Integer.MIN_VALUE;
 
 		for(String s: layers.keySet()) {
 			Layer l = layers.get(s);
@@ -146,7 +143,7 @@ public class GameMap extends TagObject {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object o2) {
+	public String accept(Exporter exporter, Object... o2) {
 		return exporter.export(this);
 	}
 }

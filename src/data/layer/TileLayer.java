@@ -25,7 +25,7 @@ public class TileLayer implements Layer {
 													 64, 208,  248, 104,
 													 66, 214,  255, 107,
 													  2,  22,   31,  11,
-													 75,  80,   88,  72,
+			   										 75,  80,   88,  72,
 													106,  82,   90,  74,
 													 86,  18,   26,  10,
 													210, 218,  250, 122,
@@ -370,7 +370,7 @@ public class TileLayer implements Layer {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object o2) {
+	public String accept(Exporter exporter, Object... o2) {
 		return exporter.export(this, o2);
 	}
 }

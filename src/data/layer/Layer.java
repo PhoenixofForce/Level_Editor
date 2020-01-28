@@ -5,7 +5,6 @@ import data.Location;
 import data.layer.layerobjects.TagObject;
 
 import java.awt.Graphics;
-import java.util.List;
 
 /**
  * a class that shares all methods all layer need

@@ -3,7 +3,6 @@ package data.layer;
 import data.exporter.Exporter;
 import data.Location;
 import data.layer.layerobjects.GO;
-import data.layer.layerobjects.Tag;
 import data.layer.layerobjects.TagObject;
 import data.TextureHandler;
 
@@ -67,7 +66,7 @@ public class FreeLayer implements Layer {
 			go.move(x - targetX, y - targetY);
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -107,7 +106,7 @@ public class FreeLayer implements Layer {
 
 	public void roundAll(int tileSize) {
 		float smallestX = Integer.MAX_VALUE,
-			smallestY = Integer.MAX_VALUE;
+				smallestY = Integer.MAX_VALUE;
 
 		for(int i = 0; i < images.size(); i++) {
 			GO r = images.get(i);
@@ -189,14 +188,14 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object o2) {
+	public String accept(Exporter exporter, Object... o2) {
 		Object[] args = (Object[]) o2;
 
-		String out = "";
+		String out = exporter.export(this, o2);
 		synchronized (images) {
 			for(GO g: getImages()) {
 
-				out += exporter.export(g, new Object[]{args[0], args[1], args[2], depth});
+				out += exporter.export(g, args[0], args[1], args[2], depth);
 			}
 		}
 

@@ -3,7 +3,6 @@ package data.layer;
 import data.exporter.Exporter;
 import data.Location;
 import data.layer.layerobjects.Area;
-import data.layer.layerobjects.Tag;
 import data.layer.layerobjects.TagObject;
 
 import java.awt.Graphics;
@@ -115,7 +114,7 @@ public class AreaLayer implements Layer {
 
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -186,8 +185,8 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object o2) {
-		String out = "";
+	public String accept(Exporter exporter, Object... o2) {
+		String out = exporter.export(this, o2);
 		for(int i = 0; i < areas.size(); i++) {
 			out += areas.get(i).accept(exporter, o2);
 		}
