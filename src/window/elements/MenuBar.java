@@ -104,11 +104,12 @@ public class MenuBar extends JMenuBar {
 
 					boolean endsWithFileType = false;
 					for(Exporter exp: exporter) {
-						if(f.getAbsolutePath().endsWith(exp.getFileFilter().getDescription())) {
+						if(exp.getFileFilter().accept(f)) {
 							endsWithFileType = true;
 							break;
 						}
 					}
+
 					if(!endsWithFileType) setSelectedFile( new File(f.getAbsolutePath() + getFileFilter().getDescription()));
 					f = getSelectedFile();
 
@@ -131,12 +132,15 @@ public class MenuBar extends JMenuBar {
 				File f = chooser.getSelectedFile();
 				lastExport = f;
 
+				boolean exported = false;
 				for(Exporter exp: exporter) {
-					if(exp.getFileFilter() == chooser.getFileFilter()) {
+					if(exp.getFileFilter().accept(f)) {
 						exp.exportToFile(w.getMap(), f);
+						exported = true;
 						break;
 					}
 				}
+				if(!exported) MapExporter.getInstance().exportToFile(w.getMap(), f);
 
 			}
 		});
@@ -181,7 +185,7 @@ public class MenuBar extends JMenuBar {
 
 		GameMap map = null;
 		for(Importer imp: importer) {
-			if(f.getAbsolutePath().endsWith(imp.getFileFilter().getExtensions()[0])) {
+			if(imp.getFileFilter().accept(f)) {
 				map = imp.importMap(w, f, isNewMap);
 				break;
 			}
@@ -255,7 +259,7 @@ public class MenuBar extends JMenuBar {
 
 			for(String s: map.getLayers().keySet()) {
 				Layer l = map.getLayer(s);
-				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + l.accept(MapExporter.getInstance(), null, new float[]{-1, -1, -1, -1}, map.getTileSize()).replaceAll("\n", "") + "\n");
+				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + ((String) l.accept(MapExporter.getInstance(), null, new float[]{-1, -1, -1, -1}, map.getTileSize())).replaceAll("\n", "") + "\n");
 			}
 
 			wr.close();

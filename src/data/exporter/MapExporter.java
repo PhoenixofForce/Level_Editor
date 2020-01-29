@@ -17,7 +17,7 @@ import java.util.List;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class MapExporter implements Exporter {
+public class MapExporter implements Exporter<String> {
 
 	private static final MapExporter INSTANCE = new MapExporter();
 
@@ -183,6 +183,11 @@ public class MapExporter implements Exporter {
 			tags += t.accept(this) + (i < go.getTags().size()-1? "; ": "");
 		}
 		return "[put; " + depth + "; " + (names != null? names.indexOf(go.name)+1: go.name) + "; " + (go.x-(sxsybxby[0]==-1? 0: sxsybxby[1])) + "; " + (go.y-(sxsybxby[1]==-1? 0: sxsybxby[1])) + (go.getTags().size() > 0? "; " + tags: "") + "]\n";
+	}
+
+	@Override
+	public String append(String o1, String o2) {
+		return o1 + o2;
 	}
 
 	@Override

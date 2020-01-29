@@ -185,10 +185,10 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object... o2) {
-		String out = exporter.export(this, o2);
+	public Object accept(Exporter exporter, Object... o2) {
+		Object out = exporter.export(this, o2);
 		for(int i = 0; i < areas.size(); i++) {
-			out += areas.get(i).accept(exporter, o2);
+			out = exporter.append(out, areas.get(i).accept(exporter, o2));
 		}
 		return out;
 	}

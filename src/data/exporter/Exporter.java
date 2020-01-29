@@ -12,23 +12,25 @@ import data.layer.layerobjects.Area;
 import data.layer.layerobjects.GO;
 import data.layer.layerobjects.Tag;
 
-public interface Exporter {
+public interface Exporter<T> {
 
 	boolean exportToFile(GameMap map, File file);
 
-	String export(GameMap map);
+	T export(GameMap map);
 
-	String export(TileLayer tileLayer, Object... o2);
-	String export(AreaLayer areaLayer, Object... o2);
-	String export(FreeLayer freeLayer, Object... o2);
+	T export(TileLayer tileLayer, Object... o2);
+	T export(AreaLayer areaLayer, Object... o2);
+	T export(FreeLayer freeLayer, Object... o2);
 
-	String export(Tag tag, Object... o2);
-	String export(Area area, Object... o2);
-	String export(GO go, Object... o2);
+	T export(Tag tag, Object... o2);
+	T export(Area area, Object... o2);
+	T export(GO go, Object... o2);
+
+	T append(T o1, T o2);
 
 	FileNameExtensionFilter getFileFilter();
 
 	interface Exportable {
-		String accept(Exporter exporter, Object... o2);
+		Object accept(Exporter exporter, Object... o2);
 	}
 }

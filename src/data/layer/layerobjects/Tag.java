@@ -66,7 +66,7 @@ public class Tag implements Exporter.Exportable {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object...   o2) {
+	public Object accept(Exporter exporter, Object...   o2) {
 		return exporter.export(this, o2);
 	}
 }

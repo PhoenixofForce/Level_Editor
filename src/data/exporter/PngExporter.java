@@ -15,7 +15,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class PngExporter implements Exporter {
+public class PngExporter implements Exporter<String> {
 
 	private static final PngExporter INSTANCE = new PngExporter();
 
@@ -75,6 +75,11 @@ public class PngExporter implements Exporter {
 	@Override
 	public String export(GO go, Object... o2) {
 		return "";
+	}
+
+	@Override
+	public String append(String o1, String o2) {
+		return o1 + o2;
 	}
 
 	@Override

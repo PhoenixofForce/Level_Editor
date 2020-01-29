@@ -143,7 +143,7 @@ public class GameMap extends TagObject {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object... o2) {
+	public Object accept(Exporter exporter, Object... o2) {
 		return exporter.export(this);
 	}
 }

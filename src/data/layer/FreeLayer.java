@@ -188,14 +188,13 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public String accept(Exporter exporter, Object... o2) {
-		Object[] args = (Object[]) o2;
+	public Object accept(Exporter exporter, Object... o2) {
 
-		String out = exporter.export(this, o2);
+		Object out = exporter.export(this, o2);
 		synchronized (images) {
 			for(GO g: getImages()) {
 
-				out += exporter.export(g, args[0], args[1], args[2], depth);
+				out = exporter.append(out, exporter.export(g, o2[0], o2[1], o2[2], depth));
 			}
 		}
 
