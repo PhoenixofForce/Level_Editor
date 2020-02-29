@@ -1,15 +1,15 @@
 package data.layer;
 
+import data.exporter.Exporter;
 import data.Location;
 import data.layer.layerobjects.TagObject;
 
 import java.awt.Graphics;
-import java.util.List;
 
 /**
  * a class that shares all methods all layer need
  */
-public interface Layer {
+public interface Layer extends Exporter.Exportable {
 
 	/**
 	 * @return drawing depth
@@ -76,15 +76,4 @@ public interface Layer {
 	 * @return the biggest y value in this layer
 	 */
 	float biggestY();
-
-	/**
-	 *
-	 * @param names a list of all used texture names
-	 * @param smallestX the smallest x position in the whole map
-	 * @param smallestY the smallest y position in the whole map
-	 * @param biggestX the biggest x position in the whole map
-	 * @param biggestY the biggest y position in the whole map
-	 * @return the mapformat of this layer
-	 */
-	String toMapFormat(List<String> names, float smallestX, float smallestY, float biggestX, float biggestY);
 }

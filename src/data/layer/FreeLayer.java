@@ -1,8 +1,8 @@
 package data.layer;
 
+import data.exporter.Exporter;
 import data.Location;
 import data.layer.layerobjects.GO;
-import data.layer.layerobjects.Tag;
 import data.layer.layerobjects.TagObject;
 import data.TextureHandler;
 
@@ -66,7 +66,7 @@ public class FreeLayer implements Layer {
 			go.move(x - targetX, y - targetY);
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -106,7 +106,7 @@ public class FreeLayer implements Layer {
 
 	public void roundAll(int tileSize) {
 		float smallestX = Integer.MAX_VALUE,
-			smallestY = Integer.MAX_VALUE;
+				smallestY = Integer.MAX_VALUE;
 
 		for(int i = 0; i < images.size(); i++) {
 			GO r = images.get(i);
@@ -179,29 +179,25 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public String toMapFormat(List<String> names, float sx, float sy, float bx, float by) {
-		String out = "";
-
-		synchronized (images) {
-			for(GO g: getImages()) {
-				String tags = "";
-				for(int i = 0; i < g.getTags().size(); i++) {
-					Tag t = g.getTags().get(i);
-					tags += t.toMapFormat() + (i < g.getTags().size()-1? "; ": "");
-				}
-				out += "[put; " + depth + "; " + (names != null? names.indexOf(g.name)+1: g.name) + "; " + (g.x-(sx==-1? 0: sx)) + "; " + (g.y-(sy==-1? 0: sy)) + (g.getTags().size() > 0? "; " + tags: "") + "]\n";
-			}
-		}
-
-		return out;
-	}
-
-	@Override
 	public void add(TagObject to) {
 		if(to instanceof GO) {
 			synchronized (images) {
 				images.add((GO) to);
 			}
 		}
+	}
+
+	@Override
+	public Object accept(Exporter exporter, Object... o2) {
+
+		Object out = exporter.export(this, o2);
+		synchronized (images) {
+			for(GO g: getImages()) {
+
+				out = exporter.append(out, exporter.export(g, o2[0], o2[1], o2[2], depth));
+			}
+		}
+
+		return out;
 	}
 }

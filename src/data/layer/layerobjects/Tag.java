@@ -1,9 +1,11 @@
 package data.layer.layerobjects;
 
+import data.exporter.Exporter;
+
 /**
  * Class to store tags the user entered
  */
-public class Tag {
+public class Tag implements Exporter.Exportable {
 
 	private String name, action;		//name and content of the tag
 
@@ -21,7 +23,7 @@ public class Tag {
 	 */
 	public Tag(String n, String a) {
 		this.name = n;
-		this.action = a.replaceAll("δ", ";");
+		this.action = a;
 	}
 
 	/**
@@ -36,9 +38,9 @@ public class Tag {
 	 * converts class to saveable text-format
 	 * @return
 	 */
-	public String toMapFormat() {
+	/*public String toMapFormat() {
 		return String.format("[tag; %s; %s]", name, action.replaceAll(";", "δ").replaceAll("\n", ""));
-	}
+	}*/
 
 	public String getAction() {
 		return action;
@@ -61,5 +63,10 @@ public class Tag {
 		}
 
 		return false;
+	}
+
+	@Override
+	public Object accept(Exporter exporter, Object...   o2) {
+		return exporter.export(this, o2);
 	}
 }

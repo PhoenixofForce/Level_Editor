@@ -22,7 +22,7 @@ public class Main {
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}*/
-
+		
 		Window window = new Window();
 
 		if (args.length > 0) {

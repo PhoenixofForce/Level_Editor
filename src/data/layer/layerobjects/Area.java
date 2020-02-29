@@ -1,5 +1,7 @@
 package data.layer.layerobjects;
 
+import data.exporter.Exporter;
+
 import java.awt.Color;
 
 /**
@@ -125,5 +127,10 @@ public class Area extends TagObject {
 	@Override
 	public String getText() {
 		return String.format("(%f/%f) (%f/%f) (%d/%d/%d)", x1, y1, x2, y2, color.getRed(), color.getGreen(), color.getBlue());
+	}
+
+	@Override
+	public Object accept(Exporter exporter, Object... o2) {
+		return exporter.export(this, o2);
 	}
 }
