@@ -87,7 +87,6 @@ public class MapExporter implements Exporter<String> {
 		bx = bounds[2];
 		by = bounds[3];
 
-
 		//Adding the map formats from every layer to the output string
 		for(TileLayer l: tiles) out += l.accept(this, names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize());
 		for(FreeLayer f: frees) out += f.accept(this, names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize());

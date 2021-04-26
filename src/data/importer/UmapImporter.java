@@ -23,7 +23,7 @@ import window.Window;
 public class UmapImporter implements Importer {
 
 	private static final UmapImporter INSTANCE = new UmapImporter();
-	
+
 	private FileNameExtensionFilter fileFilter;
 	
 	private UmapImporter() {

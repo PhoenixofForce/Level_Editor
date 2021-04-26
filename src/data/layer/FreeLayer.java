@@ -193,7 +193,6 @@ public class FreeLayer implements Layer {
 		Object out = exporter.export(this, o2);
 		synchronized (images) {
 			for(GO g: getImages()) {
-
 				out = exporter.append(out, exporter.export(g, o2[0], o2[1], o2[2], depth));
 			}
 		}
