@@ -182,7 +182,7 @@ public class MapExporter implements Exporter<String> {
 			Tag t = go.getTags().get(i);
 			tags += t.accept(this) + (i < go.getTags().size()-1? "; ": "");
 		}
-		return "[put; " + depth + "; " + (names != null? names.indexOf(go.name)+1: go.name) + "; " + (go.x-(sxsybxby[0]==-1? 0: sxsybxby[1])) + "; " + (go.y-(sxsybxby[1]==-1? 0: sxsybxby[1])) + (go.getTags().size() > 0? "; " + tags: "") + "]\n";
+		return "[put; " + depth + "; " + (names != null? names.indexOf(go.name)+1: go.name) + "; " + (go.x-(sxsybxby[0]==-1? 0: sxsybxby[0])) + "; " + (go.y-(sxsybxby[1]==-1? 0: sxsybxby[1])) + (go.getTags().size() > 0? "; " + tags: "") + "]\n";
 	}
 
 	@Override
