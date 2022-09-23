@@ -9,18 +9,11 @@ public class Tag implements Exporter.Exportable {
 
 	private String name, action;		//name and content of the tag
 
-	/**
-	 * @param n name of the tag
-	 */
 	public Tag(String n) {
 		this.name = n;
 		action = "";
 	}
 
-	/**
-	 * @param n name of the tag
-	 * @param a action of the tag
-	 */
 	public Tag(String n, String a) {
 		this.name = n;
 		this.action = a;
@@ -33,14 +26,6 @@ public class Tag implements Exporter.Exportable {
 	public void setAction(String a) {
 		this.action = a;
 	}
-
-	/**
-	 * converts class to saveable text-format
-	 * @return
-	 */
-	/*public String toMapFormat() {
-		return String.format("[tag; %s; %s]", name, action.replaceAll(";", "δ").replaceAll("\n", ""));
-	}*/
 
 	public String getAction() {
 		return action;

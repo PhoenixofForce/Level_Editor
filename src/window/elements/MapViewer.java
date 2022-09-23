@@ -16,14 +16,15 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 
 public class MapViewer extends JPanel {
+
 	private static final boolean TILE_HIGHLIGHT = true;		//true if tiles should be highlighted
 
 	private Window window;
 	private ImageList imageList;							//the ImageList => get selected Image
 	private LayerPane layerPane;							//the LayerPane => get selected Layer
 	private FreeLayer copyLayer;
-	private MenuBar mb;
-	private MainToolBar tb;
+	private MenuBar menuBar;
+	private MainToolBar toolBar;
 
 	private Camera camera;									//Camera to set viewpoint
 
@@ -40,21 +41,21 @@ public class MapViewer extends JPanel {
 	private Command bulkCommand;
 	private CommandHistory commandHistory;
 
-	public MapViewer(Window window, MenuBar mb, MainToolBar tb, ImageList imageList, LayerPane layerPane, GameMap map2) {
+	public MapViewer(Window window, MenuBar menuBar, MainToolBar toolBar, ImageList imageList, LayerPane layerPane, GameMap map2) {
 		requestFocus();
 		grabFocus();
 
 		this.window = window;
 		this.layerPane = layerPane;
 		this.imageList = imageList;
-		this.mb = mb;
-		this.tb = tb;
+		this.menuBar = menuBar;
+		this.toolBar = toolBar;
 		this.map = map2;
 
 		commandHistory = new CommandHistory(this);
 
 		tool = Tools.BRUSH;
-		tb.update(tool);
+		toolBar.update(tool);
 		mouseEntered = false;
 
 		camera = new Camera();
@@ -150,7 +151,7 @@ public class MapViewer extends JPanel {
 						tool = tool.pre();
 						if(tool == Tools.MOVE && selection == null) tool = tool.pre();
 					}
-					tb.update(tool);
+					toolBar.update(tool);
 					startClick = null;
 					if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 				}
@@ -266,7 +267,7 @@ public class MapViewer extends JPanel {
 				} else if (e.getKeyCode() == 86 && ((e.getKeyChar() != 'v' && e.getKeyChar() != 'V') || e.isControlDown())) {    // v
 					if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 					tool = Tools.MOVE;
-					tb.update(tool);
+					toolBar.update(tool);
 
 					copyLayer = new FreeLayer(0.5f, map.getWidth(), map.getHeight(), map.getTileSize());
 
@@ -286,13 +287,13 @@ public class MapViewer extends JPanel {
 					}
 					startClick = null;
 				} else if (e.getKeyCode() == 83 && ((e.getKeyChar() != 's' && e.getKeyChar() != 'S') || e.isControlDown())) {    // s
-					mb.save();
+					menuBar.save();
 				}
 
 				if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
 					int toolIndex = e.getKeyCode() - 48;
 					tool = Tools.get(toolIndex - 1);
-					tb.update(tool);
+					toolBar.update(tool);
 				}
 			}
 
@@ -335,7 +336,7 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if(selectedLayer instanceof TileLayer && (selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		if(bulkCommand == null) {
-			bulkCommand = new SetCommand(imageList.getModifier(), selectedLayer, selectedTexture, pos, drag, tb.getAutoTile());
+			bulkCommand = new SetCommand(imageList.getModifier(), selectedLayer, selectedTexture, pos, drag, toolBar.getAutoTile());
 		} else {
 			SetCommand sc = (SetCommand) bulkCommand;
 			sc.add(pos, selectedTexture);
@@ -377,7 +378,7 @@ public class MapViewer extends JPanel {
 		Location pos = getBlockLocation(x, y);
 		if((selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		//tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
-		new FillCommand(tl, rem? null: selectedTexture, pos, selection == null? null: selection.getArea(), tb.getAutoTile()).execute(commandHistory);
+		new FillCommand(tl, rem? null: selectedTexture, pos, selection == null? null: selection.getArea(), toolBar.getAutoTile()).execute(commandHistory);
 	}
 
 	/**
@@ -563,11 +564,11 @@ public class MapViewer extends JPanel {
 		if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(this, (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 
 		this.tool = t;
-		tb.update(tool);
+		toolBar.update(tool);
 	}
 
 	public void updateTitle() {
-		String title = new StringBuilder("LevelEditor - ").append(mb.getFileName()).append(commandHistory.isCurrentlySaved()? "": " (*)").toString();
+		String title = new StringBuilder("LevelEditor - ").append(menuBar.getFileName()).append(commandHistory.isCurrentlySaved()? "": " (*)").toString();
 		window.setTitle(title);
 	}
 

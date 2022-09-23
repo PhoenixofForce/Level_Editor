@@ -16,7 +16,7 @@ import data.layer.AreaLayer;
 import data.layer.FreeLayer;
 import data.layer.TileLayer;
 import data.layer.layerobjects.Area;
-import data.layer.layerobjects.GO;
+import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.Tag;
 import window.Window;
 
@@ -25,7 +25,6 @@ public class UmapImporter implements Importer {
 	private static final UmapImporter INSTANCE = new UmapImporter();
 	
 	private FileNameExtensionFilter fileFilter;
-	
 	private UmapImporter() {
 		this.fileFilter = new FileNameExtensionFilter(".umap Files", "umap");
 	}
@@ -34,15 +33,16 @@ public class UmapImporter implements Importer {
 	public GameMap importMap(Window w, File input, boolean isNewMap) {
 		try {
 			BufferedReader r = new BufferedReader(new FileReader(input));
-
 			GameMap map = null;
+
 			int width = -1, height = -1, tileSize = -1;
 			List<Tag> mapTags = new ArrayList<>();
+
 			String line = r.readLine();
 			while(line != null) {
 
 				if(line.startsWith("i: ")) {
-					handleImports(line, new Object[] {w, isNewMap});
+					handleImports(line, new Object[] { w, isNewMap });
 				}
 				else if(line.startsWith("h: ")) {
 					height = Integer.parseInt(line.split(" ")[1]);
@@ -169,12 +169,12 @@ public class UmapImporter implements Importer {
 			float gY = Float.parseFloat(s.split(";")[3]);
 
 			l.set(gName, gX, gY, false);
-			GO go = l.select(gX, gY);
+			GameObject gameObject = l.select(gX, gY);
 			
 			int tagStart = s.indexOf("[tag;");
 			if(tagStart >= 0) {
 				List<Tag> objectTags = handleTags(s.substring(tagStart));
-				for(Tag t: objectTags) go.addTag(t);
+				for(Tag t: objectTags) gameObject.addTag(t);
 			}
 		}
 		

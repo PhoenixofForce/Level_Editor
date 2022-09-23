@@ -2,7 +2,7 @@ package data.layer;
 
 import data.exporter.Exporter;
 import data.Location;
-import data.layer.layerobjects.GO;
+import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.TagObject;
 import data.TextureHandler;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public class FreeLayer implements Layer {
 
 	private float depth;						//drawing depth of this layer
-	private final List<GO> images;				//list of all placed textures
+	private final List<GameObject> images;				//list of all placed textures
 
 	private int width, height, tileSize;		//width, height and tilesize of the map
 
@@ -33,7 +33,7 @@ public class FreeLayer implements Layer {
 	/**
 	 * @return a list of placed textures
 	 */
-	public List<GO> getImages() {
+	public List<GameObject> getImages() {
 		return images;
 	}
 
@@ -45,25 +45,26 @@ public class FreeLayer implements Layer {
 	@Override
 	public void set(String name, float x, float y, boolean drag) {
 		if (drag) return;
+
 		BufferedImage image = TextureHandler.getImagePng(name);
 		float width = image.getWidth() / (float) tileSize;
 		float height = image.getHeight() / (float) tileSize;
 
 		if (x < 0 || x + width > this.width || y < 0 || y + height > this.height) return;
-		//if (find(x, y) != null) return;
 
 		synchronized (images) {
-			images.add(new GO(name, x, y, width, height));
+			images.add(new GameObject(name, x, y, width, height));
 		}
 	}
 
 	@Override
 	public boolean drag(float x, float y, float targetX, float targetY) {
-		GO go = select(x, y);
-		if (go == null) return false;
-		go.move(targetX - x, targetY - y);
-		if (go.x < 0 || go.x + go.width > this.width || go.y < 0 || go.y + go.height > this.height) {
-			go.move(x - targetX, y - targetY);
+		GameObject gameObject = select(x, y);
+		if (gameObject == null) return false;
+
+		gameObject.move(targetX - x, targetY - y);
+		if (gameObject.x < 0 || gameObject.x + gameObject.width > this.width || gameObject.y < 0 || gameObject.y + gameObject.height > this.height) {
+			gameObject.move(x - targetX, y - targetY);
 			return false;
 		}
 
@@ -72,35 +73,35 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public TagObject remove(float x, float y) {
-		GO go = find(x, y);
-		if(go == null) return null;
+		GameObject gameObject = find(x, y);
+		if(gameObject == null) return null;
 
 		synchronized (images) {
-			images.remove(go);
+			images.remove(gameObject);
 		}
 
-		return go;
+		return gameObject;
 	}
 
 	@Override
-	public GO select(float x, float y) {
-		GO go = find(x, y);
-		if (go != null) {
+	public GameObject select(float x, float y) {
+		GameObject gameObject = find(x, y);
+		if (gameObject != null) {
 			synchronized (images) {
-				images.remove(go);
-				images.add(go);
+				images.remove(gameObject);
+				images.add(gameObject);
 			}
 		}
-		return go;
+		return gameObject;
 	}
 
 	public void moveAll(float dx, float dy) {
 		for(int i = 0; i < images.size(); i++) {
-			GO go = images.get(i);
+			GameObject gameObject = images.get(i);
 
-			go.move(dx, dy);
-			if (go.x < 0 || go.x + go.width > this.width || go.y < 0 || go.y + go.height > this.height)
-				go.move(-dx, -dy);
+			gameObject.move(dx, dy);
+			if (gameObject.x < 0 || gameObject.x + gameObject.width > this.width || gameObject.y < 0 || gameObject.y + gameObject.height > this.height)
+				gameObject.move(-dx, -dy);
 		}
 	}
 
@@ -109,7 +110,7 @@ public class FreeLayer implements Layer {
 				smallestY = Integer.MAX_VALUE;
 
 		for(int i = 0; i < images.size(); i++) {
-			GO r = images.get(i);
+			GameObject r = images.get(i);
 			if(smallestX > r.x) smallestX = r.x;
 			if(smallestY > r.y) smallestY = r.y;
 		}
@@ -124,11 +125,11 @@ public class FreeLayer implements Layer {
 	 * @param y given y coordinate
 	 * @return a texture that is at the point where the user clicked
 	 */
-	private GO find(float x, float y) {
+	private GameObject find(float x, float y) {
 		for (int i = images.size() - 1; i >= 0; i--) {
-			GO go = images.get(i);
-			if (go.x <= x && go.y <= y && go.x + go.width > x && go.y + go.height > y) {
-				return go;
+			GameObject gameObject = images.get(i);
+			if (gameObject.x <= x && gameObject.y <= y && gameObject.x + gameObject.width > x && gameObject.y + gameObject.height > y) {
+				return gameObject;
 			}
 		}
 		return null;
@@ -137,8 +138,8 @@ public class FreeLayer implements Layer {
 	@Override
 	public void draw(Graphics g, Location l1, Location l2) {
 		synchronized (images) {
-			for (GO go: images) {
-				g.drawImage(TextureHandler.getImagePng(go.name), (int) (go.x * tileSize), (int) (go.y * tileSize), null);
+			for (GameObject gameObject : images) {
+				g.drawImage(TextureHandler.getImagePng(gameObject.name), (int) (gameObject.x * tileSize), (int) (gameObject.y * tileSize), null);
 			}
 		}
 	}
@@ -146,28 +147,28 @@ public class FreeLayer implements Layer {
 	@Override
 	public float smallestX() {
 		float smallestX = Integer.MAX_VALUE;
-		for(GO g: images) if(g.x < smallestX) smallestX = g.x;
+		for(GameObject g: images) if(g.x < smallestX) smallestX = g.x;
 		return smallestX == Integer.MAX_VALUE? -1: smallestX;
 	}
 
 	@Override
 	public float smallestY() {
 		float smallestY = Integer.MAX_VALUE;
-		for(GO g: images) if(g.y < smallestY) smallestY = g.y;
+		for(GameObject g: images) if(g.y < smallestY) smallestY = g.y;
 		return smallestY == Integer.MAX_VALUE? -1: smallestY;
 	}
 
 	@Override
 	public float biggestX() {
 		float smallestX = Integer.MIN_VALUE;
-		for(GO g: images) if(g.x > smallestX) smallestX = g.x;
+		for(GameObject g: images) if(g.x > smallestX) smallestX = g.x;
 		return smallestX == Integer.MIN_VALUE? -1: smallestX;
 	}
 
 	@Override
 	public float biggestY() {
 		float smallestY = Integer.MIN_VALUE;
-		for(GO g: images) if(g.y > smallestY) smallestY = g.y;
+		for(GameObject g: images) if(g.y > smallestY) smallestY = g.y;
 		return smallestY == Integer.MIN_VALUE? -1: smallestY;
 	}
 
@@ -180,9 +181,9 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public void add(TagObject to) {
-		if(to instanceof GO) {
+		if(to instanceof GameObject) {
 			synchronized (images) {
-				images.add((GO) to);
+				images.add((GameObject) to);
 			}
 		}
 	}
@@ -192,7 +193,7 @@ public class FreeLayer implements Layer {
 
 		Object out = exporter.export(this, o2);
 		synchronized (images) {
-			for(GO g: getImages()) {
+			for(GameObject g: getImages()) {
 
 				out = exporter.append(out, exporter.export(g, o2[0], o2[1], o2[2], depth));
 			}

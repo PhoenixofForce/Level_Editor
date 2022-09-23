@@ -35,10 +35,11 @@ public class MenuBar extends JMenuBar {
 
 	private List<File> imports;
 	protected static File lastExport, lastSave, lastOpen, lastImport;
-	private Window w;
+
+	private Window window;
 	private ImageList list;
 
-	public MenuBar(Window w, ImageList list) {
+	public MenuBar(Window window, ImageList list) {
 
 		imports = new ArrayList<>();
 
@@ -65,16 +66,16 @@ public class MenuBar extends JMenuBar {
 		res.add(updateRes);
 		this.add(res);
 
-		exporterWindow = new ExportWindow(w);
+		exporterWindow = new ExportWindow(window);
 
-		this.w = w;
+		this.window = window;
 		this.list = list;
 		addActions();
 	}
 
 	private void addActions() {
 		newFile.addActionListener(e -> {
-			UserInputs.newMap(w);
+			UserInputs.newMap(window);
 			lastSave = null;
 		});
 
@@ -98,7 +99,7 @@ public class MenuBar extends JMenuBar {
 		});
 
 		saveFileAs.addActionListener(e -> {
-			saveAs(w);
+			saveAs(window);
 		});
 
 		exportFile.addActionListener(e -> {
@@ -146,21 +147,21 @@ public class MenuBar extends JMenuBar {
 		GameMap map = null;
 		for(Importer imp: importer) {
 			if(imp.getFileFilter().accept(f)) {
-				map = imp.importMap(w, f, isNewMap);
+				map = imp.importMap(window, f, isNewMap);
 				break;
 			}
 		}
-		if(map != null) w.setMap(map, isNewMap);
+		if(map != null) window.setMap(map, isNewMap);
 		else lastSave = null;
 	}
 
 	public void save() {
 		if(lastSave == null) {
-			if(!saveAs(w)) return;
+			if(!saveAs(window)) return;
 		} else {
-			writeToFile(w, lastSave);
+			writeToFile(window, lastSave);
 		}
-		w.getMapViewer().saveAction();
+		window.getMapViewer().saveAction();
 	}
 
 	private boolean saveAs(Window w) {

@@ -9,16 +9,12 @@ import java.util.List;
  * an object which has tags
  */
 public abstract class TagObject implements Exporter.Exportable {
-	private List<Tag> tags;			//list of applied tags
 
+	private List<Tag> tags;			//list of applied tags
 	public TagObject() {
 		tags = new ArrayList<>();
 	}
 
-	/**
-	 *
-	 * @return list of all tags
-	 */
 	public List<Tag> getTags() {
 		return tags;
 	}

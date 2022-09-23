@@ -2,7 +2,7 @@ package window.commands;
 
 import data.layer.FreeLayer;
 import data.layer.TileLayer;
-import data.layer.layerobjects.GO;
+import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.TagObject;
 import window.elements.MapViewer;
 
@@ -28,9 +28,9 @@ public class MergeCopyLayerCommand implements Command{
 	@Override
 	public void execute(CommandHistory commandHistory) {
 		//TODO: SelectedLayer could be other Layer
-		for(GO g: copyLayer.getImages()) {
-			GO removed = (GO) selectedLayer.remove((int)g.x, (int)g.y);
-			overwritten.add(removed != null? removed: new GO(null, g.x, g.y, 1, 1));
+		for(GameObject g: copyLayer.getImages()) {
+			GameObject removed = (GameObject) selectedLayer.remove((int)g.x, (int)g.y);
+			overwritten.add(removed != null? removed: new GameObject(null, g.x, g.y, 1, 1));
 			selectedLayer.set(g.name, (int)g.x, (int)g.y, false);
 		}
 
@@ -40,7 +40,7 @@ public class MergeCopyLayerCommand implements Command{
 
 	@Override
 	public void redo() {
-		for(GO g: copyLayer.getImages()) {
+		for(GameObject g: copyLayer.getImages()) {
 			selectedLayer.set(g.name, (int)g.x, (int)g.y, false);
 		}
 

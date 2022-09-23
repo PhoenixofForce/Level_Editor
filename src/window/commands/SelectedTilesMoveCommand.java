@@ -19,8 +19,6 @@ public class SelectedTilesMoveCommand implements Command{
 	private MapViewer mv;
 
 	public SelectedTilesMoveCommand(MapViewer mv, TileLayer layer, Selection selection, int tileSize) {
-
-
 		this.layer = layer;
 		this.copyLayer = new FreeLayer(layer.depth(), layer.getTileNames()[0].length, layer.getTileNames().length, tileSize);
 		this.mv = mv;

@@ -6,6 +6,7 @@ public class Util {
 		if(texture1 != null && texture2 != null && (autoTile == 0 || !(texture1.split("_")[1].equals("block") && texture2.split("_")[1].equals("block")))) {
 			return texture1.equals(texture2);
 		}
+
 		else if(autoTile > 0) {
 			if(texture1 != null && texture2 != null) {
 				String[] parts1 = texture2.split("_");

@@ -4,7 +4,6 @@ import data.exporter.Exporter;
 import data.exporter.MapExporter;
 
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.io.File;
 
@@ -127,5 +126,4 @@ public class ExportWindow extends JDialog {
         this.getContentPane().add(exportAreaNames);
         exportAreaNames.setBounds(10, 100, 180, 20);
     }
-
 }

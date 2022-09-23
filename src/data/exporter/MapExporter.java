@@ -6,7 +6,7 @@ import data.layer.FreeLayer;
 import data.layer.Layer;
 import data.layer.TileLayer;
 import data.layer.layerobjects.Area;
-import data.layer.layerobjects.GO;
+import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.Tag;
 
 import java.io.File;
@@ -76,8 +76,8 @@ public class MapExporter implements Exporter<String> {
 				FreeLayer f = (FreeLayer) l;
 				frees.add(new AbstractMap.SimpleEntry<>(s, f));
 
-				for(GO go: f.getImages()) {
-					String st = go.name;
+				for(GameObject gameObject : f.getImages()) {
+					String st = gameObject.name;
 					if(st != null && !names.contains(st)) names.add(st);
 				}
 			}
@@ -98,16 +98,16 @@ public class MapExporter implements Exporter<String> {
 		//Adding the map formats from every layer to the output string
 		for(Map.Entry<String, TileLayer> l: tiles) {
 			lastLayerName = l.getKey();
-			out += l.getValue().accept(this, names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize());
+			out += l.getValue().accept(this, names, new float[]{ sx,  sy,  bx,  by }, map.getTileSize());
 		}
 
 		for(Map.Entry<String, FreeLayer> f: frees) {
 			lastLayerName = f.getKey();
-			out += f.getValue().accept(this, names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize());
+			out += f.getValue().accept(this, names,  new float[]{ sx,  sy,  bx,  by }, map.getTileSize());
 		}
 		for(Map.Entry<String, AreaLayer> a: areas) {
 			lastLayerName = a.getKey();
-			out += a.getValue().accept(this, names,  new float[]{sx,  sy,  bx,  by}, map.getTileSize());
+			out += a.getValue().accept(this, names,  new float[]{ sx,  sy,  bx,  by }, map.getTileSize());
 		}
 
 		//Adding the map tags
@@ -129,15 +129,15 @@ public class MapExporter implements Exporter<String> {
 
 	@Override
 	public String export(TileLayer tileLayer, Object... o2) {
-		float[] sxsybxby = (float[]) o2[1];
+		float[] bounds = (float[]) o2[1];
 		List<String> names = (List<String>) o2[0];
 
 		String[][]tileNames = tileLayer.getTileNames();
 
-		int startX = Math.max(0, (int) Math.floor(sxsybxby[0]));
-		int startY = Math.max(0, (int) Math.floor(sxsybxby[1]));
-		int endX = sxsybxby[2] == -1? tileNames[0].length: Math.min(tileNames[0].length, (int) Math.ceil(sxsybxby[2]))+1;
-		int endY = sxsybxby[3] == -1? tileNames.length: Math.min(tileNames.length, (int) Math.ceil(sxsybxby[3])+1);
+		int startX = Math.max(0, (int) Math.floor(bounds[0]));
+		int startY = Math.max(0, (int) Math.floor(bounds[1]));
+		int endX = bounds[2] == -1? tileNames[0].length: Math.min(tileNames[0].length, (int) Math.ceil(bounds[2]))+1;
+		int endY = bounds[3] == -1? tileNames.length: Math.min(tileNames.length, (int) Math.ceil(bounds[3])+1);
 
 		int width = endX - startX;
 		int height = endY - startY;
@@ -175,7 +175,7 @@ public class MapExporter implements Exporter<String> {
 
 	@Override
 	public String export(Area area, Object... o2) {
-		float[] sxsybxby = (float[]) o2[1];
+		float[] bounds = (float[]) o2[1];
 		int tileSize = (int) o2[2];
 
 		String out = "";
@@ -188,10 +188,10 @@ public class MapExporter implements Exporter<String> {
 
 		out += "[area; " +
 				(areaWithName? lastLayerName + "; ": "") +
-				(area.getSmallerX() - (sxsybxby[0]==-1? 0: sxsybxby[0])) + "; " +
-				(area.getSmallerY() - (sxsybxby[1]==-1? 0: sxsybxby[1])) + "; " +
-				((area.getBiggerX() + 1.0f/tileSize) - (sxsybxby[0]==-1? 0: sxsybxby[0])) + "; "
-				+ ((area.getBiggerY() + 1.0f/tileSize) - (sxsybxby[1]==-1? 0: sxsybxby[1])) +
+				(area.getSmallerX() - (bounds[0]==-1? 0: bounds[0])) + "; " +
+				(area.getSmallerY() - (bounds[1]==-1? 0: bounds[1])) + "; " +
+				((area.getBiggerX() + 1.0f/tileSize) - (bounds[0]==-1? 0: bounds[0])) + "; "
+				+ ((area.getBiggerY() + 1.0f/tileSize) - (bounds[1]==-1? 0: bounds[1])) +
 				(area.getTags().size() > 0? "; " + tags: "") +
 				"]\n";
 
@@ -199,23 +199,23 @@ public class MapExporter implements Exporter<String> {
 	}
 
 	@Override
-	public String export(GO go, Object... o2) {
+	public String export(GameObject gameObject, Object... o2) {
 		List<String> names = (List<String>) o2[0];
-		float[] sxsybxby = (float[]) o2[1];
+		float[] bounds = (float[]) o2[1];
 		float depth = (float) o2[3];
 
 		String tags = "";
-		for(int i = 0; i < go.getTags().size(); i++) {
-			Tag t = go.getTags().get(i);
-			tags += t.accept(this) + (i < go.getTags().size()-1? "; ": "");
+		for(int i = 0; i < gameObject.getTags().size(); i++) {
+			Tag t = gameObject.getTags().get(i);
+			tags += t.accept(this) + (i < gameObject.getTags().size()-1? "; ": "");
 		}
 		return "[put; " +
 				(freeWithName? lastLayerName + "; ": "") +
 				depth + "; " +
-				(names != null? names.indexOf(go.name)+1: go.name) + "; " +
-				(go.x-(sxsybxby[0]==-1? 0: sxsybxby[0])) + "; " +
-				(go.y-(sxsybxby[1]==-1? 0: sxsybxby[1])) +
-				(go.getTags().size() > 0? "; " + tags: "") +
+				(names != null? names.indexOf(gameObject.name)+1: gameObject.name) + "; " +
+				(gameObject.x-(bounds[0]==-1? 0: bounds[0])) + "; " +
+				(gameObject.y-(bounds[1]==-1? 0: bounds[1])) +
+				(gameObject.getTags().size() > 0? "; " + tags: "") +
 				"]\n";
 	}
 

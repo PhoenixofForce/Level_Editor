@@ -1,6 +1,6 @@
 package window.elements;
 
-import data.Debouncer;
+import window.Debouncer;
 import data.layer.layerobjects.Tag;
 
 import data.layer.layerobjects.TagObject;

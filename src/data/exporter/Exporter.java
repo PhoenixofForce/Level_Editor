@@ -9,7 +9,7 @@ import data.layer.AreaLayer;
 import data.layer.FreeLayer;
 import data.layer.TileLayer;
 import data.layer.layerobjects.Area;
-import data.layer.layerobjects.GO;
+import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.Tag;
 
 public interface Exporter<T> {
@@ -24,7 +24,7 @@ public interface Exporter<T> {
 
 	T export(Tag tag, Object... o2);
 	T export(Area area, Object... o2);
-	T export(GO go, Object... o2);
+	T export(GameObject gameObject, Object... o2);
 
 	T append(T o1, T o2);
 

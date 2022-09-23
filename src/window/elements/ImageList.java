@@ -19,7 +19,7 @@ public class ImageList extends JPanel{
 	private JPanel helpPanel;						//helping panel to put the textField in the correct position
 	private JTextField textField;					//textField that allows the user to search for textures
 	private JScrollPane imagePane;					//scrollPane to make the place for the textures bigger
-	private JList images;				//JList of all imported images
+	private JList<ImageIcon> images;				//JList of all imported images
 	private DefaultListModel<ImageIcon> listModel;	//the listModel of the List
 
 	private Map<String, ImageIcon> icons;			//map of texturenames and corresponding imageIcons
@@ -51,17 +51,7 @@ public class ImageList extends JPanel{
 		});
 
 		listModel = new DefaultListModel<>();
-		images = new JList<ImageIcon>(listModel)/* {
-			public String getToolTipText(MouseEvent evt) {
-				int index = locationToIndex(evt.getPoint());
-				//if(index < 0) return "";
-				ImageIcon item = getModel().getElementAt(index);
-				for(String s: icons.keySet()) {
-					if(icons.get(s).equals(item)) return s;
-				}
-				return "ERROR";
-			}
-		}*/;
+		images = new JList<>(listModel);
 
 		images.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		images.setLayoutOrientation(JList.HORIZONTAL_WRAP);
@@ -80,9 +70,6 @@ public class ImageList extends JPanel{
 		this.add(mod, BorderLayout.PAGE_START);
 	}
 
-	/**
-	 * loads possible new images from the TextureHandler
-	 */
 	public void update() {
 		if(icons == null) {
 			icons = new HashMap<>();
@@ -102,18 +89,11 @@ public class ImageList extends JPanel{
 		filter();
 	}
 
-	/**
-	 * applies the filter with the text of the textField
-	 */
 	private void filter() {
 		if(textField == null) return;
 		filter(textField.getText());
 	}
 
-	/**
-	 * shows only textures which names contains the user input
-	 * @param filter the userinput
-	 */
 	private void filter(String filter) {
 		if(listModel == null) return;
 		for (String s : icons.keySet()) {
@@ -132,16 +112,10 @@ public class ImageList extends JPanel{
 		}
 	}
 
-	/**
-	 * @return the selected image
-	 */
 	public ImageIcon getSelectedIcon() {
 		return listModel.get(images.getSelectedIndex());
 	}
 
-	/**
-	 * @return the name if the selected image
-	 */
 	public String getSelectedImageName() {
 		if(images.getSelectedIndex() < 0) return null;
 		for(String s: icons.keySet()) {
@@ -151,18 +125,10 @@ public class ImageList extends JPanel{
 		return null;
 	}
 
-	/**
-	 * @return the modigier
-	 */
 	public Modifier getModifier() {
 		return mod;
 	}
 
-	/**
-	 * resizes the elements depending on width and height of the window
-	 * @param width
-	 * @param height
-	 */
 	public void reSize(int width, int height) {
 		Dimension d = new Dimension(width/4, height/2);
 		imagePane.setPreferredSize(d);

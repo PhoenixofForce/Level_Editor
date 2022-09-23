@@ -5,7 +5,7 @@ import data.layer.AreaLayer;
 import data.layer.FreeLayer;
 import data.layer.TileLayer;
 import data.layer.layerobjects.Area;
-import data.layer.layerobjects.GO;
+import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.Tag;
 
 import java.awt.image.BufferedImage;
@@ -73,7 +73,7 @@ public class PngExporter implements Exporter<String> {
 	}
 
 	@Override
-	public String export(GO go, Object... o2) {
+	public String export(GameObject gameObject, Object... o2) {
 		return "";
 	}
 

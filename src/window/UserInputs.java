@@ -300,13 +300,6 @@ public class UserInputs {
 		});
 	}
 
-
-
-
-
-
-
-
 	private static void addSelectOnClick(JTextField textField) {
 		textField.addFocusListener(new FocusListener() {
 			@Override

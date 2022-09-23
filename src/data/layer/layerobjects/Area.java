@@ -21,34 +21,18 @@ public class Area extends TagObject {
 		this.color = color;
 	}
 
-	/**
-	 *
-	 * @return the smaller x value
-	 */
 	public float getSmallerX() {
 		return Math.min(x1, x2);
 	}
 
-	/**
-	 *
-	 * @return the bigger x value
-	 */
 	public float getBiggerX() {
 		return Math.max(x1, x2);
 	}
 
-	/**
-	 *
-	 * @return the smaller y value
-	 */
 	public float getSmallerY() {
 		return Math.min(y1, y2);
 	}
 
-	/**
-	 *
-	 * @return the bigger y value
-	 */
 	public float getBiggerY() {
 		return Math.max(y1, y2);
 	}

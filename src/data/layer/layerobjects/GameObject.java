@@ -5,12 +5,12 @@ import data.exporter.Exporter;
 /**
  * A GameObject that has a position with width and height, it can have tags and must have a texture
  */
-public class GO extends TagObject {
+public class GameObject extends TagObject {
 
 	public float x, y, width, height;			//x, y coordinates, width and height of the object
 	public String name;							//name of the corresponding textur
 
-	public GO(String name, float x, float y, float width, float height) {
+	public GameObject(String name, float x, float y, float width, float height) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -29,8 +29,8 @@ public class GO extends TagObject {
 	}
 
 	@Override
-	public GO clone() {
-		GO g =  new GO(name, x, y, width, height);
+	public GameObject clone() {
+		GameObject g =  new GameObject(name, x, y, width, height);
 		for(int i = 0; i < getTags().size(); i++) g.addTag(getTags().get(i).clone());
 		return g;
 	}

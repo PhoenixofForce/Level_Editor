@@ -14,12 +14,12 @@ import java.util.List;
  * A Layer in which the user can mark areas
  */
 public class AreaLayer implements Layer {
+
 	private float depth;					//drawing depth of this layer
-
 	private List<Area> areas;				//list of all areas
-	private int width, height, tileSize;	//width, height and tilesize of the map
-
 	private Area selected;					//currently selected area
+
+	private int width, height, tileSize;	//width, height and tilesize of the map
 
 	public AreaLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
@@ -85,9 +85,8 @@ public class AreaLayer implements Layer {
 		if (targetX < 0 || targetY < 0 || targetX >= width || targetY >= height) return false;
 		Area area = selected;
 
-
 		if (area != null) {
-			//Doent work with tileSize=3 :(
+			//Doesnt work with tileSize=3 :(
 
 			//Move second point
 			if (area.equalsSecondPoint(x, y)) {

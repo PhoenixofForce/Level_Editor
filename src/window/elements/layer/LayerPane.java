@@ -65,9 +65,6 @@ public class LayerPane extends JPanel {
 		updateGameMap(newMap, true);
 	}
 
-	/**
-	 * @return the selected layer
-	 */
 	public Layer getSelectedLayer() {
 		if (jList.getSelectedIndex() < 0) return null;
 		return map.getLayer(listModel.get(jList.getSelectedIndex()));
@@ -81,13 +78,6 @@ public class LayerPane extends JPanel {
 		return map.getLayer(listModel.get(i));
 	}
 
-
-	/**
-	 * adds a layer to the map
-	 * @param name name of the layer
-	 * @param type type of the layer 0-TileLayer, 1 - AreaLayer, 2-FreeLayer
-	 * @param depth drawing depth
-	 */
 	public void createLayer(String name, int type, float depth) {
 		//renames layer if name already exist
 		int i = 1;
@@ -187,11 +177,6 @@ public class LayerPane extends JPanel {
 		hidden = newHidden;
 	}
 
-	/**
-	 * resizes this component depending on window width and height
-	 * @param width
-	 * @param height
-	 */
 	public void reSize(int width, int height) {
 		height -= layerControl.getHeight();
 		Dimension d = new Dimension(width / 6, height);
@@ -199,18 +184,11 @@ public class LayerPane extends JPanel {
 		jList.setSize(d);
 	}
 
-	/**
-	 * @param layer which should be checked
-	 * @return true if a layer is hidden
-	 */
 	public boolean isHidden(Layer layer) {
 		if (hidden.containsKey(layer)) return hidden.get(layer);
 		return false;
 	}
 
-	/**
-	 * reverses the hidden value of the selected layer
-	 */
 	public void toggleHidden() {
 		if (map == null || jList.getSelectedIndex() < 0) return;
 
