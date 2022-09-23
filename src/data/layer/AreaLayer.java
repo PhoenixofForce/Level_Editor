@@ -1,6 +1,6 @@
 package data.layer;
 
-import data.exporter.Exporter;
+import data.io.exporter.Exporter;
 import data.Location;
 import data.layer.layerobjects.Area;
 import data.layer.layerobjects.TagObject;

@@ -1,6 +1,6 @@
 package data.layer.layerobjects;
 
-import data.exporter.Exporter;
+import data.io.exporter.Exporter;
 
 /**
  * A GameObject that has a position with width and height, it can have tags and must have a texture

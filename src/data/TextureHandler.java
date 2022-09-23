@@ -75,16 +75,13 @@ public class TextureHandler {
 	 * @return
 	 */
 	public static int getBlockCount(String name) {
-		Pattern pattern = Pattern.compile(name+"_[0-9]*");
 		int c = 0;
 		for(String s: textures_png.keySet()) {
-			Matcher matcher = pattern.matcher(s);
-			if(matcher.matches()) c++;
+			if(s.startsWith(name)) c++;
 		}
 
 		for(String s: textures_sprite_sheet.keySet()) {
-			Matcher matcher = pattern.matcher(s);
-			if(matcher.matches()) c++;
+			if(s.startsWith(name)) c++;
 		}
 
 		return c;

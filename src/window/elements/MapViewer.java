@@ -3,7 +3,7 @@ package window.elements;
 import data.*;
 import data.layer.*;
 import data.layer.layerobjects.TagObject;
-import window.ClipBoardUtil;
+import util.ClipBoardUtil;
 import window.Tools;
 import window.Window;
 import window.commands.*;

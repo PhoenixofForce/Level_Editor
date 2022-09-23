@@ -2,11 +2,11 @@ package window.elements;
 
 import data.GameMap;
 import data.TextureHandler;
-import data.exporter.Exporter;
-import data.exporter.MapExporter;
-import data.exporter.PngExporter;
-import data.importer.Importer;
-import data.importer.UmapImporter;
+import data.io.exporter.Exporter;
+import data.io.exporter.MapExporter;
+import data.io.exporter.PngExporter;
+import data.io.importer.Importer;
+import data.io.importer.UmapImporter;
 import data.layer.FreeLayer;
 import data.layer.Layer;
 import data.layer.TileLayer;

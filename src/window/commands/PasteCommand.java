@@ -2,7 +2,7 @@ package window.commands;
 
 import data.Location;
 import data.layer.FreeLayer;
-import window.ClipBoardUtil;
+import util.ClipBoardUtil;
 import window.elements.MapViewer;
 import window.elements.Selection;
 

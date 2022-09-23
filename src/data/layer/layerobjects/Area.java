@@ -1,6 +1,6 @@
 package data.layer.layerobjects;
 
-import data.exporter.Exporter;
+import data.io.exporter.Exporter;
 
 import java.awt.Color;
 

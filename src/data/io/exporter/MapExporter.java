@@ -1,4 +1,4 @@
-package data.exporter;
+package data.io.exporter;
 
 import data.GameMap;
 import data.layer.AreaLayer;

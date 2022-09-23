@@ -1,7 +1,7 @@
 package window.commands;
 
 import data.Location;
-import data.Util;
+import util.Util;
 import data.layer.TileLayer;
 
 import java.awt.geom.Area;

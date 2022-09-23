@@ -1,4 +1,4 @@
-package window;
+package util;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;

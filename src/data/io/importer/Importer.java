@@ -1,4 +1,4 @@
-package data.importer;
+package data.io.importer;
 
 import java.io.File;
 import java.util.List;

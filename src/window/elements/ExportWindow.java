@@ -1,7 +1,7 @@
 package window.elements;
 
-import data.exporter.Exporter;
-import data.exporter.MapExporter;
+import data.io.exporter.Exporter;
+import data.io.exporter.MapExporter;
 
 import javax.swing.*;
 import java.awt.*;
