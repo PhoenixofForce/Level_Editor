@@ -86,7 +86,10 @@ public class PngExporter implements Exporter<String> {
 	public FileNameExtensionFilter getFileFilter() {
 		return fileFilter;
 	}
-	
+
+	@Override
+	public void setOptions(boolean tileWithName, boolean freeWithName, boolean areaWithName) { }
+
 	public static PngExporter getInstance() {
 		return INSTANCE;
 	}

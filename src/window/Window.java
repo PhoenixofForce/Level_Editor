@@ -17,6 +17,8 @@ import java.io.File;
  */
 public class Window extends JFrame {
 
+	public static Window INSTANCE;
+
 	private LayerPane layerPane;			//bar on the left side to controll layers
 	private MainToolBar buttons;			//toolbar to save/ open/ export map and import ressources
 	private MapViewer mapViewer;			//displays the current map
@@ -25,13 +27,15 @@ public class Window extends JFrame {
 	private MenuBar menu;
 
 	public Window() {
+		INSTANCE = this;
+
 		//setting window attributes
 		this.setTitle("Level Editor - Untitled");
 		this.setLayout(new BorderLayout());
 		this.setMinimumSize(new Dimension(800, 600));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-		//creating new standart map
+		//creating new default map
 		setMap(new GameMap(this, 100,100,16), true);
 
 		//creating objects and adding them to the window

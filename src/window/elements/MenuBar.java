@@ -22,8 +22,8 @@ import java.util.List;
 
 public class MenuBar extends JMenuBar {
 
-	private Exporter[] exporter = new Exporter[] {MapExporter.getInstance(), PngExporter.getInstance()};
-	private Importer[] importer = new Importer[] {UmapImporter.getInstance()};
+	protected static final Exporter[] exporter = new Exporter[] { MapExporter.getInstance(), PngExporter.getInstance() };
+	private static final Importer[] importer = new Importer[] { UmapImporter.getInstance() };
 
 	private JMenu file;
 	private JMenuItem newFile, openFile, saveFile, saveFileAs, exportFile;
@@ -31,8 +31,10 @@ public class MenuBar extends JMenuBar {
 	private JMenuItem res;
 	private JMenuItem importRes, updateRes;
 
+	private ExportWindow exporterWindow;
+
 	private List<File> imports;
-	private File lastExport, lastSave, lastOpen, lastImport;
+	protected static File lastExport, lastSave, lastOpen, lastImport;
 	private Window w;
 	private ImageList list;
 
@@ -55,13 +57,15 @@ public class MenuBar extends JMenuBar {
 		file.add(exportFile);
 		this.add(file);
 
-		res = new JMenu("Ressources");
+		res = new JMenu("Resources");
 		importRes = new JMenuItem("Import Resource");
-		updateRes = new JMenuItem("Update Ressources");
+		updateRes = new JMenuItem("Update Resources");
 
 		res.add(importRes);
 		res.add(updateRes);
 		this.add(res);
+
+		exporterWindow = new ExportWindow(w);
 
 		this.w = w;
 		this.list = list;
@@ -98,51 +102,7 @@ public class MenuBar extends JMenuBar {
 		});
 
 		exportFile.addActionListener(e -> {
-			JFileChooser chooser = new JFileChooser(){
-				public void approveSelection() {
-					File f = getSelectedFile();
-
-					boolean endsWithFileType = false;
-					for(Exporter exp: exporter) {
-						if(exp.getFileFilter().accept(f)) {
-							endsWithFileType = true;
-							break;
-						}
-					}
-
-					if(!endsWithFileType) setSelectedFile( new File(f.getAbsolutePath() + getFileFilter().getDescription()));
-					f = getSelectedFile();
-
-					if(f.exists()) {
-						int n = JOptionPane.showOptionDialog(this, "The file already exists, should it be replaced?", "File exists", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Yes", "No"}, "No");
-						if(n == 0) super.approveSelection();
-					} else super.approveSelection();
-				}
-			};
-			if(lastExport != null) chooser.setSelectedFile(lastExport);
-			else if(lastSave != null) chooser.setSelectedFile(new File(lastSave.getAbsolutePath().substring(0, lastSave.getAbsolutePath().length()-4) + "map"));
-
-			chooser.setOpaque(true);
-
-			chooser.setAcceptAllFileFilterUsed(false);
-			for(Exporter exp: exporter) chooser.addChoosableFileFilter(exp.getFileFilter());
-
-			int returnVal = chooser.showDialog(new JButton(""), "Export File");
-			if(returnVal == JFileChooser.APPROVE_OPTION){
-				File f = chooser.getSelectedFile();
-				lastExport = f;
-
-				boolean exported = false;
-				for(Exporter exp: exporter) {
-					if(exp.getFileFilter().accept(f)) {
-						exp.exportToFile(w.getMap(), f);
-						exported = true;
-						break;
-					}
-				}
-				if(!exported) MapExporter.getInstance().exportToFile(w.getMap(), f);
-
-			}
+			exporterWindow.setVisible(true);
 		});
 
 		importRes.addActionListener(e -> {

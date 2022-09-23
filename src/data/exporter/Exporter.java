@@ -30,6 +30,8 @@ public interface Exporter<T> {
 
 	FileNameExtensionFilter getFileFilter();
 
+	void setOptions(boolean tileWithName, boolean freeWithName, boolean areaWithName);
+
 	interface Exportable {
 		Object accept(Exporter exporter, Object... o2);
 	}
