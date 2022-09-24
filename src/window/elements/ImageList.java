@@ -130,9 +130,14 @@ public class ImageList extends JPanel{
 	}
 
 	public void reSize(int width, int height) {
-		Dimension d = new Dimension(width/4, height/2);
+		Dimension d = new Dimension(width/4, height/2 - 25);
+		Dimension d2 = new Dimension(width/4, height);
+		this.setSize(d2);
+		this.setPreferredSize(d2);
+
 		imagePane.setPreferredSize(d);
 		imagePane.setSize(d);
+
 		textField.setPreferredSize(new Dimension(d.width, 25));
 		textField.setSize(new Dimension(d.width, 25));
 	}

@@ -1,6 +1,6 @@
 package window.elements.layer;
 
-import window.UserInputs;
+import window.modals.UserInputs;
 import window.Window;
 
 import javax.swing.*;

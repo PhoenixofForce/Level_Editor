@@ -104,7 +104,7 @@ public class GameMap extends TagObject {
 
 	@Override
 	public String getText() {
-		return "MAP";
+		return "Map";
 	}
 
 	@Override

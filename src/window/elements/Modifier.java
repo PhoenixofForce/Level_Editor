@@ -4,7 +4,7 @@ import window.Debouncer;
 import data.layer.layerobjects.Tag;
 
 import data.layer.layerobjects.TagObject;
-import window.UserInputs;
+import window.modals.UserInputs;
 import window.Window;
 import window.commands.TagAddCommand;
 import window.commands.TagChangeCommand;
@@ -20,10 +20,10 @@ import java.awt.*;
  */
 public class Modifier extends JPanel{
 
-	private Window w;
+	private Window window;
 	private Modifier instance;
 
-	private TagObject object;			//Object which tags are beeing edited
+	private TagObject object;			//Object which tags are being edited
 	private JLabel goStats;				//Label which shows texture name and coordinate of object
 	private JButton add, remove;			//Buttons to add and remove tags
 
@@ -33,13 +33,13 @@ public class Modifier extends JPanel{
 
 	private DocumentListener dc;			//Listener that saves all changes
 
-	public Modifier(Window w) {
+	public Modifier(Window window) {
 		instance = this;
 
-		this.w = w;
+		this.window = window;
 		this.setLayout(new BorderLayout());
 
-		goStats = new JLabel();
+		goStats = new JLabel("");
 		this.add(goStats, BorderLayout.PAGE_START);
 
 		input = new JTextArea();
@@ -53,10 +53,10 @@ public class Modifier extends JPanel{
 					int chooserIndex = attChooser.getSelectedIndex();
 					String tagName = attChooser.getItemAt(chooserIndex);
 					String newTagContent = input.getText();
-					String oldTagConent = object.getTag(tagName).getAction();
+					String oldTagContent = object.getTag(tagName).getAction();
 
 					Debouncer.debounce("modifier_input_input", () -> {
-						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(w.getMapViewer().getCommandHistory());
+						new TagChangeCommand(instance, tagObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory());
 					}, 250);
 				}
 			}
@@ -71,7 +71,7 @@ public class Modifier extends JPanel{
 					String oldTagConent = object.getTag(tagName).getAction();
 
 					Debouncer.debounce("modifier_input_input", () -> {
-						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(w.getMapViewer().getCommandHistory());
+						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(window.getMapViewer().getCommandHistory());
 					}, 250);
 				}
 			}
@@ -86,7 +86,7 @@ public class Modifier extends JPanel{
 					String oldTagConent = object.getTag(tagName).getAction();
 
 					Debouncer.debounce("modifier_input_input", () -> {
-						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(w.getMapViewer().getCommandHistory());
+						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(window.getMapViewer().getCommandHistory());
 					}, 250);
 				}
 			}
@@ -108,13 +108,13 @@ public class Modifier extends JPanel{
 		add = new JButton("+");
 		this.add(add, BorderLayout.LINE_START);
 		add.addActionListener(e -> {
-			UserInputs.tagName(w, this);
+			UserInputs.tagName(window, this);
 		});
 
 		remove = new JButton("-");
 		this.add(remove, BorderLayout.LINE_END);
 		remove.addActionListener(e -> {
-			new TagRemoveCommand(instance, object, (String) attChooser.getSelectedItem()).execute(w.getMapViewer().getCommandHistory());
+			new TagRemoveCommand(instance, object, (String) attChooser.getSelectedItem()).execute(window.getMapViewer().getCommandHistory());
 			attChooser.removeItem(attChooser.getSelectedItem());
 			if(attChooser.getItemCount() == 0) input.setText("");
 		});
@@ -134,7 +134,7 @@ public class Modifier extends JPanel{
 			input.getDocument().addDocumentListener(dc);
 		}
 		//Adds Tag to object
-		new TagAddCommand(instance, object, name).execute(w.getMapViewer().getCommandHistory());
+		new TagAddCommand(instance, object, name).execute(window.getMapViewer().getCommandHistory());
 
 		//Adds TagName to ComboBox and selects it
 		attChooser.addItem(name);
@@ -155,6 +155,8 @@ public class Modifier extends JPanel{
 	 * @param obj the new selected TagObject
 	 */
 	public void setTagObject(TagObject obj) {
+		if(obj == null) obj = window.getMap();
+
 		//Reset JObjects => Enabling if object is initialized, setting texts empty
 		add.setEnabled(obj != null);
 		remove.setEnabled(obj != null);

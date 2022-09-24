@@ -11,8 +11,9 @@ import data.layer.FreeLayer;
 import data.layer.Layer;
 import data.layer.TileLayer;
 import data.layer.layerobjects.Tag;
-import window.UserInputs;
+import window.modals.UserInputs;
 import window.Window;
+import window.modals.ExportWindow;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class MenuBar extends JMenuBar {
 
-	protected static final Exporter[] exporter = new Exporter[] { MapExporter.getInstance(), PngExporter.getInstance() };
+	public static final Exporter[] exporter = new Exporter[] { MapExporter.getInstance(), PngExporter.getInstance() };
 	private static final Importer[] importer = new Importer[] { UmapImporter.getInstance() };
 
 	private JMenu file;
@@ -34,7 +35,7 @@ public class MenuBar extends JMenuBar {
 	private ExportWindow exporterWindow;
 
 	private List<File> imports;
-	protected static File lastExport, lastSave, lastOpen, lastImport;
+	public static File lastExport, lastSave, lastOpen, lastImport;
 
 	private Window window;
 	private ImageList list;

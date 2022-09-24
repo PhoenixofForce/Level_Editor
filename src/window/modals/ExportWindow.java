@@ -1,7 +1,8 @@
-package window.elements;
+package window.modals;
 
 import data.io.exporter.Exporter;
 import data.io.exporter.MapExporter;
+import window.elements.MenuBar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,12 +27,32 @@ public class ExportWindow extends JDialog {
         this.setTitle("Export Map");
         this.setModal(true);
         this.setLayout(null);
-        this.setPreferredSize(new Dimension(216, 239));
-        this.pack();
         this.setResizable(false);
 
+        JFileChooser chooser = new JFileChooser(){
+            public void approveSelection() {
+                File f = getSelectedFile();
+
+                boolean endsWithFileType = false;
+                for(Exporter exp: MenuBar.exporter) {
+                    if(exp.getFileFilter().accept(f)) {
+                        endsWithFileType = true;
+                        break;
+                    }
+                }
+
+                if(!endsWithFileType) setSelectedFile( new File(f.getAbsolutePath() + getFileFilter().getDescription()));
+                f = getSelectedFile();
+
+                if(f.exists()) {
+                    int n = JOptionPane.showOptionDialog(this, "The file already exists, should it be replaced?", "File exists", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Yes", "No"}, "No");
+                    if(n == 0) super.approveSelection();
+                } else super.approveSelection();
+            }
+        };
+
         if(MenuBar.lastExport != null) file = MenuBar.lastExport;
-        else if(MenuBar.lastSave != null) file = new File(MenuBar.lastSave.getAbsolutePath().substring(0, MenuBar.lastSave.getAbsolutePath().length()-4) + "map");
+        else if(MenuBar.lastSave != null) file = new File(MenuBar.lastSave.getAbsolutePath().substring(0,MenuBar.lastSave.getAbsolutePath().length()-4) + "map");
 
         selectedFile = new JButton("Select File...");
         this.getContentPane().add(selectedFile);
@@ -45,27 +66,6 @@ public class ExportWindow extends JDialog {
         }
 
         selectedFile.addActionListener(e -> {
-            JFileChooser chooser = new JFileChooser(){
-                public void approveSelection() {
-                    File f = getSelectedFile();
-
-                    boolean endsWithFileType = false;
-                    for(Exporter exp: MenuBar.exporter) {
-                        if(exp.getFileFilter().accept(f)) {
-                            endsWithFileType = true;
-                            break;
-                        }
-                    }
-
-                    if(!endsWithFileType) setSelectedFile( new File(f.getAbsolutePath() + getFileFilter().getDescription()));
-                    f = getSelectedFile();
-
-                    if(f.exists()) {
-                        int n = JOptionPane.showOptionDialog(this, "The file already exists, should it be replaced?", "File exists", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Yes", "No"}, "No");
-                        if(n == 0) super.approveSelection();
-                    } else super.approveSelection();
-                }
-            };
            if(file != null) chooser.setSelectedFile(file);
 
             chooser.setOpaque(true);
@@ -125,5 +125,8 @@ public class ExportWindow extends JDialog {
         exportAreaNames = new JCheckBox("AreaLayer with Name");
         this.getContentPane().add(exportAreaNames);
         exportAreaNames.setBounds(10, 100, 180, 20);
+
+        this.setPreferredSize(new Dimension(200 + 16, 200 + 39));
+        this.pack();
     }
 }
