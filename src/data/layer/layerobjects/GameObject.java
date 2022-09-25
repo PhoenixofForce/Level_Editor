@@ -8,7 +8,7 @@ import data.io.exporter.Exporter;
 public class GameObject extends TagObject {
 
 	public float x, y, width, height;			//x, y coordinates, width and height of the object
-	public String name;							//name of the corresponding textur
+	public String name;							//name of the corresponding texture
 
 	public GameObject(String name, float x, float y, float width, float height) {
 		this.x = x;
@@ -36,8 +36,7 @@ public class GameObject extends TagObject {
 	}
 
 	/**
-	 * converts class to saveable text-format
-	 * @return
+	 * @return class as a savable text-format
 	 */
 	@Override
 	public String getText() {

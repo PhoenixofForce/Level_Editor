@@ -10,10 +10,10 @@ import java.util.List;
 
 public class RemoveCommand implements Command {
 
-	private Modifier mod;
-	private Layer layer;
-	private List<Location> positions;
-	private List<TagObject> toDeletes;
+	private final Modifier mod;
+	private final Layer layer;
+	private final List<Location> positions;
+	private final List<TagObject> toDeletes;
 
 	public RemoveCommand(Modifier mod, Layer layer, Location position) {
 		this.mod = mod;
@@ -47,8 +47,8 @@ public class RemoveCommand implements Command {
 
 	@Override
 	public void undo() {
-		for(int i = 0; i < toDeletes.size(); i++) {
-			layer.add(toDeletes.get(i));
+		for (TagObject toDelete : toDeletes) {
+			layer.add(toDelete);
 		}
 	}
 
@@ -59,8 +59,8 @@ public class RemoveCommand implements Command {
 
 	@Override
 	public void redo() {
-		for(int i = 0; i < positions.size(); i++) {
-			layer.remove(positions.get(i).x, positions.get(i).y);
+		for (Location position : positions) {
+			layer.remove(position.x, position.y);
 		}
 		mod.setTagObject(null);
 	}

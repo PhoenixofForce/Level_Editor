@@ -9,11 +9,12 @@ import java.util.List;
 
 public class FillCommand implements Command {
 
-	private TileLayer layer;
-	private String prevTexture, nextTexture;
-	private Location pos;
-	private Area area;
-	private int autoTile;
+	private final TileLayer layer;
+	private final String prevTexture;
+    private final String nextTexture;
+	private final Location pos;
+	private final Area area;
+	private final int autoTile;
 
 	private List<Location> changes;
 
@@ -58,8 +59,7 @@ public class FillCommand implements Command {
 
 	@Override
 	public boolean equals(Object o2) {
-		if(o2 instanceof FillCommand) {
-			FillCommand fc = (FillCommand) o2;
+		if(o2 instanceof FillCommand fc) {
 			return  fc.layer.equals(layer) &&
 					((fc.prevTexture == null && prevTexture == null) ||
 							(fc.prevTexture != null && prevTexture != null && fc.prevTexture.equals(prevTexture))) &&

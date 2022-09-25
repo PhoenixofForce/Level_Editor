@@ -23,7 +23,7 @@ public class MapExporter implements Exporter<String> {
 
 	private static final MapExporter INSTANCE = new MapExporter();
 
-	private FileNameExtensionFilter fileFilter;
+	private final FileNameExtensionFilter fileFilter;
 
 	private boolean tilesWithName = false,
 					freeWithName = false,
@@ -63,8 +63,7 @@ public class MapExporter implements Exporter<String> {
 		//Collecting all used textures
 		for(String s: map.getLayers().keySet()) {
 			Layer l = map.getLayers().get(s);
-			if(l instanceof TileLayer) {
-				TileLayer t = (TileLayer) l;
+			if(l instanceof TileLayer t) {
 				tiles.add(new AbstractMap.SimpleEntry<>(s, t));
 
 				String[][] layerNames = t.getTileNames();
@@ -72,8 +71,7 @@ public class MapExporter implements Exporter<String> {
 					for(String st: sa) if(st != null && !names.contains(st)) names.add(st);
 				}
 			}
-			else if(l instanceof FreeLayer) {
-				FreeLayer f = (FreeLayer) l;
+			else if(l instanceof FreeLayer f) {
 				frees.add(new AbstractMap.SimpleEntry<>(s, f));
 
 				for(GameObject gameObject : f.getImages()) {
@@ -81,14 +79,13 @@ public class MapExporter implements Exporter<String> {
 					if(st != null && !names.contains(st)) names.add(st);
 				}
 			}
-			else if(l instanceof AreaLayer) {
-				AreaLayer a = (AreaLayer) l;
+			else if(l instanceof AreaLayer a) {
 				areas.add(new AbstractMap.SimpleEntry<>(s, a));
 			}
 		}
 
-		//finding biggest and smalles coordinates
-		float sx = -1, sy = -1, bx = -1, by = -1;
+		//finding biggest and smalls coordinates
+		float sx, sy, bx, by;
 		int[] bounds = map.getBounds();
 		sx = bounds[0];
 		sy = bounds[1];

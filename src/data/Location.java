@@ -22,8 +22,7 @@ public class Location {
 
 	@Override
 	public boolean equals(Object b) {
-		if(b instanceof Location) {
-			Location l = (Location) b;
+		if(b instanceof Location l) {
 			return l.x == x && l.y == y;
 		}
 		return false;

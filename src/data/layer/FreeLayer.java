@@ -16,10 +16,12 @@ import java.util.List;
  */
 public class FreeLayer implements Layer {
 
-	private float depth;						//drawing depth of this layer
+	private final float depth;						//drawing depth of this layer
 	private final List<GameObject> images;				//list of all placed textures
 
-	private int width, height, tileSize;		//width, height and tilesize of the map
+	private final int width;
+	private final int height;
+	private final int tileSize;		//width, height and tilesize of the map
 
 	public FreeLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
@@ -96,9 +98,7 @@ public class FreeLayer implements Layer {
 	}
 
 	public void moveAll(float dx, float dy) {
-		for(int i = 0; i < images.size(); i++) {
-			GameObject gameObject = images.get(i);
-
+		for (GameObject gameObject : images) {
 			gameObject.move(dx, dy);
 			if (gameObject.x < 0 || gameObject.x + gameObject.width > this.width || gameObject.y < 0 || gameObject.y + gameObject.height > this.height)
 				gameObject.move(-dx, -dy);
@@ -109,10 +109,9 @@ public class FreeLayer implements Layer {
 		float smallestX = Integer.MAX_VALUE,
 				smallestY = Integer.MAX_VALUE;
 
-		for(int i = 0; i < images.size(); i++) {
-			GameObject r = images.get(i);
-			if(smallestX > r.x) smallestX = r.x;
-			if(smallestY > r.y) smallestY = r.y;
+		for (GameObject r : images) {
+			if (smallestX > r.x) smallestX = r.x;
+			if (smallestY > r.y) smallestY = r.y;
 		}
 
 		float 	dx = (smallestX%1),

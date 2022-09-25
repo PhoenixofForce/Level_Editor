@@ -9,11 +9,11 @@ import java.util.List;
 
 public class SelectionMoveCommand implements Command{
 
-	private int tileSize;
-	private boolean isRight;
-	private FreeLayer copyLayer;
-	private Selection toMove;
-	private List<Location> distances;
+	private final int tileSize;
+	private final boolean isRight;
+	private final FreeLayer copyLayer;
+	private final Selection toMove;
+	private final List<Location> distances;
 
 	public SelectionMoveCommand(int tileSize, Selection toMove, FreeLayer copyLayer, boolean isRight) {
 		this.tileSize = tileSize;
@@ -60,9 +60,10 @@ public class SelectionMoveCommand implements Command{
 
 	@Override
 	public void redo() {
-		for(int i = 0; i < distances.size(); i++) {
-			toMove.translate((int) distances.get(i).x, (int) distances.get(i).y);
-			if(copyLayer != null && isRight) copyLayer.moveAll(distances.get(i).x/ (float) tileSize, distances.get(i).y/ (float) tileSize);
+		for (Location distance : distances) {
+			toMove.translate((int) distance.x, (int) distance.y);
+			if (copyLayer != null && isRight)
+				copyLayer.moveAll(distance.x / (float) tileSize, distance.y / (float) tileSize);
 		}
 	}
 

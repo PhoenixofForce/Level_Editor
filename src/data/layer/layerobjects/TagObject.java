@@ -10,7 +10,7 @@ import java.util.List;
  */
 public abstract class TagObject implements Exporter.Exportable {
 
-	private List<Tag> tags;			//list of applied tags
+	private final List<Tag> tags;			//list of applied tags
 	public TagObject() {
 		tags = new ArrayList<>();
 	}

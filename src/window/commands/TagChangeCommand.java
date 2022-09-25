@@ -5,17 +5,17 @@ import window.elements.Modifier;
 
 public class TagChangeCommand implements Command {
 
-	private Modifier mod;
-	private TagObject tagObject;
-	private String 	tagName,
-					oldContent,
-					newContent;
+	private final Modifier mod;
+	private final TagObject tagObject;
+	private final String 	tagName;
+	private final String oldContent;
+	private final String newContent;
 
-	public TagChangeCommand(Modifier mod, TagObject tagObject, String tagName, String oldConent, String newContent) {
+	public TagChangeCommand(Modifier mod, TagObject tagObject, String tagName, String oldContent, String newContent) {
 		this.mod = mod;
 		this.tagObject = tagObject;
 		this.tagName = tagName;
-		this.oldContent = oldConent;
+		this.oldContent = oldContent;
 		this.newContent = newContent;
 	}
 

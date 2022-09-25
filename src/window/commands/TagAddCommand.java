@@ -6,9 +6,9 @@ import window.elements.Modifier;
 
 public class TagAddCommand implements Command {
 
-	private Modifier mod;
-	private TagObject tagObject;
-	private String 	tagName;
+	private final Modifier mod;
+	private final TagObject tagObject;
+	private final String 	tagName;
 
 	public TagAddCommand(Modifier mod, TagObject tagObject, String tagName) {
 		this.mod = mod;

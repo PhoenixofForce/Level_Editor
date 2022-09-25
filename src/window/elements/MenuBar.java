@@ -26,25 +26,28 @@ public class MenuBar extends JMenuBar {
 	public static final Exporter[] exporter = new Exporter[] { MapExporter.getInstance(), PngExporter.getInstance() };
 	private static final Importer[] importer = new Importer[] { UmapImporter.getInstance() };
 
-	private JMenu file;
-	private JMenuItem newFile, openFile, saveFile, saveFileAs, exportFile;
+	private final JMenuItem newFile;
+	private final JMenuItem openFile;
+	private final JMenuItem saveFile;
+	private final JMenuItem saveFileAs;
+	private final JMenuItem exportFile;
 
-	private JMenuItem res;
-	private JMenuItem importRes, updateRes;
+	private final JMenuItem importRes;
+	private final JMenuItem updateRes;
 
-	private ExportWindow exporterWindow;
+	private final ExportWindow exporterWindow;
 
-	private List<File> imports;
+	private final List<File> imports;
 	public static File lastExport, lastSave, lastOpen, lastImport;
 
-	private Window window;
-	private ImageList list;
+	private final Window window;
+	private final ImageList list;
 
 	public MenuBar(Window window, ImageList list) {
 
 		imports = new ArrayList<>();
 
-		file = new JMenu("File");
+		JMenu file = new JMenu("File");
 		newFile = new JMenuItem("New...");
 		openFile = new JMenuItem("Open");
 		saveFile = new JMenuItem("Save");
@@ -59,7 +62,7 @@ public class MenuBar extends JMenuBar {
 		file.add(exportFile);
 		this.add(file);
 
-		res = new JMenu("Resources");
+		JMenuItem res = new JMenu("Resources");
 		importRes = new JMenuItem("Import Resource");
 		updateRes = new JMenuItem("Update Resources");
 
@@ -95,17 +98,11 @@ public class MenuBar extends JMenuBar {
 			}
 		});
 
-		saveFile.addActionListener(e -> {
-			save();
-		});
+		saveFile.addActionListener(e -> save());
 
-		saveFileAs.addActionListener(e -> {
-			saveAs(window);
-		});
+		saveFileAs.addActionListener(e -> saveAs(window));
 
-		exportFile.addActionListener(e -> {
-			exporterWindow.setVisible(true);
-		});
+		exportFile.addActionListener(e -> exporterWindow.setVisible(true));
 
 		importRes.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser();

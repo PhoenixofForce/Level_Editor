@@ -4,8 +4,8 @@ import java.awt.*;
 
 public enum Tools {
 	BRUSH(0, Color.GREEN), ERASER(1, Color.RED), BUCKET(2, Color.BLUE), SELECT(3, Color.YELLOW), MOVE(4, Color.YELLOW);
-	private int pos;
-	private Color c;
+	private final int pos;
+	private final Color c;
 	Tools(int a, Color c) {
 		this.pos = a;
 		this.c = c;

@@ -15,11 +15,13 @@ import java.util.List;
  */
 public class AreaLayer implements Layer {
 
-	private float depth;					//drawing depth of this layer
-	private List<Area> areas;				//list of all areas
+	private final float depth;					//drawing depth of this layer
+	private final List<Area> areas;				//list of all areas
 	private Area selected;					//currently selected area
 
-	private int width, height, tileSize;	//width, height and tilesize of the map
+	private final int width;
+	private final int height;
+	private final int tileSize;	//width, height and tilesize of the map
 
 	public AreaLayer(float depth, int width, int height, int tileSize) {
 		this.depth = depth;
@@ -133,7 +135,7 @@ public class AreaLayer implements Layer {
 	public void draw(Graphics g, Location l1, Location l2) {
 		for (Area a: areas) {
 			g.setColor(a.getColor());
-			g.fillRect((int) Math.floor(a.getSmallerX() * tileSize), (int) Math.floor(a.getSmallerY() * tileSize), (int) Math.round((a.getBiggerX()-a.getSmallerX())*tileSize) + 1, (int) Math.round((a.getBiggerY() - a.getSmallerY())*tileSize) + 1);
+			g.fillRect((int) Math.floor(a.getSmallerX() * tileSize), (int) Math.floor(a.getSmallerY() * tileSize), Math.round((a.getBiggerX()-a.getSmallerX())*tileSize) + 1, Math.round((a.getBiggerY() - a.getSmallerY())*tileSize) + 1);
 			g.fillRect((int) Math.floor(a.getX1() * tileSize), (int) Math.floor(a.getY1() * tileSize), 1, 1);
 			g.fillRect((int) Math.floor(a.getX2() * tileSize), (int) Math.floor(a.getY2() * tileSize), 1, 1);
 		}
@@ -186,8 +188,8 @@ public class AreaLayer implements Layer {
 	@Override
 	public Object accept(Exporter exporter, Object... o2) {
 		Object out = exporter.export(this, o2);
-		for(int i = 0; i < areas.size(); i++) {
-			out = exporter.append(out, areas.get(i).accept(exporter, o2));
+		for (Area area : areas) {
+			out = exporter.append(out, area.accept(exporter, o2));
 		}
 		return out;
 	}

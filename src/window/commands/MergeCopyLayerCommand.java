@@ -11,11 +11,11 @@ import java.util.List;
 
 public class MergeCopyLayerCommand implements Command{
 
-	private MapViewer mv;
-	private TileLayer selectedLayer;
-	private FreeLayer copyLayer;
+	private final MapViewer mv;
+	private final TileLayer selectedLayer;
+	private final FreeLayer copyLayer;
 
-	private List<TagObject> overwritten;
+	private final List<TagObject> overwritten;
 
 	public MergeCopyLayerCommand(MapViewer mv, TileLayer selectedLayer, FreeLayer copyLayer) {
 		this.mv = mv;

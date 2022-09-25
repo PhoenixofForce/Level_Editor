@@ -105,8 +105,7 @@ public class Area extends TagObject {
 	}
 
 	/**
-	 * converts class to saveable text-format
-	 * @return
+	 * @return the class as a savable text-format
 	 */
 	@Override
 	public String getText() {

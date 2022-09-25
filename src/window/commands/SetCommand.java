@@ -11,12 +11,13 @@ import java.util.List;
 
 public class SetCommand implements Command {
 
-	private Modifier mod;
-	private Layer layer;
-	private List<String> prevTextures, nextTextures;
-	private List<Location> positions;
-	private boolean drag;
-	private int autoTile;
+	private final Modifier mod;
+	private final Layer layer;
+	private final List<String> prevTextures;
+	private final List<String> nextTextures;
+	private final List<Location> positions;
+	private final boolean drag;
+	private final int autoTile;
 
 	public SetCommand(Modifier mod, Layer layer, String texture, Location position, boolean drag, int autoTile) {
 		this.mod = mod;
@@ -54,25 +55,17 @@ public class SetCommand implements Command {
 	public void add(Location position, String texture) {
 		if(!(layer instanceof  TileLayer)) return;
 
-		if(layer instanceof TileLayer) {
-			if(position.x >= 0 && position.x < ((TileLayer) layer).getTileNames()[0].length &&
-					position.y >= 0 && position.y < ((TileLayer) layer).getTileNames().length) {
+		if(position.x >= 0 && position.x < ((TileLayer) layer).getTileNames()[0].length &&
+				position.y >= 0 && position.y < ((TileLayer) layer).getTileNames().length) {
 
-				String prevTexture = ((TileLayer) layer).getTileNames()[(int) position.y][(int) position.x];
-				if(!Util.textureEquals(autoTile, prevTexture, texture)) {
-					nextTextures.add(texture);
-					positions.add(position);
-					prevTextures.add(prevTexture);
+			String prevTexture = ((TileLayer) layer).getTileNames()[(int) position.y][(int) position.x];
+			if(!Util.textureEquals(autoTile, prevTexture, texture)) {
+				nextTextures.add(texture);
+				positions.add(position);
+				prevTextures.add(prevTexture);
 
-					layer.set(texture, position.x, position.y, drag);
-				}
+				layer.set(texture, position.x, position.y, drag);
 			}
-
-		} else {
-			nextTextures.add(texture);
-			positions.add(position);
-
-			layer.set(texture, position.x, position.y, drag);
 		}
 	}
 
@@ -95,8 +88,8 @@ public class SetCommand implements Command {
 				layer.set(prevTextures.get(i), positions.get(i).x, positions.get(i).y, drag);
 			}
 		} else {
-			for(int i = 0; i < positions.size(); i++) {
-				layer.remove(positions.get(i).x, positions.get(i).y);
+			for (Location position : positions) {
+				layer.remove(position.x, position.y);
 			}
 			mod.setTagObject(null);
 		}

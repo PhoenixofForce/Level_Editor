@@ -6,9 +6,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 public class TextureHandler {
 	private TextureHandler() {}
@@ -37,28 +38,28 @@ public class TextureHandler {
 		}
 	}
 
-	/**Loads an spritesheet from a .text-file
+	/**Loads a spritesheet from a .text-file
 	 * A .png with the same name has to be in the same folder
 	 *
-	 * @param spriteSheetName
+	 * @param spriteSheetName how the spritesheet should be addressed internally
 	 * @param fileName file that links to the .text file
 	 */
 	public static void loadImagePngSpriteSheet(String spriteSheetName, String fileName) {
 		//if(textures_png.containsKey(spriteSheetName)) return;
 		try {
 			loadImagePng(spriteSheetName, fileName.substring(0, fileName.length()-4)+"png");
-			Scanner s = new Scanner(new File(fileName), "UTF8");
+			Scanner s = new Scanner(new File(fileName), StandardCharsets.UTF_8);
 
-			int amount = Integer.valueOf(s.nextLine());
+			int amount = Integer.parseInt(s.nextLine());
 
 			for (int i = 0; i < amount; i++) {
 				String[] line = s.nextLine().split(" ");
 
 				String texture = line[0];
-				int x = Integer.valueOf(line[1]);
-				int y = Integer.valueOf(line[2]);
-				int width = Integer.valueOf(line[3]);
-				int height = Integer.valueOf(line[4]);
+				int x = Integer.parseInt(line[1]);
+				int y = Integer.parseInt(line[2]);
+				int width = Integer.parseInt(line[3]);
+				int height = Integer.parseInt(line[4]);
 
 				textures_sprite_sheet.put(spriteSheetName + "_" + texture, new Rectangle(x, y, width, height));
 				textures_sprite_sheet_texture.put(spriteSheetName + "_" + texture, spriteSheetName);
@@ -70,10 +71,6 @@ public class TextureHandler {
 		}
 	}
 
-	/**
-	 * @param name
-	 * @return
-	 */
 	public static int getBlockCount(String name) {
 		int c = 0;
 		for(String s: textures_png.keySet()) {
@@ -115,10 +112,7 @@ public class TextureHandler {
 	public static boolean existsImagePng(String textureName) {
 		if (textures_png.containsKey(textureName))
 			return true;
-		else if(textures_sprite_sheet.containsKey(textureName)) {
-			return true;
-		}
-		return false;
+		else return textures_sprite_sheet.containsKey(textureName);
 	}
 
 	/** Gets all images in form of ImageIcons, scales all image up to min 32x32

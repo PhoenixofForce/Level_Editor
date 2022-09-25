@@ -16,13 +16,13 @@ import java.util.Map;
  * contains also layerControl
  */
 public class LayerPane extends JPanel {
-	private JList<String> jList;					//List of the layer names
+	private final JList<String> jList;					//List of the layer names
 	private DefaultListModel<String> listModel;		//listModel used for setting/getting selected layers
-	private LayerControl layerControl;				//layer controll
+	private final LayerControl layerControl;				//layer control
 
 	private GameMap map;							//the game map
 	private Map<Layer, Boolean> hidden;				//map stores the data about the hidden state of each layer
-	private Window window;
+	private final Window window;
 
 	public LayerPane(Window window, GameMap newMap) {
 		this.map = newMap;
@@ -37,7 +37,7 @@ public class LayerPane extends JPanel {
 		jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jList.setLayoutOrientation(JList.VERTICAL);
 
-		//change layer names depending on the layer beeing hidden
+		//change layer names depending on the layer being hidden
 		//TODO: Use Spinner?
 		jList.setCellRenderer(new DefaultListCellRenderer() {
 
@@ -81,9 +81,9 @@ public class LayerPane extends JPanel {
 	public void createLayer(String name, int type, float depth) {
 		//renames layer if name already exist
 		int i = 1;
-		while (map.getLayers().keySet().contains(name)) {
+		while (map.getLayers().containsKey(name)) {
 			String newName = String.format("%s(%d)", name, i);
-			if (map.getLayers().keySet().contains(newName)) {
+			if (map.getLayers().containsKey(newName)) {
 				i++;
 			} else {
 				name = newName;
@@ -147,7 +147,7 @@ public class LayerPane extends JPanel {
 		Map<Layer, Boolean> newHidden = new HashMap<>();
 		for(String s: map.getLayers().keySet()) {
 			Layer l = this.map.getLayer(s);
-			newHidden.put(map.getLayer(s), hidden.containsKey(l)? hidden.get(l): false);
+			newHidden.put(map.getLayer(s), hidden.getOrDefault(l, false));
 		}
 
 		this.map = map;

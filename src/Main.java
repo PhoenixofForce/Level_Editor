@@ -13,16 +13,10 @@ public class Main {
 			-presets
 			-change layer settings
 			-open last/ view last edited files
-			-view used ressources (?)
+			-view used resources (?)
 			-settings (?)
 		 */
 
-		/*try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}catch(Exception ex) {
-			ex.printStackTrace();
-		}*/
-		
 		Window window = new Window();
 
 		if (args.length > 0) {

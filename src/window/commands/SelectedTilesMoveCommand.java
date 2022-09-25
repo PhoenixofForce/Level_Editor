@@ -11,12 +11,12 @@ import java.util.List;
 
 public class SelectedTilesMoveCommand implements Command{
 
-	private TileLayer layer;
-	private FreeLayer copyLayer;
-	private List<TagObject> resetTextures;
-	private List<int[]> resetPositions;
+	private final TileLayer layer;
+	private final FreeLayer copyLayer;
+	private final List<TagObject> resetTextures;
+	private final List<int[]> resetPositions;
 
-	private MapViewer mv;
+	private final MapViewer mv;
 
 	public SelectedTilesMoveCommand(MapViewer mv, TileLayer layer, Selection selection, int tileSize) {
 		this.layer = layer;
@@ -52,7 +52,7 @@ public class SelectedTilesMoveCommand implements Command{
 
 	@Override
 	public void undo() {
-		for(int i = 0; i < resetTextures.size(); i++) layer.add(resetTextures.get(i));
+		for (TagObject resetTexture : resetTextures) layer.add(resetTexture);
 		mv.setCopyLayer(null);
 
 	}

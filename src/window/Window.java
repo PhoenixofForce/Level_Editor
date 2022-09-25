@@ -19,12 +19,12 @@ public class Window extends JFrame {
 
 	public static Window INSTANCE;
 
-	private LayerPane layerPane;			//bar on the left side to controll layers
-	private MainToolBar buttons;			//toolbar to save/ open/ export map and import ressources
-	private MapViewer mapViewer;			//displays the current map
-	private ImageList images;				//image selector and filter
+	private final LayerPane layerPane;			//bar on the left side to control layers
+	private final MainToolBar buttons;			//toolbar to save/ open/ export map and import resources
+	private final MapViewer mapViewer;			//displays the current map
+	private final ImageList images;				//image selector and filter
 	private GameMap map;					//the map that is currently edited
-	private MenuBar menu;
+	private final MenuBar menu;
 
 	public Window() {
 		INSTANCE = this;
@@ -72,9 +72,7 @@ public class Window extends JFrame {
 			}
 		}).start();
 
-		this.addWindowStateListener(e -> {
-			layerPane.updateUI();
-		});
+		this.addWindowStateListener(e -> layerPane.updateUI());
 
 		//resizing components on window resize
 		this.addComponentListener(new ComponentAdapter() {
@@ -92,7 +90,7 @@ public class Window extends JFrame {
 		this.setSize(this.getWidth() + 1, this.getHeight());
 	}
 
-	/** Setting new map and resetting controll objects
+	/** Setting new map and resetting control objects
 	 */
 	public void setMap(GameMap map, boolean isNewMap) {
 		this.map = map;

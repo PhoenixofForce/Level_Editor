@@ -6,10 +6,10 @@ import window.elements.layer.LayerPane;
 
 public class LayerAddCommand implements Command {
 
-	private LayerPane layerPane;
-	private GameMap map;
-	private String name;
-	private Layer layer;
+	private final LayerPane layerPane;
+	private final GameMap map;
+	private final String name;
+	private final Layer layer;
 
 	public LayerAddCommand(LayerPane layerPane, GameMap map, Layer layer, String name) {
 		this.layerPane = layerPane;

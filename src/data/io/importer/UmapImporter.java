@@ -24,7 +24,7 @@ public class UmapImporter implements Importer {
 
 	private static final UmapImporter INSTANCE = new UmapImporter();
 	
-	private FileNameExtensionFilter fileFilter;
+	private final FileNameExtensionFilter fileFilter;
 	private UmapImporter() {
 		this.fileFilter = new FileNameExtensionFilter(".umap Files", "umap");
 	}
@@ -42,7 +42,7 @@ public class UmapImporter implements Importer {
 			while(line != null) {
 
 				if(line.startsWith("i: ")) {
-					handleImports(line, new Object[] { w, isNewMap });
+					handleImports(line, w, isNewMap);
 				}
 				else if(line.startsWith("h: ")) {
 					height = Integer.parseInt(line.split(" ")[1]);

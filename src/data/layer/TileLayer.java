@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class TileLayer implements Layer {
 
-	private static final int[] AUTPTILE_ID_TO_INDEX = new int[]{   0,  16,   24,   8,
+	private static final int[] AUTOTILE_ID_TO_INDEX = new int[]{   0,  16,   24,   8,
 													 64, 208,  248, 104,
 													 66, 214,  255, 107,
 													  2,  22,   31,  11,
@@ -32,13 +32,15 @@ public class TileLayer implements Layer {
 													120, 216,  127, 223,
 													 27,  30,  251, 254};
 
-	private float depth;					//the drawing depth
-	private String[][] tileNames;			//the texture grid
+	private final float depth;					//the drawing depth
+	private final String[][] tileNames;			//the texture grid
 
-	private int width, height, tileSize;	//width, height and tilesize of the map
-	private Random r;
+	private final int width;
+	private final int height;
+	private final int tileSize;	//width, height and tilesize of the map
+	private final Random r;
 
-	private Window window;
+	private final Window window;
 	public TileLayer(Window window, float depth, String[][] tiles, int tileSize) {
 		this.depth = depth;
 		this.tileNames = tiles;
@@ -116,7 +118,7 @@ public class TileLayer implements Layer {
 	 * If a tile is present the output gets xored(the corresponding bit gets activated).
 	 * In Autotiling mode 1 just the 4 directly adjacent are considered, in mode 2 also the adjacent corners(if the edges next to the corner are present)
 	 *
-	 * Also because the resulting number is not obvious they get mapped to a different labeling scheme, so the tiles can fit in my preferred layout
+	 * Also, because the resulting number is not obvious they get mapped to a different labeling scheme, so the tiles can fit in my preferred layout
 	 *
 	 */
 	private int calcAutoTileIndex(int x, int y, String name) {
@@ -160,7 +162,7 @@ public class TileLayer implements Layer {
 			if (x!= width-1 && y != height-1 && tileNames[y + 1][x+1] != null && Util.textureEquals(this.window.getAutoTile(), tileNames[y + 1][x + 1], name))
 				out ^= e && s? 128: 0;
 
-			out = Util.arrayIndexOf(AUTPTILE_ID_TO_INDEX, out);
+			out = Util.arrayIndexOf(AUTOTILE_ID_TO_INDEX, out);
 		}
 
 		return out;
@@ -258,9 +260,9 @@ public class TileLayer implements Layer {
 	public float smallestX() {
 		int smallestX = Integer.MAX_VALUE;
 		for (int x = 0; x < tileNames[0].length; x++) {
-			for (int y = 0; y < tileNames.length; y++) {
-				if (tileNames[y][x] == null) continue;
-				if(x < smallestX) smallestX = x;
+			for (String[] tileName : tileNames) {
+				if (tileName[x] == null) continue;
+				if (x < smallestX) smallestX = x;
 			}
 		}
 		return smallestX == Integer.MAX_VALUE? -1: smallestX;
@@ -282,9 +284,9 @@ public class TileLayer implements Layer {
 	public float biggestX() {
 		int smallestX = Integer.MIN_VALUE;
 		for (int x = 0; x < tileNames[0].length; x++) {
-			for (int y = 0; y < tileNames.length; y++) {
-				if (tileNames[y][x] == null) continue;
-				if(x > smallestX) smallestX = x;
+			for (String[] tileName : tileNames) {
+				if (tileName[x] == null) continue;
+				if (x > smallestX) smallestX = x;
 			}
 		}
 		return smallestX == Integer.MIN_VALUE? -1: smallestX;
@@ -306,17 +308,14 @@ public class TileLayer implements Layer {
 	public TileLayer clone() {
 		TileLayer out = new TileLayer(window, depth, width, height, tileSize);
 		for(int y = 0; y < height; y++) {
-			for(int x = 0; x < width; x++) {
-				out.tileNames[y][x] = tileNames[y][x];
-			}
+			if (width >= 0) System.arraycopy(tileNames[y], 0, out.tileNames[y], 0, width);
 		}
 		return out;
 	}
 
 	@Override
 	public void add(TagObject to) {
-		if(to instanceof GameObject) {
-			GameObject gameObject = (GameObject) to;
+		if(to instanceof GameObject gameObject) {
 			this.set(gameObject.name, gameObject.x, gameObject.y, false);
 		}
 	}

@@ -11,7 +11,7 @@ import java.util.List;
 public class Selection {
 
 	private Area currentArea;
-	private List<Pair> rectangles;
+	private final List<Pair> rectangles;
 
 	public Selection() {
 		currentArea = new Area();
@@ -39,8 +39,7 @@ public class Selection {
 	}
 
 	public void translate(int offX, int offY) {
-		for(int i = 0; i < rectangles.size(); i++) {
-			Pair p =  rectangles.get(i);
+		for (Pair p : rectangles) {
 			p.r.x += offX;
 			p.r.y += offY;
 		}
@@ -51,10 +50,10 @@ public class Selection {
 		int smallestX = Integer.MAX_VALUE,
 			smallestY = Integer.MAX_VALUE;
 
-		for(int i = 0; i < rectangles.size(); i++) {
-			Rectangle r = rectangles.get(i).r;
-			if(smallestX > r.x) smallestX = r.x;
-			if(smallestY > r.y) smallestY = r.y;
+		for (Pair rectangle : rectangles) {
+			Rectangle r = rectangle.r;
+			if (smallestX > r.x) smallestX = r.x;
+			if (smallestY > r.y) smallestY = r.y;
 		}
 
 		int dx = smallestX%tileSize,
@@ -74,16 +73,10 @@ public class Selection {
 	private void toArea() {
 		Area a = new Area();
 
-		for(int i = 0; i < rectangles.size(); i++) {
-			Pair p = rectangles.get(i);
-
+		for (Pair p : rectangles) {
 			switch (p.a) {
-				case ADD:
-					a.add(new Area(p.r));
-					break;
-				case SUBTRACT:
-					a.subtract(new Area(p.r));
-					break;
+				case ADD -> a.add(new Area(p.r));
+				case SUBTRACT -> a.subtract(new Area(p.r));
 			}
 		}
 
@@ -129,8 +122,7 @@ public class Selection {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Selection) {
-			Selection s2 = (Selection) obj;
+		if(obj instanceof Selection s2) {
 			if(s2.rectangles.size() == rectangles.size()) {
 				for(int i = 0; i < rectangles.size(); i++) {
 					Pair thisPair = rectangles.get(i);
@@ -160,13 +152,13 @@ public class Selection {
 	}
 
 	public enum Action {
-		ADD, SUBTRACT;
+		ADD, SUBTRACT
 	}
 
-	private class Pair {
+	private static class Pair {
 
-		private Rectangle r;
-		private Action a;
+		private final Rectangle r;
+		private final Action a;
 
 		public Pair(Rectangle r, Action a) {
 			this.r = r;

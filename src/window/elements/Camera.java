@@ -10,9 +10,9 @@ public class Camera {
 
 	public float zoom, x, y, tilt;
 
-	private List<Screenshake> screenshakeList;
+	private final List<Screenshake> screenshakeList;
 
-	private class Screenshake {
+	private static class Screenshake {
 		private Screenshake(long startTime, float decay, float amp_x, float amp_y, float phase_x, float phase_y, float freq_x, float freq_y) {
 			this.startTime = startTime;
 			this.decay = decay;
@@ -111,7 +111,7 @@ public class Camera {
 		float sx = 0, sy = 0;
 		for (int i = 0; i < screenshakeList.size(); i++) {
 			Screenshake s = screenshakeList.get(i);
-			double d = Math.pow(s.decay, (time - s.startTime)/TIME_FRAC);
+			double d = Math.pow(s.decay, (time - (double)s.startTime)/TIME_FRAC);
 			if (d * s.amp_x < MIN_AMP && d * s.amp_y < MIN_AMP) {
 				screenshakeList.remove(s);
 			} else {
@@ -147,7 +147,7 @@ public class Camera {
 	}
 
 	public void addScreenshake(float strength) {
-		screenshakeList.add(new Screenshake(System.currentTimeMillis() % 10000000, (float) DECAY, strength, strength, (float) (Math.random() * 2 * Math.PI), (float) (Math.random() * 2 * Math.PI), 1, 1));
+		screenshakeList.add(new Screenshake(System.currentTimeMillis() % 10000000, DECAY, strength, strength, (float) (Math.random() * 2 * Math.PI), (float) (Math.random() * 2 * Math.PI), 1, 1));
 	}
 
 	public void zoomSmooth(float a2) {
@@ -189,7 +189,6 @@ public class Camera {
 
 	public void setPositionSmooth(float x, float y, long time) {
 		float v2 = 0, v3 = 0;
-		float t2 = x, t3 = y;
 		if (z2) {
 			v2 = calculateDerivative(((System.currentTimeMillis() % 10000000) * 1.0f - beginTime2) / (targetTime2 - beginTime2), a2, b2, c2, d2);
 			v3 = calculateDerivative(((System.currentTimeMillis() % 10000000) * 1.0f - beginTime2) / (targetTime2 - beginTime2), a3, b3, c3, d3);
@@ -198,13 +197,13 @@ public class Camera {
 
 		d2 = currentX;
 		c2 = v2;
-		b2 = 3 * t2 - 2 * v2 - 3 * currentX;
-		a2 = v2 + 2 * currentX - 2 * t2;
+		b2 = 3 * x - 2 * v2 - 3 * currentX;
+		a2 = v2 + 2 * currentX - 2 * x;
 
 		d3 = currentY;
 		c3 = v3;
-		b3 = 3 * t3 - 2 * v3 - 3 * currentY;
-		a3 = v3 + 2 * currentY - 2 * t3;
+		b3 = 3 * y - 2 * v3 - 3 * currentY;
+		a3 = v3 + 2 * currentY - 2 * y;
 
 		beginTime2 = System.currentTimeMillis() % 10000000;
 		targetTime2 = System.currentTimeMillis() % 10000000 + time;

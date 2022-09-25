@@ -19,14 +19,14 @@ public class MapViewer extends JPanel {
 
 	private static final boolean TILE_HIGHLIGHT = true;		//true if tiles should be highlighted
 
-	private Window window;
-	private ImageList imageList;							//the ImageList => get selected Image
-	private LayerPane layerPane;							//the LayerPane => get selected Layer
+	private final Window window;
+	private final ImageList imageList;							//the ImageList => get selected Image
+	private final LayerPane layerPane;							//the LayerPane => get selected Layer
 	private FreeLayer copyLayer;
-	private MenuBar menuBar;
-	private MainToolBar toolBar;
+	private final MenuBar menuBar;
+	private final MainToolBar toolBar;
 
-	private Camera camera;									//Camera to set viewpoint
+	private final Camera camera;									//Camera to set viewpoint
 
 	private Location startClick;
 	private int last_x, last_y, midX, midY;					//x,y coordinates of the last click, ... of the last middle mouse click
@@ -88,8 +88,7 @@ public class MapViewer extends JPanel {
 					if(selection != null) moveSelection(last_x, last_y, e.getX(), e.getY(), false);
 				}
 				else if(SwingUtilities.isRightMouseButton(e)   && tool == Tools.MOVE)   {
-					if(selection != null && layerPane.getSelectedLayer() instanceof TileLayer) {
-						TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
+					if(selection != null && layerPane.getSelectedLayer() instanceof TileLayer selectedLayer) {
 						if(copyLayer == null) {
 
 							copyLayer = new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize());
@@ -141,7 +140,7 @@ public class MapViewer extends JPanel {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				//when the difference on middle mouse click and middle mouse release is smaller than than => swap between erasing and drawgin
+				//when the difference on middle mouse click and middle mouse release is smaller than => swap between erasing and drawgin
 				if (e.getButton() == 2 && Math.abs(midX - e.getX()) <= 10 && Math.abs(midY - e.getY()) <= 10) {
 					if(!e.isShiftDown()) {
 						tool = tool.next();
@@ -248,11 +247,10 @@ public class MapViewer extends JPanel {
 				} else if (e.getKeyCode() == 45 && (e.getKeyChar() != '-' || e.isControlDown())) {    						   // -
 					camera.setZoom(camera.zoom * (float) Math.pow(1.2, -1));
 				} else if (e.getKeyCode() == 67 && ((e.getKeyChar() != 'c' && e.getKeyChar() != 'C') || e.isControlDown())) {    // c
-					if(selection == null || !(layerPane.getSelectedLayer() instanceof TileLayer)) return;
+					if(selection == null || !(layerPane.getSelectedLayer() instanceof TileLayer selectedLayer)) return;
 					if(copyLayer != null) if(layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
 
 					String copiedMap = "";
-					TileLayer selectedLayer = (TileLayer) layerPane.getSelectedLayer();
 					for(int x = 0;  x < map.getWidth(); x++) {
 						boolean hadInSel = false;
 						for(int y = 0;  y < map.getHeight(); y++) {
@@ -315,15 +313,12 @@ public class MapViewer extends JPanel {
 	 * centers the camera position
 	 */
 	private void centerCamera() {
-		camera.setPosition(-map.getWidth() * map.getTileSize() / 2, -map.getHeight() * map.getTileSize() / 2);
+		camera.setPosition(-map.getWidth() * map.getTileSize() / 2.0f, -map.getHeight() * map.getTileSize() / 2.0f);
 		camera.setZoom(0.5f);
 	}
 
 	/**
 	 * calling set() on the selected layer with the selected texture
-	 * @param x
-	 * @param y
-	 * @param drag
 	 */
 	private void set(int x, int y, boolean drag) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
@@ -345,8 +340,6 @@ public class MapViewer extends JPanel {
 
 	/**
 	 * calling remove() on the selected layer
-	 * @param x
-	 * @param y
 	 */
 	private void remove(int x, int y) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
@@ -369,12 +362,11 @@ public class MapViewer extends JPanel {
 	private void fill(int x, int y, boolean rem) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
 		String selectedTexture = imageList.getSelectedImageName();
-		if ( selectedTexture == null || !(selectedLayer instanceof TileLayer) || layerPane.isHidden(selectedLayer)) {
+		if ( selectedTexture == null || !(selectedLayer instanceof TileLayer tl) || layerPane.isHidden(selectedLayer)) {
 			sendErrorMessage();
 			return;
 		}
 
-		TileLayer tl = (TileLayer) selectedLayer;
 		Location pos = getBlockLocation(x, y);
 		if((selection != null && !selection.getArea().contains(pos.x*map.getTileSize(), pos.y*map.getTileSize()))) return;
 		//tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);
@@ -383,8 +375,6 @@ public class MapViewer extends JPanel {
 
 	/**
 	 * calling select() on the selected layer with the selected texture
-	 * @param x
-	 * @param y
 	 */
 	private void select(int x, int y) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
@@ -402,10 +392,6 @@ public class MapViewer extends JPanel {
 
 	/**
 	 * calling drag() on the selected layer with the selected texture
-	 * @param x
-	 * @param y
-	 * @param targetX
-	 * @param targetY
 	 */
 	private void drag(int x, int y, int targetX, int targetY) {
 		Layer selectedLayer = layerPane.getSelectedLayer();
@@ -568,7 +554,7 @@ public class MapViewer extends JPanel {
 	}
 
 	public void updateTitle() {
-		String title = new StringBuilder("LevelEditor - ").append(menuBar.getFileName()).append(commandHistory.isCurrentlySaved()? "": " (*)").toString();
+		String title = "LevelEditor - " + menuBar.getFileName() + (commandHistory.isCurrentlySaved() ? "" : " (*)");
 		window.setTitle(title);
 	}
 

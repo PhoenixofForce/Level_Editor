@@ -6,9 +6,9 @@ import window.elements.Modifier;
 
 public class TagRemoveCommand implements Command {
 
-	private Modifier mod;
-	private TagObject tagObject;
-	private String 	tagName;
+	private final Modifier mod;
+	private final TagObject tagObject;
+	private final String 	tagName;
 	private Tag removedTag;
 
 	public TagRemoveCommand(Modifier mod, TagObject tagObject, String tagName) {

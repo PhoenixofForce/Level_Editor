@@ -19,7 +19,7 @@ public class PngExporter implements Exporter<String> {
 
 	private static final PngExporter INSTANCE = new PngExporter();
 
-	private FileNameExtensionFilter fileFilter;
+	private final FileNameExtensionFilter fileFilter;
 	private BufferedImage out;
 	private PngExporter() {
 		this.fileFilter = new FileNameExtensionFilter(".png", "png");
@@ -33,7 +33,7 @@ public class PngExporter implements Exporter<String> {
 			export(map);
 			
 			ImageIO.write(out.getSubimage(bounds[0]*map.getTileSize(), bounds[1]*map.getTileSize(), (1+bounds[2]-bounds[0])*map.getTileSize(), (1+bounds[3]-bounds[1])*map.getTileSize()), "PNG", file);
-		} catch (IOException e1) {}
+		} catch (IOException ignored) {}
 		
 		return false;
 	}

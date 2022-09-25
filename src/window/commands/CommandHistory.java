@@ -6,11 +6,11 @@ import java.util.Stack;
 
 public class CommandHistory {
 
-	private MapViewer mapViewer;
+	private final MapViewer mapViewer;
 
 	private int historySaveIndex = 0;
-	private Stack<Command> commandHistory;
-	private Stack<Command> commandFuture;
+	private final Stack<Command> commandHistory;
+	private final Stack<Command> commandFuture;
 
 	public CommandHistory(MapViewer mapViewer) {
 		this.mapViewer = mapViewer;

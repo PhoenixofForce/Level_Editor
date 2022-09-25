@@ -230,9 +230,7 @@ public class UserInputs {
 		frame.getContentPane().add(confirm);
 		confirm.setBounds(105, 60, 85, 20);
 
-		cancel.addActionListener(e -> {
-			frame.dispose();
-		});
+		cancel.addActionListener(e -> frame.dispose());
 
 		confirm.addActionListener(e -> {
 			frame.dispose();

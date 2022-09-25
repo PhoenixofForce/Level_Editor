@@ -6,9 +6,9 @@ import window.elements.layer.LayerPane;
 
 public class LayerRemoveCommand implements Command {
 
-	private LayerPane layerPane;
-	private GameMap map;
-	private String name;
+	private final LayerPane layerPane;
+	private final GameMap map;
+	private final String name;
 	private Layer layer;
 
 	public LayerRemoveCommand(LayerPane layerPane, GameMap map, String name) {

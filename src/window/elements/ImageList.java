@@ -14,19 +14,19 @@ import java.util.*;
  */
 public class ImageList extends JPanel{
 
-	private Modifier mod;							//Modifier to add tags
+	private final Modifier mod;							//Modifier to add tags
 
-	private JPanel helpPanel;						//helping panel to put the textField in the correct position
-	private JTextField textField;					//textField that allows the user to search for textures
-	private JScrollPane imagePane;					//scrollPane to make the place for the textures bigger
-	private JList<ImageIcon> images;				//JList of all imported images
-	private DefaultListModel<ImageIcon> listModel;	//the listModel of the List
+	private final JTextField textField;					//textField that allows the user to search for textures
+	private final JScrollPane imagePane;					//scrollPane to make the place for the textures bigger
+	private final JList<ImageIcon> images;				//JList of all imported images
+	private final DefaultListModel<ImageIcon> listModel;	//the listModel of the List
 
-	private Map<String, ImageIcon> icons;			//map of texturenames and corresponding imageIcons
+	private Map<String, ImageIcon> icons;			//map of texture names and corresponding imageIcons
 
 	public ImageList(Window w) {
 		this.setLayout(new BorderLayout());
-		helpPanel = new JPanel();
+		//helping panel to put the textField in the correct position
+		JPanel helpPanel = new JPanel();
 		helpPanel.setLayout(new BorderLayout());
 
 		textField = new JTextField("");
@@ -78,10 +78,10 @@ public class ImageList extends JPanel{
 
 		Map<String, ImageIcon> all = TextureHandler.getAllImages();
 		for(String s: all.keySet()) {
-			if(!icons.keySet().contains(s)) {
+			if(!icons.containsKey(s)) {
 				icons.put(s, all.get(s));
 			}
-			if(icons.keySet().contains(s) && !all.get(s).equals(icons.get(s))) {
+			if(icons.containsKey(s) && !all.get(s).equals(icons.get(s))) {
 				listModel.removeElement(icons.get(s));
 				icons.put(s, all.get(s));
 				listModel.addElement(icons.get(s));
@@ -104,7 +104,7 @@ public class ImageList extends JPanel{
 					listModel.removeElement(icons.get(s));
 				}
 			}
-			//Adds image if name contains the filter and the image is not in the list
+			//Adds image if name contains the filter and the image are not in the list
 			else {
 				if (!listModel.contains(icons.get(s))) {
 					listModel.addElement(icons.get(s));

@@ -10,7 +10,10 @@ import javax.swing.*;
  */
 public class LayerControl extends JToolBar {
 
-	private JButton add, remove, toggleHidden, options;
+	private final JButton add;
+	private final JButton remove;
+	private final JButton toggleHidden;
+	private JButton options;
 
 	public LayerControl(Window window, LayerPane layerPane) {
 		add = new JButton("+");
@@ -25,12 +28,8 @@ public class LayerControl extends JToolBar {
 		this.setFloatable(false);
 		this.setRollover(true);
 
-		this.add.addActionListener(e-> {
-			UserInputs.createLayer(window, layerPane);
-		});
-		this.remove.addActionListener(e -> {
-			UserInputs.confirm(window, "Do you really want to delete this layer?", e2 -> layerPane.removeLayer());
-		});
+		this.add.addActionListener(e-> UserInputs.createLayer(window, layerPane));
+		this.remove.addActionListener(e -> UserInputs.confirm(window, "Do you really want to delete this layer?", e2 -> layerPane.removeLayer()));
 
 		this.toggleHidden.addActionListener(e -> layerPane.toggleHidden());
 	}

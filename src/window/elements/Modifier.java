@@ -16,22 +16,22 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 
 /**
- * used to add tags to objects and change them
+ * used to add tags to an object and change them
  */
 public class Modifier extends JPanel{
 
-	private Window window;
-	private Modifier instance;
+	private final Window window;
+	private final Modifier instance;
 
 	private TagObject object;			//Object which tags are being edited
-	private JLabel goStats;				//Label which shows texture name and coordinate of object
-	private JButton add, remove;			//Buttons to add and remove tags
+	private final JLabel goStats;				//Label which shows texture name and coordinate of object
+	private final JButton add;
+	private final JButton remove;			//Buttons to add and remove tags
 
-	private JTextArea input;			//TextArea to input tag values
-	private JScrollPane scrollPane;			//ScrollPane to optimize textArea
-	private JComboBox<String> attChooser;		//ComboBox to select from existing Tags
+	private final JTextArea input;			//TextArea to input tag values
+	private final JComboBox<String> attChooser;		//ComboBox to select from existing Tags
 
-	private DocumentListener dc;			//Listener that saves all changes
+	private final DocumentListener dc;			//Listener that saves all changes
 
 	public Modifier(Window window) {
 		instance = this;
@@ -55,9 +55,7 @@ public class Modifier extends JPanel{
 					String newTagContent = input.getText();
 					String oldTagContent = object.getTag(tagName).getAction();
 
-					Debouncer.debounce("modifier_input_input", () -> {
-						new TagChangeCommand(instance, tagObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory());
-					}, 250);
+					Debouncer.debounce("modifier_input_input", () -> new TagChangeCommand(instance, tagObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory()), 250);
 				}
 			}
 
@@ -68,11 +66,9 @@ public class Modifier extends JPanel{
 					int chooserIndex = attChooser.getSelectedIndex();
 					String tagName = attChooser.getItemAt(chooserIndex);
 					String newTagContent = input.getText();
-					String oldTagConent = object.getTag(tagName).getAction();
+					String oldTagContent = object.getTag(tagName).getAction();
 
-					Debouncer.debounce("modifier_input_input", () -> {
-						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(window.getMapViewer().getCommandHistory());
-					}, 250);
+					Debouncer.debounce("modifier_input_input", () -> new TagChangeCommand(instance, tagObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory()), 250);
 				}
 			}
 
@@ -83,16 +79,15 @@ public class Modifier extends JPanel{
 					int chooserIndex = attChooser.getSelectedIndex();
 					String tagName = attChooser.getItemAt(chooserIndex);
 					String newTagContent = input.getText();
-					String oldTagConent = object.getTag(tagName).getAction();
+					String oldTagContent = object.getTag(tagName).getAction();
 
-					Debouncer.debounce("modifier_input_input", () -> {
-						new TagChangeCommand(instance, tagObject, tagName, oldTagConent, newTagContent).execute(window.getMapViewer().getCommandHistory());
-					}, 250);
+					Debouncer.debounce("modifier_input_input", () -> new TagChangeCommand(instance, tagObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory()), 250);
 				}
 			}
 		};
 
-		scrollPane = new JScrollPane(input);
+		//ScrollPane to optimize textArea
+		JScrollPane scrollPane = new JScrollPane(input);
 		scrollPane.setPreferredSize(new Dimension(0, 200));
 		this.add(scrollPane, BorderLayout.PAGE_END);
 
@@ -107,9 +102,7 @@ public class Modifier extends JPanel{
 
 		add = new JButton("+");
 		this.add(add, BorderLayout.LINE_START);
-		add.addActionListener(e -> {
-			UserInputs.tagName(window, this);
-		});
+		add.addActionListener(e -> UserInputs.tagName(window, this));
 
 		remove = new JButton("-");
 		this.add(remove, BorderLayout.LINE_END);

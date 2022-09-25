@@ -10,12 +10,12 @@ import java.awt.*;
 
 public class PasteCommand implements Command {
 
-	private MapViewer mv;
-	private FreeLayer copyLayer;
-	private Location l;
+	private final MapViewer mv;
+	private final FreeLayer copyLayer;
+	private final Location l;
 	private SelectionChangeCommand smc;
-	private Selection selection;
-	private int tileSize;
+	private final Selection selection;
+	private final int tileSize;
 
 	public PasteCommand(MapViewer mv, FreeLayer copyLayer, Location screenMiddle, Selection selection, int tileSize) {
 		this.mv = mv;

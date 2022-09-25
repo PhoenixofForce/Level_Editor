@@ -14,10 +14,12 @@ import java.util.Map;
  * the map contains all layers
  */
 public class GameMap extends TagObject {
-	private Window window;
+	private final Window window;
 
-	private int width, height, tileSize;		//width, height and tileSize of the map
-	private Map<String, Layer> layers;			//Layers saved to their name
+	private final int width;
+	private final int height;
+	private final int tileSize;		//width, height and tileSize of the map
+	private final Map<String, Layer> layers;			//Layers saved to their name
 
 	public GameMap(Window window, int width, int height, int tileSize) {
 		this(window, width, height, tileSize, true);
@@ -114,20 +116,16 @@ public class GameMap extends TagObject {
 
 		for(Map.Entry<String, Layer> e: listOfEntry) {
 			Layer l = e.getValue();
-			if(l instanceof TileLayer) {
-				TileLayer tl = (TileLayer) l;
+			if(l instanceof TileLayer tl) {
 				out.addLayer(e.getKey(), tl.clone());
 				continue;
 			}
-			if(l instanceof FreeLayer) {
-				FreeLayer tl = (FreeLayer) l;
+			if(l instanceof FreeLayer tl) {
 				out.addLayer(e.getKey(), tl.clone());
 				continue;
 			}
-			if(l instanceof AreaLayer) {
-				AreaLayer tl = (AreaLayer) l;
+			if(l instanceof AreaLayer tl) {
 				out.addLayer(e.getKey(), tl.clone());
-				continue;
 			}
 		}
 		return out;

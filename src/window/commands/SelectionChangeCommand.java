@@ -5,8 +5,9 @@ import window.elements.Selection;
 
 public class SelectionChangeCommand implements Command {
 
-	private MapViewer mv;
-	private Selection oldSelection, newSelection;
+	private final MapViewer mv;
+	private final Selection oldSelection;
+    private final Selection newSelection;
 	public SelectionChangeCommand(MapViewer mv, Selection oldSelection, Selection newSelection) {
 		this.mv = mv;
 		this.oldSelection = oldSelection;

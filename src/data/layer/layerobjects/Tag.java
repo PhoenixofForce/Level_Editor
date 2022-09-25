@@ -7,7 +7,8 @@ import data.io.exporter.Exporter;
  */
 public class Tag implements Exporter.Exportable {
 
-	private String name, action;		//name and content of the tag
+	private final String name;
+	private String action;		//name and content of the tag
 
 	public Tag(String n) {
 		this.name = n;
@@ -42,8 +43,7 @@ public class Tag implements Exporter.Exportable {
 
 	@Override
 	public boolean equals(Object b) {
-		if(b instanceof Tag) {
-			Tag t = (Tag) b;
+		if(b instanceof Tag t) {
 			return t.action.equals(action) && t.name.equals(name);
 		}
 

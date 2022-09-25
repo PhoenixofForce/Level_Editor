@@ -8,8 +8,9 @@ import data.layer.Layer;
 
 public class DragCommand implements Command {
 
-	private Layer layer;
-	private List<Location> from, to;
+	private final Layer layer;
+	private final List<Location> from;
+    private final List<Location> to;
 
 	public DragCommand( Layer layer, Location from, Location to) {
 		this.layer = layer;

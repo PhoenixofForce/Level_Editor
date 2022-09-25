@@ -11,12 +11,12 @@ import java.io.File;
 public class ExportWindow extends JDialog {
 
     private File file = null;
-    private window.Window window;
+    private final window.Window window;
 
-    private ExportWindow dialogueInstance;
+    private final ExportWindow dialogueInstance;
 
-    private JButton selectedFile, export;
-    private JLabel errorMessages;
+    private final JButton selectedFile;
+    private final JLabel errorMessages;
 
     private JCheckBox exportTileNames, exportFreeNames, exportAreaNames;
 
@@ -68,7 +68,7 @@ public class ExportWindow extends JDialog {
         selectedFile.addActionListener(e -> {
            if(file != null) chooser.setSelectedFile(file);
 
-            chooser.setOpaque(true);
+           chooser.setOpaque(true);
 
             chooser.setAcceptAllFileFilterUsed(false);
             for(Exporter exp: MenuBar.exporter) chooser.addChoosableFileFilter(exp.getFileFilter());
@@ -89,7 +89,7 @@ public class ExportWindow extends JDialog {
         this.getContentPane().add(errorMessages);
         errorMessages.setBounds(10, 165,85,25);
 
-        export = new JButton("Export");
+        JButton export = new JButton("Export");
         this.getContentPane().add(export);
         export.setBounds(105, 165,85,25);
 

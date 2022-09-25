@@ -28,7 +28,7 @@ public interface Layer extends Exporter.Exportable {
 	/**
 	 * @param x x coordinate of the point clicked
 	 * @param y y coordinate of the point clicked
-	 * @return a tagobject that is at the position where the user clicked
+	 * @return a tag object that is at the position where the user clicked
 	 */
 	TagObject select(float x, float y);
 
@@ -44,7 +44,7 @@ public interface Layer extends Exporter.Exportable {
 	void add(TagObject to);
 	
 	/**
-	 * removes a gameobject at a given
+	 * removes a game object at a given
 	 * @param x x coordinate of the point clicked
 	 * @param y y coordinate of the point clicked
 	 * @return the deleted object
