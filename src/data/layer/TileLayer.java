@@ -11,10 +11,7 @@ import window.Window;
 import java.awt.Graphics;
 
 import java.awt.geom.Area;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * a layer where the user can place textures on a grid
@@ -64,7 +61,6 @@ public class TileLayer implements Layer {
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			tileNames[y][x] = name;
 			update(x, y, true);
-
 		}
 	}
 
@@ -81,7 +77,7 @@ public class TileLayer implements Layer {
 				int out = calcAutoTileIndex(x, y, name);
 				name = tileNameStart + "_" + out;
 
-				int count = TextureHandler.getBlockCount(name);
+				int count = TextureHandler.getBlockCount(name + "_");
 				if(count > 0) {
 					int random = r.nextInt(count);
 					name += "_" + random;
@@ -194,16 +190,22 @@ public class TileLayer implements Layer {
 		int y = (int) y2;
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String oldName = tileNames[y][x];
+			System.out.println(Util.textureEquals(window.getAutoTile(), oldName, name));
 			if(Util.textureEquals(window.getAutoTile(), oldName, name)) return null;
 
 			List<Location> out = new ArrayList<>();
+			Set<Location> alreadyFilled = new HashSet<>();
+
 			Stack<Location> stack = new Stack<>();
 			stack.push(new Location(x, y));
 
 			while (!stack.isEmpty()) {
 				Location i = stack.pop();
 
-				if (Util.textureEquals(window.getAutoTile(), oldName, tileNames[(int) i.x][(int) i.y]) && (sel == null || sel.contains(i.x * window.getMap().getTileSize(), i.y * window.getMap().getTileSize()))) {
+				if(alreadyFilled.contains(i)) continue;
+				alreadyFilled.add(i);
+
+				if (Util.textureEquals(window.getAutoTile(), oldName, tileNames[(int) i.y][(int) i.x]) && (sel == null || sel.contains(i.x * window.getMap().getTileSize(), i.y * window.getMap().getTileSize()))) {
 					set(name, i.x, i.y, false);
 					out.add(i);
 
@@ -218,29 +220,6 @@ public class TileLayer implements Layer {
 		}
 
 		return null;
-	}
-
-	public void fill(Area sel, String name) {
-		int x = sel.getBounds().x+1;
-		int y = sel.getBounds().y+1;
-		if (x >= 0 && y >= 0 && x < width && y < height) {
-
-			Stack<Location> stack = new Stack<>();
-			stack.push(new Location(x, y));
-
-			while (!stack.isEmpty()) {
-				Location i = stack.pop();
-
-				if (sel.contains(i.x * window.getMap().getTileSize(), i.y * window.getMap().getTileSize())) {
-					set(name, i.x, i.y, false);
-
-					if (i.x > 0) stack.push(new Location(i.x - 1, i.y));
-					if (i.y > 0) stack.push(new Location(i.x, i.y - 1));
-					if (i.x < width - 1) stack.push(new Location(i.x + 1, i.y));
-					if (i.y < height - 1) stack.push(new Location(i.x, i.y + 1));
-				}
-			}
-		}
 	}
 
 	@Override

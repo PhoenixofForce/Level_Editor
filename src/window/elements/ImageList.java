@@ -54,7 +54,8 @@ public class ImageList extends JPanel{
 		images = new JList<>(listModel);
 
 		images.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		images.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+		images.setLayoutOrientation(JList.HORIZONTAL_WRAP);		//this as next line ensure, that the pane scrolls up and down and not (left and right or both)
+		images.setVisibleRowCount(-1);
 
 		this.update();
 		images.setSelectedIndex(0);
