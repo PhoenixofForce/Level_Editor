@@ -95,8 +95,12 @@ Here is a full example map from one of [my projects](https://github.com/Phoenixo
 [area; 6.9375; 7.9375; 12.0; 12.0625]
 ```
 
-
-
+### Keyboard Shortcuts
+- `ctrl & +/-` for zooming in and out 
+- `ctrl & c/v` for copy and paste
+- `ctrl & z/y` for undo and redo
+- `ctrl & a` to select everything or select nothing
+- `ctrl & s` to save the current map
 
 
 
