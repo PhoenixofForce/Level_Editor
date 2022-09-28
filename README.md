@@ -58,7 +58,7 @@ Maps are saved as `umap`-Files(unsaved Map files), on which i won't go into deta
 When exporting a map it automatically gets trimmed to fit the scene. 
 
 Because of this and other changes we use `map`-files instead of the  just mentioned `umap`-files.
-Here the first line represent the tile size. For each used texture follows a line `#i - texture_name` which is used to replace an texture with an index `i`(starting with 1 since 0 means no texture).
+Here the first line `Number;(tags)` represent the tile size followed by a number of tags. For each used texture follows a line `#i - texture_name` which is used to replace an texture with an index `i`(starting with 1 since 0 means no texture).
 After that the layers get exported, first the TileLayer, after that FreeLayer and then AreaLayers. 
 TileLayers use 
 
@@ -66,7 +66,7 @@ TileLayers use
 where the z-Coordinate represents the distance from the camera. And `t(m, n)` stands for the corresponding texture index.
 FreeLayer use `[put; (name); z-Coord; texture index; x; y]`.
 These layers can also use tags(description pending) which look like `[put; (name); z; texture index; x; y; [tag; tag name; tag value]]`.
-Lastly the AreaLayer are saved as `[area; (name); x1, y1; x2; y2]`, they can also use tags.
+Lastly the AreaLayer are saved as `[area; (name); x1, y1; x2; y2; (tags)]`, they can also use tags.
 With the latest version, you can also export the layer names as this is optional they area represented in parentheses.
 
 Here is a full example map from one of [my projects](https://github.com/PhoenixofForce/Ludum_Dare_48/blob/master/maps/tut/map2.map):
