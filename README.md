@@ -39,6 +39,8 @@ It works the same way as the brush tool. But instead of placing objects, they ge
 #### The Bucket/ Fill Tool
 This tool only works on tile layers. When you click the whole area gets filled until it reaches other tiles or a selection.
 
+![Example of the fill tool](readmeRes/fill_example1.png)
+
 #### The Selection Tool
 This tool only works on tile layers. With the selection tool you can create selection which can be used with the bucket tool or allow you to copy and paste the selected tiles. With left click dragging you can span a selection as large as you want. With `Shift` + left click dragging you can expand your selection with other boxes. With `Control` left click dragging boxes can be cut out. With right click the selection is deleted. Alternatively you can use `Control + A`
 
@@ -50,6 +52,8 @@ You can add Tags to your map, areas and GameObject. For example you can give an 
 
 ### Autotiling
 There are 2 autotiling modes: 4 and 8 bit. 4Bit used the green tiles from the image, and 8Bit uses the additional cyan tiles. Those tiles trigger autotile mode when they are named `block_name_also_name_ID` (NOTE: currently the spritesheet name cannot have underscores for autotiling to work). The IDs start at 0 with the top left tile, and advance to the right. The first row has the ids `(0, 1, 2)` the second row `(3, 4, 5)` and so on. When an id has no texture the programm defaults to id 0. Also you can multiple blocks called `block_name_also_name_ID_0`, `block_name_also_name_1` and so on. In this case the editor randomly selects one of the block tiles.
+
+<img src="https://raw.githubusercontent.com/PhoenixofForce/Level_Editor/master/readmeRes/autotile_visual.png" width="100">
 
 ### Saving Maps
 Maps are saved as `umap`-Files(unsaved Map files), on which i won't go into detail here.  But when opening an old file, make sure that all the used `png` and `text` files are still in the same position, otherwise the map wont load.
@@ -91,8 +95,12 @@ Here is a full example map from one of [my projects](https://github.com/Phoenixo
 [area; 6.9375; 7.9375; 12.0; 12.0625]
 ```
 
-
-
+### Keyboard Shortcuts
+- `ctrl & +/-` for zooming in and out 
+- `ctrl & c/v` for copy and paste
+- `ctrl & z/y` for undo and redo
+- `ctrl & a` to select everything or select nothing
+- `ctrl & s` to save the current map
 
 
 
