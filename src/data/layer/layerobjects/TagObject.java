@@ -5,9 +5,6 @@ import data.io.exporter.Exporter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * an object which has tags
- */
 public abstract class TagObject implements Exporter.Exportable {
 
 	private final List<Tag> tags;			//list of applied tags

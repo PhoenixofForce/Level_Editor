@@ -1,7 +1,7 @@
 package window.commands;
 
 import window.elements.MapViewer;
-import window.elements.Selection;
+import window.Selection;
 
 public class SelectionChangeCommand implements Command {
 

@@ -2,13 +2,16 @@ package window.elements;
 
 import data.*;
 import data.layer.*;
-import data.layer.layerobjects.TagObject;
+import window.EditorError;
+import window.Selection;
 import window.keyCombinations.*;
 import window.Tools;
 import window.Window;
 import window.commands.*;
-import window.elements.layer.LayerPane;
+import window.tools.DragTool;
 import window.tools.SelectTool;
+import window.tools.TagSelectTool;
+import window.tools.ToolImplementation;
 
 import java.util.List;
 
@@ -17,58 +20,51 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 public class MapViewer extends JPanel {
 
 	private static final boolean TILE_HIGHLIGHT = true;		//true if tiles should be highlighted
 
 	private final Window window;
-	private final ImageList imageList;							//the ImageList => get selected Image
-	private final LayerPane layerPane;							//the LayerPane => get selected Layer
-	private FreeLayer copyLayer;
-	private final MenuBar menuBar;
-	private final MainToolBar toolBar;
 
 	private final Camera camera;									//Camera to set viewpoint
 
 	private int lastMousePosX, lastMousePosY, lastMiddleClickX, lastMiddleClickY;
 
 	private Selection selection;
+	private FreeLayer copyLayer;
 
 	private boolean mouseEntered;							//booleans if the mouse is in the window and the user has drawing mode (true) or erase mode (false)
-	private Tools tool;
+	private Tools selectedTool;
 
 	private GameMap map;									//the game map
 
 	private Command bulkCommand;
 	private CommandHistory commandHistory;
+	private final ToolImplementation tagSelectTool, dragTool;
 
-	private List<KeyCombination> keyCombinations;
+	private final List<KeyCombination> keyCombinations;
+	private BufferedImage staticTileGrid;
 
-	public MapViewer(Window window, MenuBar menuBar, MainToolBar toolBar, ImageList imageList, LayerPane layerPane, GameMap map2) {
+	public MapViewer(Window window, GameMap inputMap) {
 		requestFocus();
 		grabFocus();
 
 		this.window = window;
-		this.layerPane = layerPane;
-		this.imageList = imageList;
-		this.menuBar = menuBar;
-		this.toolBar = toolBar;
-		this.map = map2;
-
-		commandHistory = new CommandHistory(this);
-
-		tool = Tools.BRUSH;
-		toolBar.update(tool);
-		mouseEntered = false;
-
 		camera = new Camera();
-		centerCamera();
+		setGameMap(inputMap, true);
+
+		tagSelectTool = new TagSelectTool();
+		dragTool = new DragTool();
+
+		setSelectedTool(Tools.BRUSH);
+		mouseEntered = false;
 
 		this.keyCombinations = List.of(
 				new ZoomCombination(camera),
 				new UndoRedoCombination(commandHistory),
-				new LambdaCommand('s', menuBar::save),
+				new LambdaCombination('s', window::save),
 				new CopyPasteCombination(commandHistory),
 				new SelectAllCombination(commandHistory)
 		);
@@ -108,7 +104,7 @@ public class MapViewer extends JPanel {
 					if (button == 1) {
 						camera.move((e.getX() - lastMousePosX) / camera.zoom,(e.getY() - lastMousePosY) / camera.zoom);
 					} else if (button == 2) {
-						drag(lastMousePosX, lastMousePosY, e.getX(), e.getY());
+						executeToolAction(dragTool, button, e.getX(), e.getY(), true, false, false);
 					}
 				}
 
@@ -122,16 +118,16 @@ public class MapViewer extends JPanel {
 				grabFocus();
 
 				boolean executedToolAction =  false;
-				if(tool != Tools.MOVE) executedToolAction = executeToolAction(e.getButton() - 1, e.getX(), e.getY(), false, e.isShiftDown(), e.isControlDown());
+				if(selectedTool != Tools.MOVE) executedToolAction = executeToolAction(e.getButton() - 1, e.getX(), e.getY(), false, e.isShiftDown(), e.isControlDown());
 				if(executedToolAction) return;
 
-				if (e.getButton() == 3) select(e.getX(), e.getY());
+				if (e.getButton() == 3) executeToolAction(tagSelectTool, 2, e.getX(), e.getY(), false, false, false);
 				else if (e.getButton() == 2) {
 					//Save clicked position
 					lastMiddleClickX = e.getX();
 					lastMiddleClickY = e.getY();
 				} else if (e.getButton() == 4) {
-					imageList.getModifier().setTagObject(map);
+					window.getModifier().setTagObject(map);
 				}
 			}
 
@@ -140,17 +136,17 @@ public class MapViewer extends JPanel {
 				//when the difference on middle mouse click and middle mouse release is smaller than => swap between tools
 				if (e.getButton() == 2 && Math.abs(lastMiddleClickX - e.getX()) <= 10 && Math.abs(lastMiddleClickY - e.getY()) <= 10) {
 					if(!e.isShiftDown()) {
-						tool = tool.next();
-						if(tool == Tools.MOVE && selection == null) tool = tool.next();
+						setSelectedTool(selectedTool.next());
+						if(selectedTool == Tools.MOVE && selection == null) setSelectedTool(selectedTool.next());
 					}
 					else {
-						tool = tool.pre();
-						if(tool == Tools.MOVE && selection == null) tool = tool.pre();
+						setSelectedTool(selectedTool.pre());
+						if(selectedTool == Tools.MOVE && selection == null) setSelectedTool(selectedTool.pre());
 					}
-					toolBar.update(tool);
+					window.getToolbar().update(selectedTool);
 
 					((SelectTool) Tools.SELECT.getImplementation()).eraseStartClick();
-					if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
+					if(copyLayer != null && window.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) window.getSelectedLayer(), copyLayer).execute(commandHistory);
 				}
 
 				executeToolAction(e.getButton() - 1, e.getX(), e.getY(), false, e.isShiftDown(), e.isControlDown());
@@ -163,7 +159,6 @@ public class MapViewer extends JPanel {
 		};
 
 		this.addMouseMotionListener(mouseMotionAdapter);
-
 		this.addMouseListener(mouseMotionAdapter);
 
 		this.addKeyListener(new KeyAdapter() {
@@ -175,8 +170,7 @@ public class MapViewer extends JPanel {
 
 				if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
 					int toolIndex = e.getKeyCode() - 48;
-					tool = Tools.get(toolIndex - 1);
-					toolBar.update(tool);
+					setSelectedTool(Tools.get(toolIndex - 1));
 				}
 			}
 		});
@@ -184,6 +178,7 @@ public class MapViewer extends JPanel {
 
 	public void setGameMap(GameMap map, boolean isNewMap) {
 		this.map = map;
+		this.staticTileGrid = generateStaticTileGrid();
 		if(isNewMap) {
 			centerCamera();
 			commandHistory = new CommandHistory(this);
@@ -196,60 +191,28 @@ public class MapViewer extends JPanel {
 	}
 
 	private boolean executeToolAction(int button, int x, int y, boolean isDragged, boolean shiftDown, boolean controlDown) {
-		Layer selectedLayer = layerPane.getSelectedLayer();
-		String selectedTexture = imageList.getSelectedImageName();
+		return executeToolAction(selectedTool.getImplementation(), button, x, y, isDragged, shiftDown, controlDown);
+	}
 
-		if (layerPane.isHidden(selectedLayer)) {
-			sendErrorMessage();
+	private boolean executeToolAction(ToolImplementation implementation, int button, int x, int y, boolean isDragged, boolean shiftDown, boolean controlDown) {
+		Layer selectedLayer = window.getSelectedLayer();
+		String selectedTexture = window.getSelectedTexture();
+
+		if (window.isLayerHidden(selectedLayer)) {
+			sendErrorMessage(new EditorError("You cannot modify a hidden layer!", true, true));
 			return false;
 		}
 
 		Location pos = windowToMapPosition(x, y);
 
-		boolean actionWorked;
-		if(isDragged) actionWorked = tool.getImplementation().onMouseDrag(commandHistory, button, selectedLayer, selectedTexture, pos, selection, shiftDown, controlDown);
-		else actionWorked = tool.getImplementation().onMouseClick(commandHistory, button, selectedLayer, selectedTexture, pos, selection, shiftDown, controlDown);
+		Optional<EditorError> actionThrewError;
+		if(isDragged) actionThrewError = implementation.onMouseDrag(commandHistory, button, selectedLayer, selectedTexture, pos, selection, shiftDown, controlDown);
+		else actionThrewError = implementation.onMouseClick(commandHistory, button, selectedLayer, selectedTexture, pos, selection, shiftDown, controlDown);
 
-		if (!actionWorked && !(button == 1 && isDragged))	//error shake causes areas to be useless => TODO: fine tune shake requirements
-			;//sendErrorMessage();
+		if (actionThrewError.isPresent())
+			sendErrorMessage(actionThrewError.get());
 
-		return actionWorked;
-	}
-
-	private void select(int x, int y) {
-		Layer selectedLayer = layerPane.getSelectedLayer();
-		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
-			sendErrorMessage();
-			return;
-		}
-
-		Location pos = windowToMapPosition(x, y);
-		TagObject obj = selectedLayer.select(pos.x, pos.y);
-
-		imageList.getModifier().setTagObject(obj);
-	}
-
-	private void drag(int fromX, int fromY, int toX, int toY) {
-		Layer selectedLayer = layerPane.getSelectedLayer();
-		String selectedTexture = imageList.getSelectedImageName();
-		if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) || layerPane.isHidden(selectedLayer)) {
-			sendErrorMessage();
-			return;
-		}
-
-		Location from = windowToMapPosition(fromX, fromY);
-		Location to = windowToMapPosition(toX, toY);
-		boolean success = selectedLayer.drag(from.x, from.y, to.x, to.y);
-		
-		if(success) {
-			if(bulkCommand == null) {
-				bulkCommand = new DragCommand(selectedLayer, from, to);
-			} else {
-				DragCommand dc = (DragCommand) bulkCommand;
-				dc.setTo(from, to);
-			}
-		}
+		return !actionThrewError.isPresent();
 	}
 
 	/**
@@ -292,35 +255,27 @@ public class MapViewer extends JPanel {
 		g2.translate(camera.x, camera.y);
 
 		//draws map canvas
-		g2.setColor(Color.LIGHT_GRAY);
-		g2.fillRect(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
-
-		//prepares graphics object to draw tile separators
-		g2.setColor(Color.LIGHT_GRAY.darker());
-		g2.setStroke(new BasicStroke(1 / camera.zoom));
-
-		//draw tile separators
-		for (int x = 0; x < map.getWidth(); x++) {
-			for (int y = 0; y < map.getHeight(); y++) {
-				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), map.getWidth() * map.getTileSize(), y * map.getTileSize());
-				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), x * map.getTileSize(), map.getHeight() * map.getTileSize());
-			}
-		}
+		g2.drawImage(staticTileGrid, 0, 0, null);
+		g2.setStroke(new BasicStroke(2 / camera.zoom));
 
 		//draws layer by their drawing depth
 		map.getLayers().values().stream()
-				.filter(l -> !layerPane.isHidden(l))
+				.filter(l -> !window.isLayerHidden(l))
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
 				.forEach(l -> l.draw(g2, windowToMapPosition(0, 0), windowToMapPosition(this.getWidth(), this.getHeight())));
 
 		//Draws a highlighter (in size of tile => tilelayer, of selected texture => freelayer, of area corner => arealayer) in green(drawing) or red(erasing)
 		if (mouseEntered && TILE_HIGHLIGHT) {
 			Location l = windowToMapPosition(lastMousePosX, lastMousePosY);
-			g2.setColor(tool.getColor());
-			boolean isAreaLayer = layerPane.getSelectedLayer() instanceof AreaLayer;
-			if (imageList.getSelectedImageName() != null || isAreaLayer) {
-				BufferedImage tex = imageList.getSelectedImageName() == null? null: TextureHandler.getImagePng(imageList.getSelectedImageName());
-				if (!(layerPane.getSelectedLayer() instanceof TileLayer))
+			g2.setColor(selectedTool.getColor());
+
+			String selectedTexture = window.getSelectedTexture();
+			Layer selectedLayer = window.getSelectedLayer();
+
+			boolean isAreaLayer = selectedLayer instanceof AreaLayer;
+			if (selectedTexture != null || isAreaLayer) {
+				BufferedImage tex = selectedTexture == null? null: TextureHandler.getImagePng(selectedTexture);
+				if (!(selectedLayer instanceof TileLayer))
 					g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), isAreaLayer? 1: tex.getWidth(), isAreaLayer? 1: tex.getHeight());
 				else
 					g2.drawRect((int) (l.x) * map.getTileSize(), (int) (l.y) * map.getTileSize(), tex.getWidth(), tex.getHeight());
@@ -356,15 +311,41 @@ public class MapViewer extends JPanel {
 		g.drawImage(img, 0, 0, null);
 	}
 
-	public void setTool(Tools t) {
-		if(copyLayer != null && layerPane.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(this, (TileLayer) layerPane.getSelectedLayer(), copyLayer).execute(commandHistory);
+	private BufferedImage generateStaticTileGrid() {
+		/*
+			Since the tile grid does not change, its better to draw this once, when the map changes
+		 */
 
-		this.tool = t;
-		toolBar.update(tool);
+		BufferedImage out = new BufferedImage( map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize(), BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2 = (Graphics2D) out.getGraphics();
+
+		g2.setColor(Color.LIGHT_GRAY);
+		g2.fillRect(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
+
+		//prepares graphics object to draw tile separators
+		g2.setColor(Color.LIGHT_GRAY.darker());
+		g2.setStroke(new BasicStroke(1));
+
+		//draw tile separators
+		for (int x = 0; x < map.getWidth(); x++) {
+			for (int y = 0; y < map.getHeight(); y++) {
+				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), map.getWidth() * map.getTileSize(), y * map.getTileSize());
+				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), x * map.getTileSize(), map.getHeight() * map.getTileSize());
+			}
+		}
+
+		return out;
+	}
+
+	public void setSelectedTool(Tools t) {
+		if(copyLayer != null && window.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(this, (TileLayer) window.getSelectedLayer(), copyLayer).execute(commandHistory);
+
+		this.selectedTool = t;
+		window.getToolbar().update(selectedTool);
 	}
 
 	public void updateTitle() {
-		String title = "LevelEditor - " + menuBar.getFileName() + (commandHistory.isCurrentlySaved() ? "" : " (*)");
+		String title = "LevelEditor - " + window.getMyMenuBar().getFileName() + (commandHistory.isCurrentlySaved() ? "" : " (*)");
 		window.setTitle(title);
 	}
 
@@ -373,8 +354,9 @@ public class MapViewer extends JPanel {
 		updateTitle();
 	}
 
-	public void sendErrorMessage() {
-		camera.addScreenshake(10f);
+	public void sendErrorMessage(EditorError error) {
+		if(error.throwScreenShake()) camera.addScreenshake(10f);
+		window.setError(error.errorMessage(), 2000);
 	}
 
 	public CommandHistory getCommandHistory() {
@@ -387,10 +369,6 @@ public class MapViewer extends JPanel {
 
 	public void setBulkCommand(Command command) {
 		this.bulkCommand = command;
-	}
-
-	public Modifier getModifier() {
-		return imageList.getModifier();
 	}
 
 	public Location getLastMousePos() {
@@ -407,10 +385,6 @@ public class MapViewer extends JPanel {
 
 	public void setCopyLayer(FreeLayer fl) {
 		this.copyLayer = fl;
-	}
-
-	public Layer getSelectedLayer() {
-		return layerPane.getSelectedLayer();
 	}
 
 	public void setSelection(Selection toSet) {

@@ -5,9 +5,6 @@ import window.Window;
 
 import javax.swing.*;
 
-/**
- * jcomponent to add and remove layers
- */
 public class LayerControl extends JToolBar {
 
 	private final JButton add;
@@ -47,6 +44,4 @@ public class LayerControl extends JToolBar {
 		remove.setEnabled(false);
 		toggleHidden.setEnabled(false);
 	}
-
-
 }

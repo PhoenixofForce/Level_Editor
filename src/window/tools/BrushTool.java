@@ -4,42 +4,47 @@ import data.Location;
 import data.layer.AreaLayer;
 import data.layer.Layer;
 import data.layer.TileLayer;
+import window.EditorError;
 import window.Window;
 import window.commands.CommandHistory;
 import window.commands.SetCommand;
-import window.elements.Selection;
+import window.Selection;
+import window.elements.MapViewer;
 
-public class BrushTool implements Tool {
+import java.util.Optional;
+
+public class BrushTool implements ToolImplementation {
 
     @Override
-    public boolean onMouseClick(CommandHistory history, int button, Layer selectedLayer, String selectedTexture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
+    public Optional<EditorError> onMouseClick(CommandHistory history, int button, Layer selectedLayer, String selectedTexture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
         return set(history, button, selectedLayer, selectedTexture, mapPosition, selection, false);
     }
 
     @Override
-    public boolean onMouseDrag(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
+    public Optional<EditorError> onMouseDrag(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
         return set(history, button, layer, texture, mapPosition, selection, true);
     }
 
-    private boolean set(CommandHistory history, int button, Layer selectedLayer, String selectedTexture, Location pos, Selection selection, boolean isDragging) {
-        if(button != 0) return false;
+    private Optional<EditorError> set(CommandHistory history, int button, Layer selectedLayer, String selectedTexture, Location pos, Selection selection, boolean isDragging) {
+        if(button != 0) return Optional.of(new EditorError("", false, false));
 
         Window window = Window.INSTANCE;
+        MapViewer mv = window.getMapViewer();
         if (selectedLayer == null || (selectedTexture == null && !(selectedLayer instanceof AreaLayer)) /*|| layerPane.isHidden(selectedLayer)*/) {
-            return false;
+            return Optional.of(new EditorError("You need to select a layer and texture first", false, true));
         }
 
-        boolean positionOutsideOfSelection = selection != null && !selection.getArea().contains(pos.x * window.getMap().getTileSize(), pos.y * window.getMap().getTileSize());
+        boolean positionOutsideOfSelection = selection != null && !selection.getArea().contains(pos.x * window.getTileSize(), pos.y * window.getTileSize());
         if(selectedLayer instanceof TileLayer && positionOutsideOfSelection)
-            return false;
+            return Optional.of(new EditorError("You can only draw inside of the selection", false, true));
 
-        if(window.getMapViewer().getBulkCommand() == null) {
-            window.getMapViewer().setBulkCommand(new SetCommand(window.getMapViewer().getModifier(), selectedLayer, selectedTexture, pos, isDragging, window.getAutoTile()));
+        if(mv.getBulkCommand() == null) {
+            mv.setBulkCommand(new SetCommand(window.getModifier(), selectedLayer, selectedTexture, pos, isDragging, window.getAutoTile()));
         } else {
-            SetCommand sc = (SetCommand) window.getMapViewer().getBulkCommand();
+            SetCommand sc = (SetCommand) mv.getBulkCommand();
             sc.add(pos, selectedTexture);
         }
 
-        return true;
+        return Optional.empty();
     }
 }

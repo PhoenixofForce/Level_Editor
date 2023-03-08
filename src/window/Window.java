@@ -1,9 +1,8 @@
 package window;
 
 import data.GameMap;
-import window.elements.ImageList;
-import window.elements.MainToolBar;
-import window.elements.MapViewer;
+import data.layer.Layer;
+import window.elements.*;
 import window.elements.MenuBar;
 import window.elements.layer.LayerPane;
 
@@ -12,19 +11,23 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
-/**
- * combining all elements and displaying them in a window
- */
 public class Window extends JFrame {
 
 	public static Window INSTANCE;
 
-	private final LayerPane layerPane;			//bar on the left side to control layers
-	private final MainToolBar buttons;			//toolbar to save/ open/ export map and import resources
-	private final MapViewer mapViewer;			//displays the current map
-	private final ImageList images;				//image selector and filter
-	private GameMap map;					//the map that is currently edited
+	/*
+		Every component that needs to be exposed to multiple other components should be declared here in the window class.
+		LayerControl as an example only interacts with LayerPane, so LayerPane has the control over LayerControl
+	 */
+	private final ErrorPanel errorPanel;
+	private final LayerPane layerPane;
+	private final MainToolBar toolbar;
+	private final MapViewer mapViewer;
+	private final ImageList imageDisplay;
+	private final Modifier tagModifier;
 	private final MenuBar menu;
+
+	private GameMap map;
 
 	public Window() {
 		INSTANCE = this;
@@ -35,35 +38,45 @@ public class Window extends JFrame {
 		this.setMinimumSize(new Dimension(800, 600));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-		//creating new default map
 		setMap(new GameMap(this, 100,100,16), true);
 
-		//creating objects and adding them to the window
-		images = new ImageList(this);
-		this.add(images, BorderLayout.LINE_END);
-		images.reSize(getContentPane().getWidth(), getContentPane().getHeight());
-		images.setFocusable(false);
+		tagModifier = new Modifier(this);
 
-		buttons = new MainToolBar(this, images);
-		this.add(buttons, BorderLayout.PAGE_START);
+		imageDisplay = new ImageList(tagModifier);
+		this.add(imageDisplay, BorderLayout.LINE_END);
+		imageDisplay.reSize(getContentPane().getWidth(), getContentPane().getHeight());
+		imageDisplay.setFocusable(false);
 
-		this.menu = new MenuBar(this, images);
+		toolbar = new MainToolBar(this);
+		this.add(toolbar, BorderLayout.PAGE_START);
+
+		this.menu = new MenuBar(this, imageDisplay);
 		this.setJMenuBar(menu);
 
 		layerPane = new LayerPane(this, map);
 		this.add(layerPane, BorderLayout.LINE_START);
 		layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
-		mapViewer = new MapViewer(this, menu, buttons, images, layerPane, map);
-		this.add(mapViewer, BorderLayout.CENTER);
+		JPanel centerPane = new JPanel();
+		centerPane.setLayout(new BorderLayout());
+
+		mapViewer = new MapViewer(this, map);
+		centerPane.add(mapViewer, BorderLayout.CENTER);
 		mapViewer.setFocusable(true);
+
+		errorPanel = new ErrorPanel();
+		centerPane.add(errorPanel, BorderLayout.NORTH);
+
+		this.add(centerPane, BorderLayout.CENTER);
 
 		//starting repaint thread
 		new Thread(() -> {
-			long lastTime;
+			long lastTime = 0;
 			while (true) {
+				errorPanel.update(System.currentTimeMillis() - lastTime);
+				mapViewer.repaint();
 				lastTime = System.currentTimeMillis();
-				if (mapViewer != null) mapViewer.repaint();
+
 				try {
 					Thread.sleep(Math.max(0, 1000 / 60 - (System.currentTimeMillis() - lastTime)));
 				} catch (InterruptedException e) {
@@ -78,10 +91,8 @@ public class Window extends JFrame {
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				if (images != null)
-					images.reSize(getContentPane().getWidth(), getContentPane().getHeight() - buttons.getHeight());
-				if (images != null && buttons != null)
-					layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight() - buttons.getHeight());
+				imageDisplay.reSize(getContentPane().getWidth(), getContentPane().getHeight() - toolbar.getHeight());
+				layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight() - toolbar.getHeight());
 			}
 		});
 
@@ -90,14 +101,12 @@ public class Window extends JFrame {
 		this.setSize(this.getWidth() + 1, this.getHeight());
 	}
 
-	/** Setting new map and resetting control objects
-	 */
 	public void setMap(GameMap map, boolean isNewMap) {
 		this.map = map;
-		if(buttons != null) buttons.mapUpdate(this, isNewMap);
+		if(toolbar != null) toolbar.mapUpdate(this, isNewMap);
 		if(menu != null && isNewMap) menu.reset();
 		if (mapViewer != null) mapViewer.setGameMap(map, isNewMap);
-		if (images != null && isNewMap) images.getModifier().setTagObject(null);
+		if (imageDisplay != null && isNewMap) tagModifier.setTagObject(null);
 		if (layerPane != null) layerPane.updateGameMap(map, isNewMap);
 	}
 
@@ -105,16 +114,44 @@ public class Window extends JFrame {
 		return map;
 	}
 
+	// Forwarding methods
+
 	public void open(File f) {
 		menu.open(f, true);
 	}
 
-	public MapViewer getMapViewer() {
-		return mapViewer;
+	public void save() {
+		menu.save();
 	}
 
 	public int getAutoTile() {
-		return buttons.getAutoTile();
+		return toolbar.getAutoTile();
+	}
+
+	public int getTileSize() {
+		return map.getTileSize();
+	}
+
+	public boolean isLayerHidden(Layer layer) {
+		return layerPane.isHidden(layer);
+	}
+
+	public Layer getSelectedLayer() {
+		return layerPane.getSelectedLayer();
+	}
+
+	public String getSelectedTexture() {
+		return imageDisplay.getSelectedImageName();
+	}
+
+	public void setError(String error, long displayTime) {
+		errorPanel.setError(error, displayTime);
+	}
+
+	// Get UI Elements
+
+	public MapViewer getMapViewer() {
+		return mapViewer;
 	}
 
 	public MenuBar getMyMenuBar() {
@@ -122,7 +159,19 @@ public class Window extends JFrame {
 	}
 
 	public ImageList getImageList() {
-		return images;
+		return imageDisplay;
+	}
+
+	public Modifier getModifier() {
+		return tagModifier;
+	}
+
+	public LayerPane getLayerPane() {
+		return layerPane;
+	}
+
+	public MainToolBar getToolbar() {
+		return toolbar;
 	}
 
 }

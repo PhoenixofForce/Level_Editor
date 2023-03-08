@@ -6,8 +6,9 @@ import java.awt.event.KeyEvent;
 
 public class UndoRedoCombination implements KeyCombination {
 
-    private KeyCombinationTrigger undoTrigger, redoTrigger;
-    private CommandHistory history;
+    private final KeyCombinationTrigger undoTrigger;
+    private final KeyCombinationTrigger redoTrigger;
+    private final CommandHistory history;
 
     public UndoRedoCombination(CommandHistory history) {
         this.undoTrigger = KeyCombinationTrigger.withControl('z');

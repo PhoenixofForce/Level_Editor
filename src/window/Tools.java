@@ -13,9 +13,9 @@ public enum Tools {
 
 	private final int pos;
 	private final Color c;
-	private final Tool implementation;
+	private final ToolImplementation implementation;
 
-	Tools(int a, Color c, Tool implementation) {
+	Tools(int a, Color c, ToolImplementation implementation) {
 		this.pos = a;
 		this.c = c;
 		this.implementation = implementation;
@@ -38,7 +38,7 @@ public enum Tools {
 		return pos;
 	}
 
-	public Tool getImplementation() {
+	public ToolImplementation getImplementation() {
 		return implementation;
 	}
 

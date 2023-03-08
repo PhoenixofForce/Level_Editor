@@ -4,7 +4,7 @@ import data.layer.FreeLayer;
 import data.layer.TileLayer;
 import data.layer.layerobjects.TagObject;
 import window.elements.MapViewer;
-import window.elements.Selection;
+import window.Selection;
 
 import java.util.ArrayList;
 import java.util.List;

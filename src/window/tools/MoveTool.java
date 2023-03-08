@@ -5,20 +5,22 @@ import data.Location;
 import data.layer.FreeLayer;
 import data.layer.Layer;
 import data.layer.TileLayer;
-import window.Tools;
+import window.EditorError;
 import window.Window;
 import window.commands.CommandHistory;
 import window.commands.MergeCopyLayerCommand;
 import window.commands.SelectedTilesMoveCommand;
 import window.commands.SelectionMoveCommand;
 import window.elements.MapViewer;
-import window.elements.Selection;
+import window.Selection;
 
-public class MoveTool implements Tool {
+import java.util.Optional;
+
+public class MoveTool implements ToolImplementation {
 
     @Override
-    public boolean onMouseClick(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
-        if(selection == null) return false;
+    public Optional<EditorError> onMouseClick(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
+        if(selection == null) return Optional.of(new EditorError("You can only move with a selection", false, true));
 
         if(button == 2 || button == 0) {
             Window window = Window.INSTANCE;
@@ -33,15 +35,15 @@ public class MoveTool implements Tool {
             smc.round();
 
             if(button == 2  && copyLayer != null) copyLayer.roundAll(map.getTileSize());
-            return true;
+            return Optional.empty();
         }
 
-        return false;
+        return Optional.of(new EditorError("", false, false));
     }
 
     @Override
-    public boolean onMouseDrag(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
-        if(selection == null) return false;
+    public Optional<EditorError> onMouseDrag(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
+        if(selection == null) return Optional.of(new EditorError("You can only move with a selection", false, true));
 
         if(button == 0 || button == 2) {
             if(button == 2) {
@@ -50,7 +52,7 @@ public class MoveTool implements Tool {
                 MapViewer mv = window.getMapViewer();
                 FreeLayer copyLayer = mv.getCopyLayer();
 
-                if(!(layer instanceof TileLayer selectedLayer)) return false;
+                if(!(layer instanceof TileLayer selectedLayer)) return Optional.of(new EditorError("You can only move on a tile layer", false, true));
                 if(copyLayer == null) {
                     //mv.setCopyLayer(new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize()));
                     history.addCommand(new SelectedTilesMoveCommand(window.getMapViewer(), selectedLayer, selection, map.getTileSize()));
@@ -58,10 +60,10 @@ public class MoveTool implements Tool {
             }
 
             moveSelection(history, layer, selection, mapPosition, button == 2);
-            return true;
+            return Optional.empty();
         }
 
-        return false;
+        return Optional.of(new EditorError("", false, false));
     }
 
     private void moveSelection(CommandHistory history, Layer selectedLayer, Selection selection, Location to, boolean isRightClick) {

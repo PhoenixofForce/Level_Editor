@@ -1,4 +1,4 @@
-package window.elements;
+package window;
 
 import data.Location;
 
@@ -155,14 +155,7 @@ public class Selection {
 		ADD, SUBTRACT
 	}
 
-	private static class Pair {
+	private record Pair(Rectangle r, Action a) {
 
-		private final Rectangle r;
-		private final Action a;
-
-		public Pair(Rectangle r, Action a) {
-			this.r = r;
-			this.a = a;
-		}
 	}
 }

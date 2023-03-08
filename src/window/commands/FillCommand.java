@@ -63,7 +63,7 @@ public class FillCommand implements Command {
 			return  fc.layer.equals(layer) &&
 					((fc.prevTexture == null && prevTexture == null) ||
 							(fc.prevTexture != null && prevTexture != null && fc.prevTexture.equals(prevTexture))) &&
-					(fc.nextTexture == null && nextTexture == null || fc.nextTexture.equalsIgnoreCase(nextTexture)) &&
+					((fc.nextTexture == null && nextTexture == null) || nextTexture.equalsIgnoreCase(fc.nextTexture)) &&
 					fc.area == area &&
 					Math.floor(fc.pos.x) == Math.floor(pos.x)&& Math.floor(fc.pos.y) == Math.floor(pos.y);
 		}

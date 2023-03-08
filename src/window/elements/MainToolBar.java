@@ -13,12 +13,12 @@ public class MainToolBar extends JToolBar {
 	private final JComboBox<String> toggleAutoTile;
 	private final List<JButton> chooser;
 
-	public MainToolBar(Window w, ImageList imageList) {
+	public MainToolBar(Window w) {
 		this.setFloatable(false);
 		this.setRollover(true);
 
 		JButton editMapTags = new JButton("Edit Map Tags");
-		editMapTags.addActionListener(e -> imageList.getModifier().setTagObject(w.getMap()));
+		editMapTags.addActionListener(e -> w.getModifier().setTagObject(w.getMap()));
 		this.add(editMapTags);
 
 		toggleAutoTile = new JComboBox<>();
@@ -37,7 +37,7 @@ public class MainToolBar extends JToolBar {
 		chooser = new ArrayList<>();
 		for(Tools t: Tools.values()) {
 			JButton button = new JButton(t.toString().charAt(0) + t.toString().substring(1).toLowerCase());
-			button.addActionListener(e -> w.getMapViewer().setTool(t));
+			button.addActionListener(e -> w.getMapViewer().setSelectedTool(t));
 			this.add(button);
 			chooser.add(button);
 		}

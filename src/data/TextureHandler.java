@@ -14,9 +14,9 @@ import java.util.Scanner;
 public class TextureHandler {
 	private TextureHandler() {}
 
-	public static Map<String, BufferedImage> textures_png;
-	public static Map<String, Rectangle> textures_sprite_sheet;
-	public static Map<String, String> textures_sprite_sheet_texture;
+	public static final Map<String, BufferedImage> textures_png;
+	public static final Map<String, Rectangle> textures_sprite_sheet;
+	public static final Map<String, String> textures_sprite_sheet_texture;
 
 	static {
 		textures_png = new HashMap<>();
@@ -122,7 +122,10 @@ public class TextureHandler {
 		Map<String, ImageIcon> out = new HashMap<>();
 		for(String s: textures_sprite_sheet.keySet()) {
 			BufferedImage img = getImagePng(s);
-			while(img.getWidth() < 32 && img.getHeight() < 32) img = scale(img);
+
+			while(img.getWidth() < 32 && img.getHeight() < 32) img = scale(img, 2);
+			while(img.getHeight() > 128 || img.getHeight() > 128) img = scale(img, 0.5);
+
 			out.put(s, new ImageIcon(img));
 		}
 		return out;
@@ -132,8 +135,8 @@ public class TextureHandler {
 	*   @param in the image that gets scaled
 	*   @return the scaled image
 	**/
-	private static BufferedImage scale(BufferedImage in) {
-		BufferedImage out = new BufferedImage(in.getWidth() * 2, in.getHeight() * 2, BufferedImage.TYPE_INT_ARGB);
+	private static BufferedImage scale(BufferedImage in, double scale) {
+		BufferedImage out = new BufferedImage((int) (in.getWidth() * scale), (int)(in.getHeight() * scale), BufferedImage.TYPE_INT_ARGB);
 		out.getGraphics().drawImage(in, 0, 0, out.getWidth(), out.getHeight(), null);
 		return out;
 	}

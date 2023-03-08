@@ -42,7 +42,7 @@ public interface Layer extends Exporter.Exportable {
 	boolean drag(float x, float y, float targetX, float targetY);
 
 	void add(TagObject to);
-	
+
 	/**
 	 * removes a game object at a given
 	 * @param x x coordinate of the point clicked

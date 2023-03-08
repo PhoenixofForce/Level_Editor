@@ -262,7 +262,10 @@ public class TileLayer implements Layer {
 		for (int x = 0; x < tileNames[0].length; x++) {
 			for (String[] tileName : tileNames) {
 				if (tileName[x] == null) continue;
-				if (x < smallestX) smallestX = x;
+				if (x < smallestX) {
+					smallestX = x;
+					break;
+				}
 			}
 		}
 		return smallestX == Integer.MAX_VALUE? -1: smallestX;
@@ -286,7 +289,10 @@ public class TileLayer implements Layer {
 		for (int x = 0; x < tileNames[0].length; x++) {
 			for (String[] tileName : tileNames) {
 				if (tileName[x] == null) continue;
-				if (x > smallestX) smallestX = x;
+				if (x > smallestX) {
+					smallestX = x;
+					break;
+				}
 			}
 		}
 		return smallestX == Integer.MIN_VALUE? -1: smallestX;

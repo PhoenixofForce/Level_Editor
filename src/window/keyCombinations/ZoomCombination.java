@@ -6,8 +6,9 @@ import java.awt.event.KeyEvent;
 
 public class ZoomCombination implements KeyCombination {
 
-    private KeyCombinationTrigger zoomInTrigger, zoomOutTrigger;
-    private Camera camera;
+    private final KeyCombinationTrigger zoomInTrigger;
+    private final KeyCombinationTrigger zoomOutTrigger;
+    private final Camera camera;
 
     public ZoomCombination(Camera camera) {
         this.zoomInTrigger = KeyCombinationTrigger.withControl('+');

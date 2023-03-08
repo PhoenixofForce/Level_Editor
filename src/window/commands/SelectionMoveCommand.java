@@ -2,7 +2,7 @@ package window.commands;
 
 import data.Location;
 import data.layer.FreeLayer;
-import window.elements.Selection;
+import window.Selection;
 
 import java.util.ArrayList;
 import java.util.List;

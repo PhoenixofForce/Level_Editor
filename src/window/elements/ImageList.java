@@ -1,7 +1,6 @@
 package window.elements;
 
 import data.TextureHandler;
-import window.Window;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -9,31 +8,26 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.*;
 
-/**
- * used to show the user all imported textures
- */
 public class ImageList extends JPanel{
 
-	private final Modifier mod;							//Modifier to add tags
+	private final JTextField filterInput;
+	private final JScrollPane imagePane;
+	private final JList<ImageIcon> imageDisplay;
+	private final DefaultListModel<ImageIcon> imageDisplayData;
 
-	private final JTextField textField;					//textField that allows the user to search for textures
-	private final JScrollPane imagePane;					//scrollPane to make the place for the textures bigger
-	private final JList<ImageIcon> images;				//JList of all imported images
-	private final DefaultListModel<ImageIcon> listModel;	//the listModel of the List
+	private Map<String, ImageIcon> icons;
 
-	private Map<String, ImageIcon> icons;			//map of texture names and corresponding imageIcons
-
-	public ImageList(Window w) {
+	public ImageList(Modifier m) {
 		this.setLayout(new BorderLayout());
-		//helping panel to put the textField in the correct position
+
 		JPanel helpPanel = new JPanel();
 		helpPanel.setLayout(new BorderLayout());
 
-		textField = new JTextField("");
-		helpPanel.add(textField, BorderLayout.PAGE_START);
+		filterInput = new JTextField("");
+		helpPanel.add(filterInput, BorderLayout.PAGE_START);
 
 		//when typing into the textField the filter is to the imageList
-		textField.getDocument().addDocumentListener(new DocumentListener() {
+		filterInput.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				filter();
@@ -50,25 +44,24 @@ public class ImageList extends JPanel{
 			}
 		});
 
-		listModel = new DefaultListModel<>();
-		images = new JList<>(listModel);
+		imageDisplayData = new DefaultListModel<>();
+		imageDisplay = new JList<>(imageDisplayData);
 
-		images.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		images.setLayoutOrientation(JList.HORIZONTAL_WRAP);		//this as next line ensure, that the pane scrolls up and down and not (left and right or both)
-		images.setVisibleRowCount(-1);
+		imageDisplay.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		imageDisplay.setLayoutOrientation(JList.HORIZONTAL_WRAP);		//this as next line ensure, that the pane scrolls up and down and not (left and right or both)
+		imageDisplay.setVisibleRowCount(-1);
 
 		this.update();
-		images.setSelectedIndex(0);
+		imageDisplay.setSelectedIndex(0);
 
-		imagePane = new JScrollPane(images);
+		imagePane = new JScrollPane(imageDisplay);
 		helpPanel.add(imagePane, BorderLayout.PAGE_END);
 
 		this.add(helpPanel, BorderLayout.PAGE_END);
 
 		//images.addListSelectionListener(e -> System.out.println(getSelectedImageName()));	//For Debugging
 
-		mod = new Modifier(w);
-		this.add(mod, BorderLayout.PAGE_START);
+		this.add(m, BorderLayout.PAGE_START);
 	}
 
 	public void update() {
@@ -81,53 +74,52 @@ public class ImageList extends JPanel{
 			if(!icons.containsKey(s)) {
 				icons.put(s, all.get(s));
 			}
+
 			if(icons.containsKey(s) && !all.get(s).equals(icons.get(s))) {
-				listModel.removeElement(icons.get(s));
+				imageDisplayData.removeElement(icons.get(s));
 				icons.put(s, all.get(s));
-				listModel.addElement(icons.get(s));
+				imageDisplayData.addElement(icons.get(s));
 			}
 		}
 		filter();
 	}
 
 	private void filter() {
-		if(textField == null) return;
-		filter(textField.getText());
+		if(filterInput == null) return;
+		filter(filterInput.getText());
 	}
 
 	private void filter(String filter) {
-		if(listModel == null) return;
+		if(imageDisplayData == null) return;
 		for (String s : icons.keySet()) {
+
 			//Remove image if name does not contain the filter and if the image still is in the list
 			if (!s.toLowerCase().contains(filter.toLowerCase())) {
-				if (listModel.contains(icons.get(s))) {
-					listModel.removeElement(icons.get(s));
+				if (imageDisplayData.contains(icons.get(s))) {
+					imageDisplayData.removeElement(icons.get(s));
 				}
 			}
+
 			//Adds image if name contains the filter and the image are not in the list
 			else {
-				if (!listModel.contains(icons.get(s))) {
-					listModel.addElement(icons.get(s));
+				if (!imageDisplayData.contains(icons.get(s))) {
+					imageDisplayData.addElement(icons.get(s));
 				}
 			}
 		}
 	}
 
 	public ImageIcon getSelectedIcon() {
-		return listModel.get(images.getSelectedIndex());
+		return imageDisplayData.get(imageDisplay.getSelectedIndex());
 	}
 
 	public String getSelectedImageName() {
-		if(images.getSelectedIndex() < 0) return null;
+		if(imageDisplay.getSelectedIndex() < 0) return null;
 		for(String s: icons.keySet()) {
 			if(icons.get(s).equals(getSelectedIcon())) return s;
 		}
 
 		return null;
-	}
-
-	public Modifier getModifier() {
-		return mod;
 	}
 
 	public void reSize(int width, int height) {
@@ -139,7 +131,7 @@ public class ImageList extends JPanel{
 		imagePane.setPreferredSize(d);
 		imagePane.setSize(d);
 
-		textField.setPreferredSize(new Dimension(d.width, 25));
-		textField.setSize(new Dimension(d.width, 25));
+		filterInput.setPreferredSize(new Dimension(d.width, 25));
+		filterInput.setSize(new Dimension(d.width, 25));
 	}
 }

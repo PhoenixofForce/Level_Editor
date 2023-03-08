@@ -3,45 +3,45 @@ package window.tools;
 import data.GameMap;
 import data.Location;
 import data.layer.Layer;
-import window.Tools;
+import window.EditorError;
 import window.Window;
 import window.commands.CommandHistory;
 import window.commands.SelectionChangeCommand;
 import window.elements.MapViewer;
-import window.elements.Selection;
+import window.Selection;
 
 import java.awt.*;
+import java.util.Optional;
 
-public class SelectTool implements Tool {
+public class SelectTool implements ToolImplementation {
 
     private Location startClick;
 
     @Override
-    public boolean onMouseClick(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
+    public Optional<EditorError> onMouseClick(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
         Window window = Window.INSTANCE;
         GameMap map =  window.getMap();
         MapViewer mv = window.getMapViewer();
 
         if(button == 0 && startClick == null) {
             startClick = mapPosition;
-            return true;
+            return Optional.empty();
         }
 
         else if(button == 0 && startClick != null) {
-            Location last = mapPosition;
-            int x = (int)(Math.min(last.x, startClick.x));
-            int y = (int)(Math.min(last.y, startClick.y));
+            int x = (int)(Math.min(mapPosition.x, startClick.x));
+            int y = (int)(Math.min(mapPosition.y, startClick.y));
 
             if(x < 0) x = 0;
             if(y < 0) y = 0;
 
-            int w = (int)(Math.max(last.x, startClick.x)) - x + 1;
-            int h = (int)(Math.max(last.y, startClick.y)) - y + 1;
+            int w = (int)(Math.max(mapPosition.x, startClick.x)) - x + 1;
+            int h = (int)(Math.max(mapPosition.y, startClick.y)) - y + 1;
 
             if(w < 0 || h < 0 || x > map.getWidth() || y > map.getWidth()) {
                 startClick = null;
                 new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(history);
-                return false;
+                return Optional.of(new EditorError("", false, false));
             }
 
             if(x + w > map.getWidth()) w = map.getWidth() - x;
@@ -66,21 +66,21 @@ public class SelectTool implements Tool {
                 new SelectionChangeCommand(window.getMapViewer(), selection, newSelection).execute(history);
             }
             startClick = null;
-            return true;
+            return Optional.empty();
         }
 
         else if(button == 2) {
             new SelectionChangeCommand(window.getMapViewer(), selection, null).execute(history);
             startClick = null;
-            return true;
+            return Optional.empty();
         }
 
-        return false;
+        return Optional.of(new EditorError("", false, false));
     }
 
     @Override
-    public boolean onMouseDrag(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
-        return button == 0;
+    public Optional<EditorError> onMouseDrag(CommandHistory history, int button, Layer layer, String texture, Location mapPosition, Selection selection, boolean shiftPressed, boolean controlPressed) {
+        return Optional.of(new EditorError("", false, false));
     }
 
     public Location getStartClick() {

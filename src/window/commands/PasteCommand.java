@@ -4,7 +4,7 @@ import data.Location;
 import data.layer.FreeLayer;
 import util.ClipBoardUtil;
 import window.elements.MapViewer;
-import window.elements.Selection;
+import window.Selection;
 
 import java.awt.*;
 

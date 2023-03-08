@@ -2,12 +2,12 @@ package window.keyCombinations;
 
 import java.awt.event.KeyEvent;
 
-public class LambdaCommand implements KeyCombination {
+public class LambdaCombination implements KeyCombination {
 
-    private KeyCombinationTrigger trigger;
-    private Runnable onTrigger;
+    private final KeyCombinationTrigger trigger;
+    private final Runnable onTrigger;
 
-    public LambdaCommand(char keyChar, Runnable onTrigger) {
+    public LambdaCombination(char keyChar, Runnable onTrigger) {
         this.trigger = KeyCombinationTrigger.withControl(keyChar);
         this.onTrigger = onTrigger;
     }

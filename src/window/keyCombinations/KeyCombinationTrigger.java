@@ -12,8 +12,6 @@ public record KeyCombinationTrigger(char keyChar, boolean needsControl, boolean 
         boolean altDown = !needsAlt || e.isAltDown();
         boolean controlDown = !needsControl || e.isControlDown();
 
-        System.out.println(keyChar + " " + charDown + " " + controlDown );
-
         return charDown && shiftDown && altDown && controlDown;
     }
 

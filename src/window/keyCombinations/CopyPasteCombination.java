@@ -15,9 +15,9 @@ import java.awt.event.KeyEvent;
 
 public class CopyPasteCombination implements KeyCombination {
 
-    private KeyCombinationTrigger copyTrigger;
-    private KeyCombinationTrigger pasteTrigger;
-    private CommandHistory history;
+    private final KeyCombinationTrigger copyTrigger;
+    private final KeyCombinationTrigger pasteTrigger;
+    private final CommandHistory history;
 
     public CopyPasteCombination(CommandHistory history) {
         this.copyTrigger = KeyCombinationTrigger.withControl('c');
@@ -33,8 +33,8 @@ public class CopyPasteCombination implements KeyCombination {
         FreeLayer copyLayer = mv.getCopyLayer();
 
         if (copyTrigger.isFulfilled(e)) {
-            if(mv.getSelectedLayer() == null || !(mv.getSelectedLayer() instanceof TileLayer selectedLayer)) return;
-            if(copyLayer != null && mv.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) mv.getSelectedLayer(), copyLayer).execute(history);
+            if(window.getSelectedLayer() == null || !(window.getSelectedLayer() instanceof TileLayer selectedLayer)) return;
+            if(copyLayer != null && window.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) window.getSelectedLayer(), copyLayer).execute(history);
 
             String copiedMap = "";
             for(int x = 0;  x < map.getWidth(); x++) {
@@ -51,8 +51,8 @@ public class CopyPasteCombination implements KeyCombination {
         }
 
         if(pasteTrigger.isFulfilled(e)) {
-            if(copyLayer != null && mv.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) mv.getSelectedLayer(), copyLayer).execute(history);
-            mv.setTool(Tools.MOVE);
+            if(copyLayer != null && window.getSelectedLayer() instanceof TileLayer) new MergeCopyLayerCommand(window.getMapViewer(), (TileLayer) window.getSelectedLayer(), copyLayer).execute(history);
+            mv.setSelectedTool(Tools.MOVE);
 
             mv.setCopyLayer(new FreeLayer(0.5f, map.getWidth(), map.getHeight(), map.getTileSize()));
 

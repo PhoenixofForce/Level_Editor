@@ -6,7 +6,7 @@ import window.Window;
 import window.commands.CommandHistory;
 import window.commands.SelectionChangeCommand;
 import window.elements.MapViewer;
-import window.elements.Selection;
+import window.Selection;
 import window.tools.SelectTool;
 
 import java.awt.*;
@@ -14,8 +14,8 @@ import java.awt.event.KeyEvent;
 
 public class SelectAllCombination implements KeyCombination {
 
-    private KeyCombinationTrigger trigger;
-    private CommandHistory history;
+    private final KeyCombinationTrigger trigger;
+    private final CommandHistory history;
 
     public SelectAllCombination(CommandHistory history) {
         this.trigger = KeyCombinationTrigger.withControl('a');
