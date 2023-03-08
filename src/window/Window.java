@@ -124,4 +124,5 @@ public class Window extends JFrame {
 	public ImageList getImageList() {
 		return images;
 	}
+
 }

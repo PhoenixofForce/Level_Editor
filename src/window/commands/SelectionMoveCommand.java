@@ -33,12 +33,7 @@ public class SelectionMoveCommand implements Command{
 		this.copyLayer = copyLayer;
 		this.isRight = isRight;
 
-		int dx = Math.round((float)tileSize * (to.x-from.x));
-		int dy = Math.round((float)tileSize*(to.y-from.y));
-		this.distances.add(new Location(dx, dy));
-		toMove.translate(dx, dy);
-
-		if(copyLayer != null && isRight) copyLayer.moveAll(to.x-from.x, to.y-from.y);
+		add(from, to);
 	}
 
 	public void add(Location from, Location to) {
@@ -47,7 +42,9 @@ public class SelectionMoveCommand implements Command{
 		this.distances.add(new Location(dx, dy));
 		toMove.translate(dx, dy);
 
-		if(copyLayer != null && isRight) copyLayer.moveAll(to.x-from.x, to.y-from.y);
+		if(copyLayer != null && isRight) {
+			copyLayer.moveAll(to.x-from.x, to.y-from.y);
+		}
 	}
 
 	public void round() {

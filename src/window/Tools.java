@@ -1,14 +1,24 @@
 package window;
 
+import window.tools.*;
+
 import java.awt.*;
 
 public enum Tools {
-	BRUSH(0, Color.GREEN), ERASER(1, Color.RED), BUCKET(2, Color.BLUE), SELECT(3, Color.YELLOW), MOVE(4, Color.YELLOW);
+	BRUSH(0, Color.GREEN, new BrushTool()),
+	ERASER(1, Color.RED, new EraserTool()),
+	BUCKET(2, Color.BLUE, new FillTool()),
+	SELECT(3, Color.YELLOW, new SelectTool()),
+	MOVE(4, Color.YELLOW, new MoveTool());
+
 	private final int pos;
 	private final Color c;
-	Tools(int a, Color c) {
+	private final Tool implementation;
+
+	Tools(int a, Color c, Tool implementation) {
 		this.pos = a;
 		this.c = c;
+		this.implementation = implementation;
 	}
 
 	public Tools next() {
@@ -16,7 +26,7 @@ public enum Tools {
 	}
 
 	public Tools pre() {
-		int npos = (pos-1);
+		int npos = (pos - 1);
 		while(npos < 0) npos += Tools.values().length;
 		return Tools.values()[npos];
 	}
@@ -26,6 +36,10 @@ public enum Tools {
 	}
 	public int getIndex() {
 		return pos;
+	}
+
+	public Tool getImplementation() {
+		return implementation;
 	}
 
 	public static Tools get(int i) {
