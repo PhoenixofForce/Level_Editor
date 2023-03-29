@@ -37,8 +37,8 @@ public abstract class GameMap extends TagObject {
 		TextureHandler.createError(tileWidth);
 	}
 
-	public abstract Location worldSpaceToMapSpace(Location screenLocation);
-	public abstract Location mapSpaceToWorldSpace(Location mapLocation);
+	public abstract Location worldToMapSpace(Location screenLocation);
+	public abstract Location mapToWorldSpace(Location mapLocation);
 	public abstract BufferedImage generateStaticTileGrid();
 
 	public Layer getLayer(String name) {

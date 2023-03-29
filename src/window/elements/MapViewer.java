@@ -185,7 +185,7 @@ public class MapViewer extends JPanel {
 	}
 
 	private void centerCamera() {
-		Location worldPos = map.mapSpaceToWorldSpace(new Location(-map.getTileHeight() / 2.0f, -map.getHeight() / 2.0f));
+		Location worldPos = map.mapToWorldSpace(new Location(-map.getTileHeight() / 2.0f, -map.getHeight() / 2.0f));
 		camera.setPosition(worldPos.x, worldPos.y);
 		camera.setZoom(0.5f);
 	}
@@ -203,8 +203,8 @@ public class MapViewer extends JPanel {
 			return false;
 		}
 
-		Location pos = screenToWorldPosition(x, y);
-		pos = map.worldSpaceToMapSpace(pos);
+		Location pos = screenToWorldSpace(x, y);
+		pos = map.worldToMapSpace(pos);
 		System.out.println(pos);
 
 		Optional<EditorError> actionThrewError;
@@ -222,7 +222,7 @@ public class MapViewer extends JPanel {
 	 * @param yPos y coordinate the user clicked
 	 * @return the position on the whole map
 	 */
-	public Location screenToWorldPosition(int xPos, int yPos) {
+	public Location screenToWorldSpace(int xPos, int yPos) {
 		float x = xPos, y = yPos;
 		x -= this.getWidth() / 2.0;
 		y -= this.getHeight() / 2.0;
@@ -263,12 +263,12 @@ public class MapViewer extends JPanel {
 		map.getLayers().values().stream()
 				.filter(l -> !window.isLayerHidden(l))
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
-				.forEach(l -> l.draw(g2, map.worldSpaceToMapSpace(screenToWorldPosition(0, 0)), map.worldSpaceToMapSpace(screenToWorldPosition(this.getWidth(), this.getHeight()))));
+				.forEach(l -> l.draw(g2, map.worldToMapSpace(screenToWorldSpace(0, 0)), map.worldToMapSpace(screenToWorldSpace(this.getWidth(), this.getHeight()))));
 
 		//Draws a highlighter (in size of tile => tilelayer, of selected texture => freelayer, of area corner => arealayer) in green(drawing) or red(erasing)
 		if (mouseEntered && TILE_HIGHLIGHT) {
-			Location l = screenToWorldPosition(lastMousePosX, lastMousePosY);
-			l = map.worldSpaceToMapSpace(l);
+			Location l = screenToWorldSpace(lastMousePosX, lastMousePosY);
+			l = map.worldToMapSpace(l);
 
 			g2.setColor(selectedTool.getColor());
 
@@ -282,7 +282,7 @@ public class MapViewer extends JPanel {
 				l.x = (int) l.x;
 				l.y = (int) l.y;
 			}
-			l = map.mapSpaceToWorldSpace(l);
+			l = map.mapToWorldSpace(l);
 
 			if (selectedLayer instanceof AreaLayer){
 				width = 1;
@@ -315,8 +315,8 @@ public class MapViewer extends JPanel {
 		if(startClick != null) {
 			g2.setColor(Tools.SELECT.getColor().brighter());
 
-			Location last = screenToWorldPosition(lastMousePosX, lastMousePosY);
-			last = map.worldSpaceToMapSpace(last);
+			Location last = screenToWorldSpace(lastMousePosX, lastMousePosY);
+			last = map.worldToMapSpace(last);
 
 			int x = (int)(Math.min(last.x, startClick.x));
 			int y = (int)(Math.min(last.y, startClick.y));
@@ -327,6 +327,39 @@ public class MapViewer extends JPanel {
 		}
 
 		g.drawImage(img, 0, 0, null);
+
+
+		//debug info
+		//the green dot should stay inside the black area while the mouse hovers over the map
+		//yellow and blue dot should overlap
+		{
+			g.setColor(Color.BLACK);
+			Location corner1 = map.worldToMapSpace(new Location(0, 0));
+			Location corner2 = map.worldToMapSpace(new Location(0, map.getHeight() * map.getTileHeight()));
+			Location corner3 = map.worldToMapSpace(new Location(map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight()));
+			Location corner4 = map.worldToMapSpace(new Location(map.getHeight() * map.getTileWidth(), 0));
+			g.fillPolygon(
+					new int[]{ (int) corner1.x, (int) corner2.x, (int) corner3.x, (int) corner4.x },
+					new int[]{ (int) corner1.y, (int) corner2.y, (int) corner3.y, (int) corner4.y },
+					4
+			);
+		}
+
+		{
+			Location screenSpace = new Location(lastMousePosX, lastMousePosY);
+			Location worldSpace = screenToWorldSpace(lastMousePosX, lastMousePosY);
+			Location mapSpace = map.worldToMapSpace(worldSpace);
+			Location worldSpace2 = map.mapToWorldSpace(mapSpace);
+
+			g.setColor(Color.RED);
+			g.fillOval((int) screenSpace.x - 10, (int) screenSpace.y - 10, 20, 20);
+			g.setColor(Color.BLUE);
+			g.fillOval((int) worldSpace.x - 10, (int) worldSpace.y - 10, 20, 20);
+			g.setColor(Color.GREEN);
+			g.fillOval((int) mapSpace.x - 10, (int) mapSpace.y - 10, 20, 20);
+			g.setColor(Color.YELLOW);
+			g.fillOval((int) worldSpace2.x - 5, (int) worldSpace2.y - 5, 10, 10);
+		}
 	}
 
 	private BufferedImage generateStaticTileGrid() {
@@ -372,7 +405,7 @@ public class MapViewer extends JPanel {
 	}
 
 	public Location getLastMousePosInMapPosition() {
-		return map.worldSpaceToMapSpace(screenToWorldPosition(lastMousePosX, lastMousePosY));
+		return map.worldToMapSpace(screenToWorldSpace(lastMousePosX, lastMousePosY));
 	}
 
 	public FreeLayer getCopyLayer() {

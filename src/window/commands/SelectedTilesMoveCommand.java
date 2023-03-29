@@ -30,7 +30,7 @@ public class SelectedTilesMoveCommand implements Command{
 
 		for(int x = 0;  x < layer.getTileNames()[0].length; x++) {
 			for(int y = 0;  y < layer.getTileNames().length; y++) {
-				Location worldPos = Window.INSTANCE.getMap().mapSpaceToWorldSpace(new Location(x, y));
+				Location worldPos = Window.INSTANCE.getMap().mapToWorldSpace(new Location(x, y));
 				if(selection.getArea().contains(worldPos.x, worldPos.y)) {
 					if(layer.getTileNames()[y][x] != null) {
 						copyLayer.set(layer.getTileNames()[y][x], x, y, false);

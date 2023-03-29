@@ -141,7 +141,7 @@ public class FreeLayer implements Layer {
 	public void draw(Graphics g, Location l1, Location l2) {
 		synchronized (images) {
 			for (GameObject gameObject : images) {
-				Location worldPos = Window.INSTANCE.getMap().mapSpaceToWorldSpace(new Location(gameObject.x, gameObject.y));
+				Location worldPos = Window.INSTANCE.getMap().mapToWorldSpace(new Location(gameObject.x, gameObject.y));
 				g.drawImage(TextureHandler.getImagePng(gameObject.name), (int) worldPos.x, (int) worldPos.y, null);
 			}
 		}

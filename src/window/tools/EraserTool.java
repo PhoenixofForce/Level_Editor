@@ -31,7 +31,7 @@ public class EraserTool implements ToolImplementation {
         GameMap map =  window.getMap();
         MapViewer mv = window.getMapViewer();
 
-        Location worldPos = map.mapSpaceToWorldSpace(pos);
+        Location worldPos = map.mapToWorldSpace(pos);
         boolean positionOutsideOfSelection = selection != null && !selection.getArea().contains(worldPos.x, worldPos.y);
         if(selectedLayer instanceof TileLayer && positionOutsideOfSelection) return Optional.of(new EditorError("You can only erase inside of the selection", false, true));
 

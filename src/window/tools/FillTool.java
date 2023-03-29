@@ -35,7 +35,7 @@ public class FillTool implements ToolImplementation {
 
         boolean brushMode = button == 2;
 
-        Location worldPos = map.mapSpaceToWorldSpace(pos);
+        Location worldPos = map.mapToWorldSpace(pos);
         boolean positionOutsideOfSelection = selection != null && !selection.getArea().contains(worldPos.x, worldPos.y);
         if(positionOutsideOfSelection) return Optional.of(new EditorError("You can only fill inside the selection", false, true));
 

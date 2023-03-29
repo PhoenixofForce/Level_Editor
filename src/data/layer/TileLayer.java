@@ -213,7 +213,7 @@ public class TileLayer implements Layer {
 				if(alreadyFilled.contains(i)) continue;
 				alreadyFilled.add(i);
 
-				Location iInWorldSpace = window.getMap().mapSpaceToWorldSpace(i);
+				Location iInWorldSpace = window.getMap().mapToWorldSpace(i);
 				if (Util.textureEquals(window.getAutoTile(), oldName, tileNames[(int) i.y][(int) i.x]) &&
 						(sel == null || sel.contains(iInWorldSpace.x, iInWorldSpace.y))) {
 
@@ -252,6 +252,8 @@ public class TileLayer implements Layer {
 
 	@Override
 	public void draw(Graphics g, Location topLeft, Location downRight) {
+		topLeft = null;	//todo: temporary
+		downRight = null;
 		int startX = (int) Math.max(0,  topLeft == null? 0: Math.floor(topLeft.x));
 		int endX = (int) Math.min(tileNames[0].length,  downRight == null? tileNames[0].length: Math.ceil(downRight.x));
 		int startY = (int) Math.max(0,  topLeft == null? 0: Math.floor(topLeft.y));
@@ -260,7 +262,7 @@ public class TileLayer implements Layer {
 		for (int x = startX; x < endX; x++) {
 			for (int y = startY; y < endY; y++) {
 				if (tileNames[y][x] == null) continue;
-				Location worldPosition = window.getMap().mapSpaceToWorldSpace(new Location(x, y));
+				Location worldPosition = window.getMap().mapToWorldSpace(new Location(x, y));
 
 				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), (int) worldPosition.x, (int) worldPosition.y, null);
 			}

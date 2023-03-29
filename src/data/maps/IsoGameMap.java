@@ -17,14 +17,20 @@ public class IsoGameMap extends GameMap {
         this.tileHeight = tileHeight;
     }
 
-    @Deprecated
-    private Location worldSpaceToMapSpaceF(Location inWorldLocation) {
-        return worldSpaceToMapSpace(new Location(inWorldLocation.x * 1, inWorldLocation.y * 1));
+    @Override
+    public Location worldToMapSpace(Location mapLocation) {
+        double imageHeight = (Math.max(getWidth(), getHeight()) * tileHeight);
+
+        //reversed calculation from mapSpaceToWorldSpace
+        double worldX = 0.5 * ((2.0 / tileWidth) * mapLocation.x - getHeight() - (2.0 / tileHeight) * (mapLocation.y - imageHeight));
+        double worldY = -((2.0 / tileHeight) * (mapLocation.y - imageHeight) + worldX);
+
+        return new Location((float) worldX * 1, (float) worldY * 1);
     }
 
     @Override
-    public Location worldSpaceToMapSpace(Location inWorldLocation) {
-        Location worldLocation = new Location(inWorldLocation.x, inWorldLocation.y);
+    public Location mapToWorldSpace(Location inWorldLocation) {
+        Location worldLocation = new Location(inWorldLocation.x / 1, inWorldLocation.y / 1);
 
         double imageHeight = (Math.max(getWidth(), getHeight()) * tileHeight);
         double inverseWorldY = (getHeight() - worldLocation.y);
@@ -33,16 +39,6 @@ public class IsoGameMap extends GameMap {
         double mapY = imageHeight - (worldLocation.x + worldLocation.y) * tileHeight / 2.0;
 
         return new Location((float) mapX, (float) mapY);
-    }
-
-    @Override
-    public Location mapSpaceToWorldSpace(Location mapLocation) {
-        double imageHeight = (Math.max(getWidth(), getHeight()) * tileHeight);
-
-        double worldX = 0.5 * ((2.0 / tileWidth) * mapLocation.x - getHeight() - (2.0 / tileHeight) * (mapLocation.y - imageHeight));
-        double worldY = -((2.0 / tileHeight) * (mapLocation.y - imageHeight) + worldX);
-
-        return new Location((float) worldX, (float) worldY);
     }
 
     @Override
@@ -55,15 +51,15 @@ public class IsoGameMap extends GameMap {
 
         int tileLength = Math.max(mapWidth, mapHeight);
 
-        BufferedImage out = new BufferedImage( tileLength * isoWidth + 1, tileLength * isoHeight + 1, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage out = new BufferedImage( tileLength * isoWidth, tileLength * isoHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) out.getGraphics();
         g2.setColor(Color.LIGHT_GRAY.brighter());
         g2.fillRect(0, 0, out.getWidth(), out.getHeight());
 
-        Location corner1 = worldSpaceToMapSpaceF(new Location(0, 0));
-        Location corner2 = worldSpaceToMapSpaceF(new Location(0, getHeight()));
-        Location corner3 = worldSpaceToMapSpaceF(new Location(getWidth(), getHeight()));
-        Location corner4 = worldSpaceToMapSpaceF(new Location(getHeight(), 0));
+        Location corner1 = mapToWorldSpace(new Location(0, 0));
+        Location corner2 = mapToWorldSpace(new Location(0, getHeight()));
+        Location corner3 = mapToWorldSpace(new Location(getWidth(), getHeight()));
+        Location corner4 = mapToWorldSpace(new Location(getWidth(), 0));
         g2.setColor(Color.LIGHT_GRAY);
         g2.fillPolygon(
                 new int[]{ (int) corner1.x, (int) corner2.x, (int) corner3.x, (int) corner4.x },
@@ -71,17 +67,20 @@ public class IsoGameMap extends GameMap {
                 4
         );
 
+        g2.setColor(Color.BLACK);
+        g2.fillOval((int) corner1.x - 10, (int) corner1.y - 10, 20, 20);
+
         g2.setColor(Color.GRAY);
         for(int xi = 1; xi < mapWidth; xi++) {
-            Location from = worldSpaceToMapSpaceF(new Location(xi, 0));
-            Location to = worldSpaceToMapSpaceF(new Location(xi, mapHeight));
+            Location from = mapToWorldSpace(new Location(xi, 0));
+            Location to = mapToWorldSpace(new Location(xi, mapHeight));
 
             g2.drawLine((int) from.x, (int) from.y, (int) to.x, (int) to.y);
         }
 
         for(int yi = 1; yi < mapHeight; yi++) {
-            Location from = worldSpaceToMapSpaceF(new Location(0, yi));
-            Location to = worldSpaceToMapSpaceF(new Location(mapWidth, yi));
+            Location from = mapToWorldSpace(new Location(0, yi));
+            Location to = mapToWorldSpace(new Location(mapWidth, yi));
 
             g2.drawLine((int) from.x, (int) from.y, (int) to.x, (int) to.y);
         }

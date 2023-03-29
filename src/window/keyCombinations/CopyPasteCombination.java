@@ -41,7 +41,7 @@ public class CopyPasteCombination implements KeyCombination {
             for(int x = 0;  x < map.getWidth(); x++) {
                 boolean hadInSel = false;
                 for(int y = 0;  y < map.getHeight(); y++) {
-                    Location worldPosition = map.mapSpaceToWorldSpace(new Location(x, y));
+                    Location worldPosition = map.mapToWorldSpace(new Location(x, y));
                     if(mv.getSelection().getArea().contains(worldPosition.x, worldPosition.y)) {
                         copiedMap += (selectedLayer.getTileNames()[y][x] == null? "[x]": selectedLayer.getTileNames()[y][x]) + " ";
                         hadInSel = true;
@@ -58,7 +58,7 @@ public class CopyPasteCombination implements KeyCombination {
 
             mv.setCopyLayer(new FreeLayer(0.5f, map.getWidth(), map.getHeight(), map.getTileWidth(), map.getTileHeight()));
 
-            new PasteCommand(window.getMapViewer(), mv.getCopyLayer(), mv.screenToWorldPosition(mv.getWidth()/2, mv.getHeight()/2), mv.getSelection(), map.getTileWidth(), map.getTileHeight()).execute(history);
+            new PasteCommand(window.getMapViewer(), mv.getCopyLayer(), mv.screenToWorldSpace(mv.getWidth()/2, mv.getHeight()/2), mv.getSelection(), map.getTileWidth(), map.getTileHeight()).execute(history);
         }
     }
 }

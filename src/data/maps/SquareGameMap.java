@@ -12,12 +12,12 @@ public class SquareGameMap extends GameMap {
     }
 
     @Override
-    public Location worldSpaceToMapSpace(Location worldLocation) {
+    public Location worldToMapSpace(Location worldLocation) {
         return new Location(worldLocation.x / getTileWidth(), worldLocation.y / getTileWidth()); // divide by tileSize
     }
 
     @Override
-    public Location mapSpaceToWorldSpace(Location mapLocation) {
+    public Location mapToWorldSpace(Location mapLocation) {
         return new Location(mapLocation.x * getTileWidth(), mapLocation.y * getTileWidth());  // multiply by tilSize
     }
 
