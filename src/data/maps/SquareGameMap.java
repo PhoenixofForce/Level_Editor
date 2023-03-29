@@ -11,6 +11,10 @@ public class SquareGameMap extends GameMap {
         super(width, height, tileSize);
     }
 
+    public Location getDrawingOffset() {
+        return new Location(0, 0);
+    }
+
     @Override
     public Location worldToMapSpace(Location worldLocation) {
         return new Location(worldLocation.x / getTileWidth(), worldLocation.y / getTileWidth()); // divide by tileSize

@@ -2,7 +2,7 @@ package window;
 
 import data.Location;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
@@ -79,6 +79,7 @@ public class Selection {
 	private void toArea() {
 		Area a = new Area();
 
+		//a.add(new Area(new Polygon(new int[]{}, new int[]{}, 3)));
 		for (Pair p : rectangles) {
 			switch (p.a) {
 				case ADD -> a.add(new Area(p.r));

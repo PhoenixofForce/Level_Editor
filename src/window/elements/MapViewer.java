@@ -31,7 +31,10 @@ public class MapViewer extends JPanel {
 
 	private final Camera camera;									//Camera to set viewpoint
 
-	private int lastMousePosX, lastMousePosY, lastMiddleClickX, lastMiddleClickY;
+	private int lastMousePosX,
+				lastMousePosY;
+	private int lastMiddleClickX,
+				lastMiddleClickY;
 
 	private Selection selection;
 	private FreeLayer copyLayer;
@@ -205,7 +208,7 @@ public class MapViewer extends JPanel {
 
 		Location pos = screenToWorldSpace(x, y);
 		pos = map.worldToMapSpace(pos);
-		System.out.println(pos);
+		//System.out.println(pos);
 
 		Optional<EditorError> actionThrewError;
 		if(isDragged) actionThrewError = implementation.onMouseDrag(commandHistory, button, selectedLayer, selectedTexture, pos, selection, shiftDown, controlDown);
@@ -329,10 +332,10 @@ public class MapViewer extends JPanel {
 		g.drawImage(img, 0, 0, null);
 
 
-		//debug info
+		//DEBUG info, useful for implementing different grids
 		//the green dot should stay inside the black area while the mouse hovers over the map
 		//yellow and blue dot should overlap
-		{
+		/*{
 			g.setColor(Color.BLACK);
 			Location corner1 = map.worldToMapSpace(new Location(0, 0));
 			Location corner2 = map.worldToMapSpace(new Location(0, map.getHeight() * map.getTileHeight()));
@@ -359,7 +362,7 @@ public class MapViewer extends JPanel {
 			g.fillOval((int) mapSpace.x - 10, (int) mapSpace.y - 10, 20, 20);
 			g.setColor(Color.YELLOW);
 			g.fillOval((int) worldSpace2.x - 5, (int) worldSpace2.y - 5, 10, 10);
-		}
+		}*/
 	}
 
 	private BufferedImage generateStaticTileGrid() {

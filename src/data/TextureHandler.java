@@ -109,6 +109,10 @@ public class TextureHandler {
 		throw new RuntimeException("No such image: " + textureName);
 	}
 
+	public static Rectangle getBounds(String textureName) {
+		return textures_sprite_sheet.get(textureName);
+	}
+
 	public static boolean existsImagePng(String textureName) {
 		if (textures_png.containsKey(textureName))
 			return true;

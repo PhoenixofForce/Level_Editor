@@ -8,10 +8,12 @@ import data.layer.layerobjects.TagObject;
 import data.TextureHandler;
 import window.Window;
 
-import java.awt.Graphics;
+import java.awt.*;
 
 import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 
 /**
  * a layer where the user can place textures on a grid
@@ -252,6 +254,10 @@ public class TileLayer implements Layer {
 
 	@Override
 	public void draw(Graphics g, Location topLeft, Location downRight) {
+		record LocatedSprite(Location location, String texture) {}
+
+		List<LocatedSprite> spritesToDraw = new ArrayList<>();
+
 		topLeft = null;	//todo: temporary
 		downRight = null;
 		int startX = (int) Math.max(0,  topLeft == null? 0: Math.floor(topLeft.x));
@@ -263,10 +269,23 @@ public class TileLayer implements Layer {
 			for (int y = startY; y < endY; y++) {
 				if (tileNames[y][x] == null) continue;
 				Location worldPosition = window.getMap().mapToWorldSpace(new Location(x, y));
-
-				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), (int) worldPosition.x, (int) worldPosition.y, null);
+				spritesToDraw.add(new LocatedSprite(worldPosition, tileNames[y][x]));
 			}
 		}
+
+		spritesToDraw.stream()
+				.sorted(Comparator.comparingDouble(e -> e.location.y))
+				.forEach(e -> {
+					BufferedImage texture = TextureHandler.getImagePng(e.texture);
+					Rectangle textureBound = TextureHandler.getBounds(e.texture);
+
+					Location drawingOffset = window.getMap().getDrawingOffset();
+
+					//add offset, so that the bottom of the texture aligns with the bottom of the grid
+					drawingOffset.y -= textureBound.height - window.getMap().getTileHeight();
+
+					g.drawImage(texture, (int) (e.location.x + drawingOffset.x), (int) (e.location.y + drawingOffset.y), null);
+				});
 	}
 
 	@Override

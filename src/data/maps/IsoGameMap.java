@@ -12,9 +12,13 @@ public class IsoGameMap extends GameMap {
     private int tileWidth, tileHeight;
 
     public IsoGameMap(int width, int height, int tileWidth, int tileHeight) {
-        super(width, height, Math.max(tileWidth, tileHeight));
+        super(width, height, tileWidth, tileHeight);
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
+    }
+
+    public Location getDrawingOffset() {
+        return new Location(-tileWidth / 2.0f, -tileHeight);
     }
 
     @Override
@@ -54,7 +58,7 @@ public class IsoGameMap extends GameMap {
         BufferedImage out = new BufferedImage( tileLength * isoWidth, tileLength * isoHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) out.getGraphics();
         g2.setColor(Color.LIGHT_GRAY.brighter());
-        g2.fillRect(0, 0, out.getWidth(), out.getHeight());
+        //g2.fillRect(0, 0, out.getWidth(), out.getHeight());
 
         Location corner1 = mapToWorldSpace(new Location(0, 0));
         Location corner2 = mapToWorldSpace(new Location(0, getHeight()));
@@ -68,7 +72,7 @@ public class IsoGameMap extends GameMap {
         );
 
         g2.setColor(Color.BLACK);
-        g2.fillOval((int) corner1.x - 10, (int) corner1.y - 10, 20, 20);
+        //g2.fillOval((int) corner1.x - 10, (int) corner1.y - 10, 20, 20);
 
         g2.setColor(Color.GRAY);
         for(int xi = 1; xi < mapWidth; xi++) {
