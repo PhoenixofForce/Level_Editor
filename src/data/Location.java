@@ -1,9 +1,41 @@
 package data;
 
-/**
- * a position
- */
 public class Location {
+
+	/*
+	 * Our window is 800*600 pixel
+	 *
+	 * ScreenSpace
+	 * +------------------+ 0
+	 * |                  | |
+	 * |        +---------| |
+	 * |        |   x  MAP| |
+	 * +------------------+ v height
+	 * 0------------------> width
+	 *
+	 * X = (600, 550) from the top right of the panel
+	 *
+	 * World Space
+	 * +------------------+ 0
+	 * |                  | |
+	 * |        +---------| |
+	 * |        |   x  MAP| |
+	 * +------------------+ v height
+	 * 0------------------> width
+	 *
+	 * X = (50, 20) from the top right of the map
+	 *
+	 * Map Space
+	 * +------------------+ 0
+	 * |                  | |
+	 * |        +----+----| |
+	 * |        |   X| MAP| |
+	 * +------------------+ v height
+	 * 0------------------> width
+	 *
+	 * X = (0.9, 0.5) tile position from map axis, in tilesizes,
+	 *
+	 */
 
 	public float x, y;
 

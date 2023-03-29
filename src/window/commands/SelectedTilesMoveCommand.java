@@ -1,8 +1,10 @@
 package window.commands;
 
+import data.Location;
 import data.layer.FreeLayer;
 import data.layer.TileLayer;
 import data.layer.layerobjects.TagObject;
+import window.Window;
 import window.elements.MapViewer;
 import window.Selection;
 
@@ -18,9 +20,9 @@ public class SelectedTilesMoveCommand implements Command{
 
 	private final MapViewer mv;
 
-	public SelectedTilesMoveCommand(MapViewer mv, TileLayer layer, Selection selection, int tileSize) {
+	public SelectedTilesMoveCommand(MapViewer mv, TileLayer layer, Selection selection, int tileWidth, int tileHeight) {
 		this.layer = layer;
-		this.copyLayer = new FreeLayer(layer.depth(), layer.getTileNames()[0].length, layer.getTileNames().length, tileSize);
+		this.copyLayer = new FreeLayer(layer.depth(), layer.getTileNames()[0].length, layer.getTileNames().length, tileWidth, tileHeight);
 		this.mv = mv;
 
 		resetPositions = new ArrayList<>();
@@ -28,7 +30,8 @@ public class SelectedTilesMoveCommand implements Command{
 
 		for(int x = 0;  x < layer.getTileNames()[0].length; x++) {
 			for(int y = 0;  y < layer.getTileNames().length; y++) {
-				if(selection.getArea().contains(x*tileSize, y*tileSize)) {
+				Location worldPos = Window.INSTANCE.getMap().mapSpaceToWorldSpace(new Location(x, y));
+				if(selection.getArea().contains(worldPos.x, worldPos.y)) {
 					if(layer.getTileNames()[y][x] != null) {
 						copyLayer.set(layer.getTileNames()[y][x], x, y, false);
 						resetPositions.add(new int[]{x, y});

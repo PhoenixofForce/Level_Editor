@@ -207,7 +207,7 @@ public class MenuBar extends JMenuBar {
 
 			wr.write("w: " + map.getWidth() + "\n");
 			wr.write("h: " + map.getHeight() + "\n");
-			wr.write("t: " + map.getTileSize() + "\n");
+			wr.write("t: " + map.getTileWidth() + "\n");	//todo: also height
 
 			String tags = "";
 			for(int i = 0; i < map.getTags().size(); i++) {
@@ -218,7 +218,7 @@ public class MenuBar extends JMenuBar {
 
 			for(String s: map.getLayers().keySet()) {
 				Layer l = map.getLayer(s);
-				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + ((String) l.accept(MapExporter.getInstance(), null, new float[]{-1, -1, -1, -1}, map.getTileSize())).replaceAll("\n", "") + "\n");
+				wr.write((l instanceof FreeLayer? "f_": l instanceof TileLayer? "t_": "a_") + s + " " + l.depth() + " " + ((String) l.accept(MapExporter.getInstance(), null, new float[]{-1, -1, -1, -1}, map.getWidth())).replaceAll("\n", "") + "\n");
 			}
 
 			wr.close();

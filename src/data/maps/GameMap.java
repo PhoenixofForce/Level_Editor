@@ -17,22 +17,28 @@ import java.util.Map;
  */
 public abstract class GameMap extends TagObject {
 
-	protected final int width;
-	protected final int height;
-	protected final int tileSize;		//width, height and tileSize of the map
+	protected final int width,
+						height;
+	protected final int	tileWidth,
+						tileHeight;
 	protected final Map<String, Layer> layers;			//Layers saved to their name
 
 	public GameMap(int width, int height, int tileSize) {
+		this(width, height, tileSize, tileSize);
+	}
+
+	public GameMap(int width, int height, int tileWidth, int tileHeight) {
 		layers = new HashMap<>();
 		this.width = width;
 		this.height = height;
-		this.tileSize = tileSize;
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
 
-		TextureHandler.createError(tileSize);
+		TextureHandler.createError(tileWidth);
 	}
 
-	public abstract Location screenSpaceToMapSpace(Location screenLocation);
-	public abstract Location mapSpaceToScreenSpace(Location mapLocation);
+	public abstract Location worldSpaceToMapSpace(Location screenLocation);
+	public abstract Location mapSpaceToWorldSpace(Location mapLocation);
 	public abstract BufferedImage generateStaticTileGrid();
 
 	public Layer getLayer(String name) {
@@ -45,15 +51,15 @@ public abstract class GameMap extends TagObject {
 	}
 
 	public GameMap addTileLayer(String name, float depth) {
-		return addLayer(name, new TileLayer(depth, width, height, tileSize));
+		return addLayer(name, new TileLayer(depth, width, height, tileWidth, tileHeight));
 	}
 
 	public GameMap addFreeLayer(String name, float depth) {
-		return addLayer(name, new FreeLayer(depth, width, height, tileSize));
+		return addLayer(name, new FreeLayer(depth, width, height, tileWidth, tileHeight));
 	}
 
 	public GameMap addAreaLayer(String name, float depth) {
-		return addLayer(name, new AreaLayer(depth, width, height, tileSize));
+		return addLayer(name, new AreaLayer(depth, width, height, tileWidth, tileHeight));
 	}
 
 	public Layer removeLayer(String name) {
@@ -74,8 +80,12 @@ public abstract class GameMap extends TagObject {
 		return height;
 	}
 
-	public int getTileSize() {
-		return tileSize;
+	public int getTileWidth() {
+		return tileWidth;
+	}
+
+	public int getTileHeight() {
+		return tileHeight;
 	}
 
 	public int[] getBounds() {

@@ -32,7 +32,7 @@ public class Main {
 			- open/view last edited files
 		 */
 
-		Window window = new Window(new SquareGameMap(100,100,8));
+		Window window = new Window(new IsoGameMap(20,20,16, 9));
 
 		if (args.length > 0) {
 			try {

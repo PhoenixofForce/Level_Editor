@@ -88,9 +88,9 @@ public class LayerPane extends JPanel {
 
 		Layer layer;
 		switch (type) {
-			case 2 -> layer = new FreeLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
-			case 1 -> layer = new AreaLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
-			case 0 -> layer = new TileLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+			case 2 -> layer = new FreeLayer(depth, map.getWidth(), map.getHeight(), map.getTileWidth(), map.getTileHeight());
+			case 1 -> layer = new AreaLayer(depth, map.getWidth(), map.getHeight(), map.getTileWidth(), map.getTileHeight());
+			case 0 -> layer = new TileLayer(depth, map.getWidth(), map.getHeight(), map.getTileWidth(), map.getTileHeight());
 			default -> {
 				return;
 			}

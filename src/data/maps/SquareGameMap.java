@@ -1,16 +1,9 @@
 package data.maps;
 
 import data.Location;
-import data.layer.AreaLayer;
-import data.layer.FreeLayer;
-import data.layer.Layer;
-import data.layer.TileLayer;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class SquareGameMap extends GameMap {
 
@@ -19,22 +12,22 @@ public class SquareGameMap extends GameMap {
     }
 
     @Override
-    public Location screenSpaceToMapSpace(Location screenLocation) {
-        return screenLocation;
+    public Location worldSpaceToMapSpace(Location worldLocation) {
+        return new Location(worldLocation.x / getTileWidth(), worldLocation.y / getTileWidth()); // divide by tileSize
     }
 
     @Override
-    public Location mapSpaceToScreenSpace(Location mapLocation) {
-        return mapLocation;
+    public Location mapSpaceToWorldSpace(Location mapLocation) {
+        return new Location(mapLocation.x * getTileWidth(), mapLocation.y * getTileWidth());  // multiply by tilSize
     }
 
     @Override
     public BufferedImage generateStaticTileGrid() {
-        BufferedImage out = new BufferedImage( getWidth() * getTileSize(), getHeight() * getTileSize(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage out = new BufferedImage( getWidth() * getTileWidth(), getHeight() * getTileWidth(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) out.getGraphics();
 
         g2.setColor(Color.LIGHT_GRAY);
-        g2.fillRect(0, 0, getWidth() * getTileSize(), getHeight() * getTileSize());
+        g2.fillRect(0, 0, getWidth() * getTileWidth(), getHeight() * getTileWidth());
 
         //prepares graphics object to draw tile separators
         g2.setColor(Color.LIGHT_GRAY.darker());
@@ -43,8 +36,8 @@ public class SquareGameMap extends GameMap {
         //draw tile separators
         for (int x = 0; x < getWidth(); x++) {
             for (int y = 0; y < getHeight(); y++) {
-                g2.drawLine(x * getTileSize(), y * getTileSize(), getWidth() * getTileSize(), y * getTileSize());
-                g2.drawLine(x * getTileSize(), y * getTileSize(), x * getTileSize(), getHeight() * getTileSize());
+                g2.drawLine(x * getTileWidth(), y * getTileWidth(), getWidth() * getTileWidth(), y * getTileWidth());
+                g2.drawLine(x * getTileWidth(), y * getTileWidth(), x * getTileWidth(), getHeight() * getTileWidth());
             }
         }
 
@@ -53,7 +46,7 @@ public class SquareGameMap extends GameMap {
 
     @Override
     public GameMap clone() {
-        GameMap out = new SquareGameMap(width, height, tileSize);
+        GameMap out = new SquareGameMap(width, height, tileWidth);
         super.cloneLayersTo(out);
         return out;
     }

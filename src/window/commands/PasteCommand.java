@@ -15,14 +15,16 @@ public class PasteCommand implements Command {
 	private final Location l;
 	private SelectionChangeCommand smc;
 	private final Selection selection;
-	private final int tileSize;
+	private final int tileWidth,
+						tileHeight;
 
-	public PasteCommand(MapViewer mv, FreeLayer copyLayer, Location screenMiddle, Selection selection, int tileSize) {
+	public PasteCommand(MapViewer mv, FreeLayer copyLayer, Location screenMiddle, Selection selection, int tileWidth, int tileHeight) {
 		this.mv = mv;
 		this.copyLayer = copyLayer;
 		this.l = screenMiddle;
 		this.selection = selection;
-		this.tileSize = tileSize;
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
 	}
 
 	@Override
@@ -43,11 +45,11 @@ public class PasteCommand implements Command {
 			}
 		}
 
-		copyLayer.roundAll(tileSize);
+		copyLayer.roundAll(tileWidth, tileHeight);
 
 		Selection newSelection = new Selection();
-		newSelection.add(new Rectangle(Math.round(l.x* tileSize), Math.round(l.y* tileSize), lineC*tileSize, textureC *tileSize));
-		newSelection.roundPosition(tileSize);
+		newSelection.add(new Rectangle(Math.round(l.x* tileWidth), Math.round(l.y* tileHeight), lineC*tileWidth, textureC *tileHeight));
+		newSelection.roundPosition(tileWidth, tileHeight);
 
 		smc = new SelectionChangeCommand(mv, selection, newSelection);
 		smc.redo();

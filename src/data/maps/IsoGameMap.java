@@ -17,17 +17,32 @@ public class IsoGameMap extends GameMap {
         this.tileHeight = tileHeight;
     }
 
-    @Override
-    public Location screenSpaceToMapSpace(Location screenLocation) {
-        double imageHeight = (Math.max(getWidth(), getHeight()) * tileHeight);
-        double xPos = 1.0 * (screenLocation.x + (getHeight() - screenLocation.y)) * tileWidth / 2.0;
-        double yPos = (imageHeight + tileHeight / 2.0) - (screenLocation.x + screenLocation.y) * tileHeight / 2.0 - tileHeight / 2;
-        return new Location((float) xPos, (float) yPos);
+    @Deprecated
+    private Location worldSpaceToMapSpaceF(Location inWorldLocation) {
+        return worldSpaceToMapSpace(new Location(inWorldLocation.x * 1, inWorldLocation.y * 1));
     }
 
     @Override
-    public Location mapSpaceToScreenSpace(Location mapLocation) {
-        return null;
+    public Location worldSpaceToMapSpace(Location inWorldLocation) {
+        Location worldLocation = new Location(inWorldLocation.x, inWorldLocation.y);
+
+        double imageHeight = (Math.max(getWidth(), getHeight()) * tileHeight);
+        double inverseWorldY = (getHeight() - worldLocation.y);
+
+        double mapX = (worldLocation.x + inverseWorldY) * tileWidth / 2.0;
+        double mapY = imageHeight - (worldLocation.x + worldLocation.y) * tileHeight / 2.0;
+
+        return new Location((float) mapX, (float) mapY);
+    }
+
+    @Override
+    public Location mapSpaceToWorldSpace(Location mapLocation) {
+        double imageHeight = (Math.max(getWidth(), getHeight()) * tileHeight);
+
+        double worldX = 0.5 * ((2.0 / tileWidth) * mapLocation.x - getHeight() - (2.0 / tileHeight) * (mapLocation.y - imageHeight));
+        double worldY = -((2.0 / tileHeight) * (mapLocation.y - imageHeight) + worldX);
+
+        return new Location((float) worldX, (float) worldY);
     }
 
     @Override
@@ -45,11 +60,10 @@ public class IsoGameMap extends GameMap {
         g2.setColor(Color.LIGHT_GRAY.brighter());
         g2.fillRect(0, 0, out.getWidth(), out.getHeight());
 
-
-        Location corner1 = screenSpaceToMapSpace(new Location(0, 0));
-        Location corner2 = screenSpaceToMapSpace(new Location(0, getHeight()));
-        Location corner3 = screenSpaceToMapSpace(new Location(getWidth(), getHeight()));
-        Location corner4 = screenSpaceToMapSpace(new Location(getHeight(), 0));
+        Location corner1 = worldSpaceToMapSpaceF(new Location(0, 0));
+        Location corner2 = worldSpaceToMapSpaceF(new Location(0, getHeight()));
+        Location corner3 = worldSpaceToMapSpaceF(new Location(getWidth(), getHeight()));
+        Location corner4 = worldSpaceToMapSpaceF(new Location(getHeight(), 0));
         g2.setColor(Color.LIGHT_GRAY);
         g2.fillPolygon(
                 new int[]{ (int) corner1.x, (int) corner2.x, (int) corner3.x, (int) corner4.x },
@@ -58,16 +72,16 @@ public class IsoGameMap extends GameMap {
         );
 
         g2.setColor(Color.GRAY);
-        for(int xi = 0; xi <= mapWidth; xi++) {
-            Location from = screenSpaceToMapSpace(new Location(xi, 0));
-            Location to = screenSpaceToMapSpace(new Location(xi, mapHeight));
+        for(int xi = 1; xi < mapWidth; xi++) {
+            Location from = worldSpaceToMapSpaceF(new Location(xi, 0));
+            Location to = worldSpaceToMapSpaceF(new Location(xi, mapHeight));
 
             g2.drawLine((int) from.x, (int) from.y, (int) to.x, (int) to.y);
         }
 
-        for(int yi = 0; yi <= mapHeight; yi++) {
-            Location from = screenSpaceToMapSpace(new Location(0, yi));
-            Location to = screenSpaceToMapSpace(new Location(mapWidth, yi));
+        for(int yi = 1; yi < mapHeight; yi++) {
+            Location from = worldSpaceToMapSpaceF(new Location(0, yi));
+            Location to = worldSpaceToMapSpaceF(new Location(mapWidth, yi));
 
             g2.drawLine((int) from.x, (int) from.y, (int) to.x, (int) to.y);
         }

@@ -35,7 +35,8 @@ public class FillTool implements ToolImplementation {
 
         boolean brushMode = button == 2;
 
-        boolean positionOutsideOfSelection = selection != null && !selection.getArea().contains(pos.x * map.getTileSize(), pos.y * map.getTileSize());
+        Location worldPos = map.mapSpaceToWorldSpace(pos);
+        boolean positionOutsideOfSelection = selection != null && !selection.getArea().contains(worldPos.x, worldPos.y);
         if(positionOutsideOfSelection) return Optional.of(new EditorError("You can only fill inside the selection", false, true));
 
         //tl.fill(selection == null? null: selection.getArea(), rem? null: selectedTexture, pos.x, pos.y);

@@ -47,7 +47,7 @@ public class SelectTool implements ToolImplementation {
             if(x + w > map.getWidth()) w = map.getWidth() - x;
             if(y + h > map.getHeight()) h = map.getHeight() - y;
 
-            Rectangle r = new Rectangle(x * map.getTileSize(), y * map.getTileSize(), w * map.getTileSize(),h * map.getTileSize());
+            Rectangle r = new Rectangle(x * map.getTileWidth(), y * map.getTileHeight(), w * map.getTileWidth(),h * map.getTileHeight());
             if(selection == null || (!shiftPressed && !controlPressed)) {
                 Selection newSelection = new Selection();
                 newSelection.add(r);

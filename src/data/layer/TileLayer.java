@@ -37,23 +37,28 @@ public class TileLayer implements Layer {
 
 	private final int width;
 	private final int height;
-	private final int tileSize;	//width, height and tilesize of the map
+	private final int tileWidth,
+						tileHeight;
+
 	private final Random r;
 
 	private final Window window;
-	public TileLayer(float depth, String[][] tiles, int tileSize) {
+	public TileLayer(float depth, String[][] tiles, int tileWidth, int tileHeight) {
 		this.depth = depth;
 		this.tileNames = tiles;
-		this.tileSize = tileSize;
+
 		this.width = tiles[0].length;
 		this.height = tiles.length;
+
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
 
 		r = new Random();
 		this.window = Window.INSTANCE;
 	}
 
-	public TileLayer(float depth, int width, int height, int tileSize) {
-		this(depth, new String[height][width], tileSize);
+	public TileLayer(float depth, int width, int height, int tileWidth, int tileHeight) {
+		this(depth, new String[height][width], tileWidth, tileHeight);
 	}
 
 	@Override
@@ -86,7 +91,7 @@ public class TileLayer implements Layer {
 				}
 
 				String tile = TextureHandler.existsImagePng(name)? name: tileNameStart + "_0";
-				if(!TextureHandler.existsImagePng(tile)) tile = "error_" + tileSize;
+				if(!TextureHandler.existsImagePng(tile)) tile = "error_" + tileWidth;
 
 				if(!tile.equals(name)) System.err.println("MSSING TEXTURE: " + name);
 				tileNames[y][x] = tile;
@@ -98,6 +103,7 @@ public class TileLayer implements Layer {
 			update(x-1, y, false);
 			update(x, y-1, false);
 			update(x, y+1, false);
+
 			if(window.getAutoTile() == 2) {
 				update(x + 1, y - 1, false);
 				update(x - 1, y + 1, false);
@@ -207,7 +213,10 @@ public class TileLayer implements Layer {
 				if(alreadyFilled.contains(i)) continue;
 				alreadyFilled.add(i);
 
-				if (Util.textureEquals(window.getAutoTile(), oldName, tileNames[(int) i.y][(int) i.x]) && (sel == null || sel.contains(i.x * window.getMap().getTileSize(), i.y * window.getMap().getTileSize()))) {
+				Location iInWorldSpace = window.getMap().mapSpaceToWorldSpace(i);
+				if (Util.textureEquals(window.getAutoTile(), oldName, tileNames[(int) i.y][(int) i.x]) &&
+						(sel == null || sel.contains(iInWorldSpace.x, iInWorldSpace.y))) {
+
 					set(name, i.x, i.y, false);
 					out.add(i);
 
@@ -251,7 +260,9 @@ public class TileLayer implements Layer {
 		for (int x = startX; x < endX; x++) {
 			for (int y = startY; y < endY; y++) {
 				if (tileNames[y][x] == null) continue;
-				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), x * tileSize, y * tileSize, null);
+				Location worldPosition = window.getMap().mapSpaceToWorldSpace(new Location(x, y));
+
+				g.drawImage(TextureHandler.getImagePng(tileNames[y][x]), (int) worldPosition.x, (int) worldPosition.y, null);
 			}
 		}
 	}
@@ -312,7 +323,7 @@ public class TileLayer implements Layer {
 
 	@Override
 	public TileLayer clone() {
-		TileLayer out = new TileLayer(depth, width, height, tileSize);
+		TileLayer out = new TileLayer(depth, width, height, tileWidth, tileHeight);
 		for(int y = 0; y < height; y++) {
 			if (width >= 0) System.arraycopy(tileNames[y], 0, out.tileNames[y], 0, width);
 		}

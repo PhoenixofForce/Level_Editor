@@ -121,13 +121,13 @@ public class UmapImporter implements Importer {
 			}
 		}
 
-		return new TileLayer(depth, names, tileSize);
+		return new TileLayer(depth, names, tileSize, tileSize);
 	}
 
 	public AreaLayer importAreaLayer(String line) {
 		float depth = Float.parseFloat(line.split(" ")[1]);
 
-		AreaLayer layer = new AreaLayer(depth, width, height, tileSize);
+		AreaLayer layer = new AreaLayer(depth, width, height, tileSize, tileSize);
 		for(int i = 1; i < line.split("\\[area; ").length; i++) {
 			String s = line.split("\\[area; ")[i];
 			s = s.substring(0, s.length()-1);
@@ -157,7 +157,7 @@ public class UmapImporter implements Importer {
 	public FreeLayer importFreeLayer(String line) {
 		float depth = Float.parseFloat(line.split(" ")[1]);
 
-		FreeLayer layer = new FreeLayer(depth, width, height, tileSize);
+		FreeLayer layer = new FreeLayer(depth, width, height, tileSize, tileSize);
 		for(int i = 1; i < line.split("\\[put; ").length; i++) {
 			String s = line.split("\\[put; ")[i];
 			s = s.substring(0, s.length()-1);

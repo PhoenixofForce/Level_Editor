@@ -52,7 +52,7 @@ public class Selection {
 		toArea();
 	}
 
-	public Location roundPosition(int tileSize) {
+	public Location roundPosition(int tileWidth, int tileHeight) {
 		int smallestX = Integer.MAX_VALUE,
 			smallestY = Integer.MAX_VALUE;
 
@@ -62,11 +62,11 @@ public class Selection {
 			if (smallestY > r.y) smallestY = r.y;
 		}
 
-		int dx = smallestX%tileSize,
-			dy = smallestY%tileSize;
+		int dx = smallestX%tileWidth,
+			dy = smallestY%tileHeight;
 
-		dx = dx < tileSize/2.0? -dx: tileSize-dx;
-		dy = dy < tileSize/2.0f? -dy: tileSize-dy;
+		dx = dx < tileWidth/2.0? -dx: tileWidth-dx;
+		dy = dy < tileHeight/2.0f? -dy: tileHeight-dy;
 		translate(dx, dy);
 
 		return new Location(dx, dy);

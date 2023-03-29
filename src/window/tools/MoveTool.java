@@ -29,12 +29,12 @@ public class MoveTool implements ToolImplementation {
             FreeLayer copyLayer = mv.getCopyLayer();
 
             if(mv.getBulkCommand() == null)
-                mv.setBulkCommand(new SelectionMoveCommand(map.getTileSize(), selection, null, true));
+                mv.setBulkCommand(new SelectionMoveCommand(map.getTileWidth(), map.getTileHeight(), selection, null, true));
 
             SelectionMoveCommand smc = (SelectionMoveCommand) mv.getBulkCommand();
             smc.round();
 
-            if(button == 2  && copyLayer != null) copyLayer.roundAll(map.getTileSize());
+            if(button == 2  && copyLayer != null) copyLayer.roundAll(map.getTileWidth(), map.getTileHeight());
             return Optional.empty();
         }
 
@@ -55,7 +55,7 @@ public class MoveTool implements ToolImplementation {
                 if(!(layer instanceof TileLayer selectedLayer)) return Optional.of(new EditorError("You can only move on a tile layer", false, true));
                 if(copyLayer == null) {
                     //mv.setCopyLayer(new FreeLayer(selectedLayer.depth(), map.getWidth(), map.getHeight(), map.getTileSize()));
-                    history.addCommand(new SelectedTilesMoveCommand(window.getMapViewer(), selectedLayer, selection, map.getTileSize()));
+                    history.addCommand(new SelectedTilesMoveCommand(window.getMapViewer(), selectedLayer, selection, map.getTileWidth(), map.getTileHeight()));
                 }
             }
 
@@ -74,7 +74,7 @@ public class MoveTool implements ToolImplementation {
         Location from = mv.getLastMousePosInMapPosition();
 
         if(mv.getBulkCommand() == null) {
-            mv.setBulkCommand(new SelectionMoveCommand(map.getTileSize(), selection, from, to, mv.getCopyLayer(), isRightClick));
+            mv.setBulkCommand(new SelectionMoveCommand(map.getTileWidth(), map.getTileHeight(), selection, from, to, mv.getCopyLayer(), isRightClick));
         } else {
             SelectionMoveCommand smc = (SelectionMoveCommand) mv.getBulkCommand();
             smc.add(from, to);

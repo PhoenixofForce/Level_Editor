@@ -34,7 +34,8 @@ public class BrushTool implements ToolImplementation {
             return Optional.of(new EditorError("You need to select a layer and texture first", false, true));
         }
 
-        boolean positionOutsideOfSelection = selection != null && !selection.getArea().contains(pos.x * window.getTileSize(), pos.y * window.getTileSize());
+        Location worldPos = window.getMap().mapSpaceToWorldSpace(pos);
+        boolean positionOutsideOfSelection = selection != null && !selection.getArea().contains(worldPos.x, worldPos.y);
         if(selectedLayer instanceof TileLayer && positionOutsideOfSelection)
             return Optional.of(new EditorError("You can only draw inside of the selection", false, true));
 

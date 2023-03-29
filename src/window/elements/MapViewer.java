@@ -185,7 +185,8 @@ public class MapViewer extends JPanel {
 	}
 
 	private void centerCamera() {
-		camera.setPosition(-map.getWidth() * map.getTileSize() / 2.0f, -map.getHeight() * map.getTileSize() / 2.0f);
+		Location worldPos = map.mapSpaceToWorldSpace(new Location(-map.getTileHeight() / 2.0f, -map.getHeight() / 2.0f));
+		camera.setPosition(worldPos.x, worldPos.y);
 		camera.setZoom(0.5f);
 	}
 
@@ -202,7 +203,9 @@ public class MapViewer extends JPanel {
 			return false;
 		}
 
-		Location pos = windowToMapPosition(x, y);
+		Location pos = screenToWorldPosition(x, y);
+		pos = map.worldSpaceToMapSpace(pos);
+		System.out.println(pos);
 
 		Optional<EditorError> actionThrewError;
 		if(isDragged) actionThrewError = implementation.onMouseDrag(commandHistory, button, selectedLayer, selectedTexture, pos, selection, shiftDown, controlDown);
@@ -219,7 +222,7 @@ public class MapViewer extends JPanel {
 	 * @param yPos y coordinate the user clicked
 	 * @return the position on the whole map
 	 */
-	public Location windowToMapPosition(int xPos, int yPos) {
+	public Location screenToWorldPosition(int xPos, int yPos) {
 		float x = xPos, y = yPos;
 		x -= this.getWidth() / 2.0;
 		y -= this.getHeight() / 2.0;
@@ -229,8 +232,8 @@ public class MapViewer extends JPanel {
 		y -= camera.y;
 		x = (float) Math.floor(x);
 		y = (float) Math.floor(y);
-		x /= map.getTileSize();
-		y /= map.getTileSize();
+		//x /= map.getTileSize();	//TODO: extract
+		//y /= map.getTileSize();
 
 		return new Location(x, y);
 	}
@@ -260,11 +263,13 @@ public class MapViewer extends JPanel {
 		map.getLayers().values().stream()
 				.filter(l -> !window.isLayerHidden(l))
 				.sorted((o1, o2) -> Float.compare(o2.depth(), o1.depth()))
-				.forEach(l -> l.draw(g2, windowToMapPosition(0, 0), windowToMapPosition(this.getWidth(), this.getHeight())));
+				.forEach(l -> l.draw(g2, map.worldSpaceToMapSpace(screenToWorldPosition(0, 0)), map.worldSpaceToMapSpace(screenToWorldPosition(this.getWidth(), this.getHeight()))));
 
 		//Draws a highlighter (in size of tile => tilelayer, of selected texture => freelayer, of area corner => arealayer) in green(drawing) or red(erasing)
 		if (mouseEntered && TILE_HIGHLIGHT) {
-			Location l = windowToMapPosition(lastMousePosX, lastMousePosY);
+			Location l = screenToWorldPosition(lastMousePosX, lastMousePosY);
+			l = map.worldSpaceToMapSpace(l);
+
 			g2.setColor(selectedTool.getColor());
 
 			String selectedTexture = window.getSelectedTexture();
@@ -277,6 +282,7 @@ public class MapViewer extends JPanel {
 				l.x = (int) l.x;
 				l.y = (int) l.y;
 			}
+			l = map.mapSpaceToWorldSpace(l);
 
 			if (selectedLayer instanceof AreaLayer){
 				width = 1;
@@ -288,7 +294,7 @@ public class MapViewer extends JPanel {
 				height = tex.getHeight();
 			}
 
-			if(height > 0 && width > 0) g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), width, height);
+			if(height > 0 && width > 0) g2.drawRect((int) (l.x), (int) (l.y), width, height);
 		}
 
 		if(copyLayer != null) {
@@ -308,12 +314,15 @@ public class MapViewer extends JPanel {
 		Location startClick = ((SelectTool) Tools.SELECT.getImplementation()).getStartClick();
 		if(startClick != null) {
 			g2.setColor(Tools.SELECT.getColor().brighter());
-			Location last = windowToMapPosition(lastMousePosX, lastMousePosY);
+
+			Location last = screenToWorldPosition(lastMousePosX, lastMousePosY);
+			last = map.worldSpaceToMapSpace(last);
+
 			int x = (int)(Math.min(last.x, startClick.x));
 			int y = (int)(Math.min(last.y, startClick.y));
 			int w = (int)(Math.max(last.x, startClick.x)) -x+1;
 			int h = (int)(Math.max(last.y, startClick.y)) -y+1;
-			Rectangle r = new Rectangle(x * map.getTileSize(), y * map.getTileSize(), w * map.getTileSize(),h * map.getTileSize());
+			Rectangle r = new Rectangle(x * map.getTileWidth(), y * map.getTileWidth(), w * map.getTileWidth(),h * map.getTileWidth());
 			g2.draw(new Area(r));
 		}
 
@@ -363,7 +372,7 @@ public class MapViewer extends JPanel {
 	}
 
 	public Location getLastMousePosInMapPosition() {
-		return windowToMapPosition(lastMousePosX, lastMousePosY);
+		return map.worldSpaceToMapSpace(screenToWorldPosition(lastMousePosX, lastMousePosY));
 	}
 
 	public FreeLayer getCopyLayer() {

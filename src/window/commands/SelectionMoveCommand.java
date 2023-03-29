@@ -9,14 +9,15 @@ import java.util.List;
 
 public class SelectionMoveCommand implements Command{
 
-	private final int tileSize;
+	private final int tileWidth, tileHeight;
 	private final boolean isRight;
 	private final FreeLayer copyLayer;
 	private final Selection toMove;
 	private final List<Location> distances;
 
-	public SelectionMoveCommand(int tileSize, Selection toMove, FreeLayer copyLayer, boolean isRight) {
-		this.tileSize = tileSize;
+	public SelectionMoveCommand(int tileWidth, int tileHeight, Selection toMove, FreeLayer copyLayer, boolean isRight) {
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
 		this.toMove = toMove;
 
 		this.copyLayer = copyLayer;
@@ -25,8 +26,9 @@ public class SelectionMoveCommand implements Command{
 		this.distances = new ArrayList<>();
 	}
 
-	public SelectionMoveCommand(int tileSize, Selection toMove, Location from, Location to, FreeLayer copyLayer, boolean isRight) {
-		this.tileSize = tileSize;
+	public SelectionMoveCommand(int tileWidth, int tileHeight, Selection toMove, Location from, Location to, FreeLayer copyLayer, boolean isRight) {
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
 		this.toMove = toMove;
 
 		this.distances = new ArrayList<>();
@@ -37,8 +39,8 @@ public class SelectionMoveCommand implements Command{
 	}
 
 	public void add(Location from, Location to) {
-		int dx = Math.round((float)tileSize * (to.x-from.x));
-		int dy = Math.round((float)tileSize*(to.y-from.y));
+		int dx = Math.round((float)tileWidth * (to.x-from.x));
+		int dy = Math.round((float)tileHeight*(to.y-from.y));
 		this.distances.add(new Location(dx, dy));
 		toMove.translate(dx, dy);
 
@@ -48,7 +50,7 @@ public class SelectionMoveCommand implements Command{
 	}
 
 	public void round() {
-		this.distances.add(toMove.roundPosition(tileSize));
+		this.distances.add(toMove.roundPosition(tileWidth, tileHeight));
 	}
 
 	@Override
@@ -60,7 +62,7 @@ public class SelectionMoveCommand implements Command{
 		for (Location distance : distances) {
 			toMove.translate((int) distance.x, (int) distance.y);
 			if (copyLayer != null && isRight)
-				copyLayer.moveAll(distance.x / (float) tileSize, distance.y / (float) tileSize);
+				copyLayer.moveAll(distance.x / (float) tileWidth, distance.y / (float) tileHeight);
 		}
 	}
 
@@ -68,7 +70,7 @@ public class SelectionMoveCommand implements Command{
 	public void undo() {
 		for(int i = distances.size() - 1; i >= 0; i--) {
 			toMove.translate(-(int) distances.get(i).x, -(int)distances.get(i).y);
-			if(copyLayer != null && isRight) copyLayer.moveAll(-distances.get(i).x/ (float) tileSize, -distances.get(i).y/ (float) tileSize);
+			if(copyLayer != null && isRight) copyLayer.moveAll(-distances.get(i).x/ (float) tileWidth, -distances.get(i).y/ (float) tileHeight);
 		}
 	}
 

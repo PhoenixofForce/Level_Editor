@@ -29,10 +29,10 @@ public class PngExporter implements Exporter<String> {
 	public boolean exportToFile(GameMap map, File file) {
 		try {
 			int[] bounds = map.getBounds();
-			out = new BufferedImage(map.getWidth()*map.getTileSize(), map.getHeight()*map.getTileSize(), BufferedImage.TYPE_INT_ARGB);
+			out = new BufferedImage(map.getWidth()*map.getTileWidth(), map.getHeight()*map.getTileHeight(), BufferedImage.TYPE_INT_ARGB);
 			export(map);
 			
-			ImageIO.write(out.getSubimage(bounds[0]*map.getTileSize(), bounds[1]*map.getTileSize(), (1+bounds[2]-bounds[0])*map.getTileSize(), (1+bounds[3]-bounds[1])*map.getTileSize()), "PNG", file);
+			ImageIO.write(out.getSubimage(bounds[0]*map.getTileWidth(), bounds[1]*map.getTileHeight(), (1+bounds[2]-bounds[0])*map.getTileWidth(), (1+bounds[3]-bounds[1])*map.getTileHeight()), "PNG", file);
 		} catch (IOException ignored) {}
 		
 		return false;

@@ -19,15 +19,17 @@ public class AreaLayer implements Layer {
 	private final List<Area> areas;				//list of all areas
 	private Area selected;					//currently selected area
 
-	private final int width;
-	private final int height;
-	private final int tileSize;	//width, height and tilesize of the map
+	private final int width,
+						height;
+	private final int tileWidth,
+						tileHeight;
 
-	public AreaLayer(float depth, int width, int height, int tileSize) {
+	public AreaLayer(float depth, int width, int height, int tileWidth, int tileHeight) {
 		this.depth = depth;
 		this.width = width;
 		this.height = height;
-		this.tileSize = tileSize;
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
 
 		areas = new ArrayList<>();
 	}
@@ -133,11 +135,12 @@ public class AreaLayer implements Layer {
 
 	@Override
 	public void draw(Graphics g, Location l1, Location l2) {
+		//TOOD:
 		for (Area a: areas) {
 			g.setColor(a.getColor());
-			g.fillRect((int) Math.floor(a.getSmallerX() * tileSize), (int) Math.floor(a.getSmallerY() * tileSize), Math.round((a.getBiggerX()-a.getSmallerX())*tileSize) + 1, Math.round((a.getBiggerY() - a.getSmallerY())*tileSize) + 1);
-			g.fillRect((int) Math.floor(a.getX1() * tileSize), (int) Math.floor(a.getY1() * tileSize), 1, 1);
-			g.fillRect((int) Math.floor(a.getX2() * tileSize), (int) Math.floor(a.getY2() * tileSize), 1, 1);
+			g.fillRect((int) Math.floor(a.getSmallerX() * tileWidth), (int) Math.floor(a.getSmallerY() * tileWidth), Math.round((a.getBiggerX()-a.getSmallerX())*tileWidth) + 1, Math.round((a.getBiggerY() - a.getSmallerY())*tileWidth) + 1);
+			g.fillRect((int) Math.floor(a.getX1() * tileWidth), (int) Math.floor(a.getY1() * tileWidth), 1, 1);
+			g.fillRect((int) Math.floor(a.getX2() * tileWidth), (int) Math.floor(a.getY2() * tileWidth), 1, 1);
 		}
 	}
 
@@ -171,7 +174,7 @@ public class AreaLayer implements Layer {
 
 	@Override
 	public AreaLayer clone() {
-		AreaLayer out = new AreaLayer(depth, width, height, tileSize);
+		AreaLayer out = new AreaLayer(depth, width, height, tileWidth, tileHeight);
 		for(int i = 0; i < areas.size(); i++) out.areas.add(areas.get(i).clone());
 		return out;
 	}

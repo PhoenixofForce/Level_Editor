@@ -5,6 +5,7 @@ import data.Location;
 import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.TagObject;
 import data.TextureHandler;
+import window.Window;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -21,15 +22,17 @@ public class FreeLayer implements Layer {
 
 	private final int width;
 	private final int height;
-	private final int tileSize;		//width, height and tilesize of the map
+	private final int tileWidth,
+						tileHeight;
 
-	public FreeLayer(float depth, int width, int height, int tileSize) {
+	public FreeLayer(float depth, int width, int height, int tileWidth, int tileHeight) {
 		this.depth = depth;
 		this.images = new ArrayList<>();
 
 		this.width = width;
 		this.height = height;
-		this.tileSize = tileSize;
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
 	}
 
 	/**
@@ -49,8 +52,8 @@ public class FreeLayer implements Layer {
 		if (drag) return;
 
 		BufferedImage image = TextureHandler.getImagePng(name);
-		float width = image.getWidth() / (float) tileSize;
-		float height = image.getHeight() / (float) tileSize;
+		float width = image.getWidth() / (float) tileWidth;
+		float height = image.getHeight() / (float) tileHeight;
 
 		if (x < 0 || x + width > this.width || y < 0 || y + height > this.height) return;
 
@@ -105,7 +108,7 @@ public class FreeLayer implements Layer {
 		}
 	}
 
-	public void roundAll(int tileSize) {
+	public void roundAll(int tileWidth, int tileHeight) {
 		float smallestX = Integer.MAX_VALUE,
 				smallestY = Integer.MAX_VALUE;
 
@@ -138,7 +141,8 @@ public class FreeLayer implements Layer {
 	public void draw(Graphics g, Location l1, Location l2) {
 		synchronized (images) {
 			for (GameObject gameObject : images) {
-				g.drawImage(TextureHandler.getImagePng(gameObject.name), (int) (gameObject.x * tileSize), (int) (gameObject.y * tileSize), null);
+				Location worldPos = Window.INSTANCE.getMap().mapSpaceToWorldSpace(new Location(gameObject.x, gameObject.y));
+				g.drawImage(TextureHandler.getImagePng(gameObject.name), (int) worldPos.x, (int) worldPos.y, null);
 			}
 		}
 	}
@@ -173,7 +177,7 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public FreeLayer clone() {
-		FreeLayer out = new FreeLayer(depth, width, height, tileSize);
+		FreeLayer out = new FreeLayer(depth, width, height, tileWidth, tileHeight);
 		for(int i = 0; i < images.size(); i++) out.images.add(images.get(i).clone());
 		return out;
 	}

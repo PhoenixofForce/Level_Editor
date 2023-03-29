@@ -131,9 +131,7 @@ public class Window extends JFrame {
 		return toolbar.getAutoTile();
 	}
 
-	public int getTileSize() {
-		return map.getTileSize();
-	}
+	//TODO: tileWidth and Height from map
 
 	public boolean isLayerHidden(Layer layer) {
 		return layerPane.isHidden(layer);

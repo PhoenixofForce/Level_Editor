@@ -32,7 +32,7 @@ public class SelectAllCombination implements KeyCombination {
             if(mv.getSelection() != null) new SelectionChangeCommand(mv, mv.getSelection(), null).execute(history);
             else {
                 Selection newSelection = new Selection();
-                newSelection.add(new Rectangle(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize()));
+                newSelection.add(new Rectangle(0, 0, map.getWidth() * map.getTileWidth(), map.getHeight() * map.getTileHeight()));  //adjust to different shapes
 
                 new SelectionChangeCommand(window.getMapViewer(), mv.getSelection(), newSelection).execute(history);
             }

@@ -95,16 +95,16 @@ public class MapExporter implements Exporter<String> {
 		//Adding the map formats from every layer to the output string
 		for(Map.Entry<String, TileLayer> l: tiles) {
 			lastLayerName = l.getKey();
-			out += l.getValue().accept(this, names, new float[]{ sx,  sy,  bx,  by }, map.getTileSize());
+			out += l.getValue().accept(this, names, new float[]{ sx,  sy,  bx,  by }, map.getTileWidth(), map.getTileHeight());
 		}
 
 		for(Map.Entry<String, FreeLayer> f: frees) {
 			lastLayerName = f.getKey();
-			out += f.getValue().accept(this, names,  new float[]{ sx,  sy,  bx,  by }, map.getTileSize());
+			out += f.getValue().accept(this, names,  new float[]{ sx,  sy,  bx,  by }, map.getTileWidth(), map.getTileHeight());
 		}
 		for(Map.Entry<String, AreaLayer> a: areas) {
 			lastLayerName = a.getKey();
-			out += a.getValue().accept(this, names,  new float[]{ sx,  sy,  bx,  by }, map.getTileSize());
+			out += a.getValue().accept(this, names,  new float[]{ sx,  sy,  bx,  by }, map.getTileWidth(), map.getTileHeight());
 		}
 
 		//Adding the map tags
@@ -115,7 +115,7 @@ public class MapExporter implements Exporter<String> {
 		}
 
 		//replacing the texture names with numbers
-		String repl = map.getTileSize() + (tags.length() > 0 ? ";" : "" ) + tags + "\n";
+		String repl = map.getTileWidth() + (tags.length() > 0 ? ";" : "" ) + tags + "\n";
 		for(int i = 0; i < names.size(); i++) {
 			out = out.replaceAll(names.get(i), (i+1) + "");
 			repl += "#" + (i+1) + " - " + names.get(i) + "\n";
