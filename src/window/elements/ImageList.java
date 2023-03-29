@@ -92,18 +92,18 @@ public class ImageList extends JPanel{
 	private void filter(String filter) {
 		if(imageDisplayData == null) return;
 		for (String s : icons.keySet()) {
-
+			ImageIcon current = icons.get(s);
 			//Remove image if name does not contain the filter and if the image still is in the list
 			if (!s.toLowerCase().contains(filter.toLowerCase())) {
-				if (imageDisplayData.contains(icons.get(s))) {
-					imageDisplayData.removeElement(icons.get(s));
+				if (imageDisplayData.contains(current)) {
+					imageDisplayData.removeElement(current);
 				}
 			}
 
 			//Adds image if name contains the filter and the image are not in the list
 			else {
-				if (!imageDisplayData.contains(icons.get(s))) {
-					imageDisplayData.addElement(icons.get(s));
+				if (!imageDisplayData.contains(current)) {
+					imageDisplayData.addElement(current);
 				}
 			}
 		}
@@ -122,9 +122,9 @@ public class ImageList extends JPanel{
 		return null;
 	}
 
-	public void reSize(int width, int height) {
-		Dimension d = new Dimension(width/4, height/2 - 25);
-		Dimension d2 = new Dimension(width/4, height);
+	public void onWindowResize(int width, int height) {
+		Dimension d = new Dimension(width / 4, height / 2 - 25);
+		Dimension d2 = new Dimension(width / 4, height);
 		this.setSize(d2);
 		this.setPreferredSize(d2);
 

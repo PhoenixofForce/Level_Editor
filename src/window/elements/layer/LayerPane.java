@@ -1,7 +1,7 @@
 package window.elements.layer;
 
-import data.*;
 import data.layer.*;
+import data.maps.GameMap;
 import window.Window;
 import window.commands.LayerAddCommand;
 import window.commands.LayerRemoveCommand;
@@ -34,7 +34,6 @@ public class LayerPane extends JPanel {
 		layerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		layerList.setLayoutOrientation(JList.VERTICAL);
 
-		//TODO: Use Spinner?
 		//change layer names depending on the layer being hidden
 		layerList.setCellRenderer(new DefaultListCellRenderer() {
 
@@ -89,17 +88,12 @@ public class LayerPane extends JPanel {
 
 		Layer layer;
 		switch (type) {
-			case 2:
-				layer = new FreeLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
-				break;
-			case 1:
-				layer = new AreaLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
-				break;
-			case 0:
-				layer = new TileLayer(window, depth, map.getWidth(), map.getHeight(), map.getTileSize());
-				break;
-			default:
+			case 2 -> layer = new FreeLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+			case 1 -> layer = new AreaLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+			case 0 -> layer = new TileLayer(depth, map.getWidth(), map.getHeight(), map.getTileSize());
+			default -> {
 				return;
+			}
 		}
 
 		new LayerAddCommand(this, map, layer, name).execute(window.getMapViewer().getCommandHistory());
@@ -114,8 +108,8 @@ public class LayerPane extends JPanel {
 
 	public void removeLayer() {
 		if (layerList.getSelectedIndex() < 0) return;
-		int sel = layerList.getSelectedIndex();
-		String name = layerListData.get(sel);
+		int selectedIndex = layerList.getSelectedIndex();
+		String name = layerListData.get(selectedIndex);
 
 		new LayerRemoveCommand(this, map, name).execute(window.getMapViewer().getCommandHistory());
 	}
@@ -140,8 +134,7 @@ public class LayerPane extends JPanel {
 		}
 
 		this.map = map;
-
-		String selected = layerList.getSelectedIndex() >= 0? layerListData.get(layerList.getSelectedIndex()): null;
+		String selectedLayerName = layerList.getSelectedIndex() >= 0? layerListData.get(layerList.getSelectedIndex()): null;
 
 		//resets the listModel and list
 		layerListData = new DefaultListModel<>();
@@ -157,7 +150,7 @@ public class LayerPane extends JPanel {
 		layerList.setSelectedIndex(0);
 		if(!isNewMap) {
 			for(int i = 0; i < layerListData.size(); i++) {
-				if(layerListData.get(i).equals(selected)) {
+				if(layerListData.get(i).equals(selectedLayerName)) {
 					layerList.setSelectedIndex(i);
 					break;
 				}
@@ -167,7 +160,7 @@ public class LayerPane extends JPanel {
 		hidden = newHidden;
 	}
 
-	public void reSize(int width, int height) {
+	public void onWindowResize(int width, int height) {
 		height -= layerControl.getHeight();
 		Dimension d = new Dimension(width / 6, height);
 		layerList.setPreferredSize(d);

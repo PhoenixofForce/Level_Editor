@@ -1,6 +1,6 @@
 package window.keyCombinations;
 
-import data.GameMap;
+import data.maps.GameMap;
 import data.layer.FreeLayer;
 import data.layer.TileLayer;
 import util.ClipBoardUtil;

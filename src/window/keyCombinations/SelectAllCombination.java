@@ -1,6 +1,6 @@
 package window.keyCombinations;
 
-import data.GameMap;
+import data.maps.GameMap;
 import window.Tools;
 import window.Window;
 import window.commands.CommandHistory;

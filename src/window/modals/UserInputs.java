@@ -1,6 +1,7 @@
 package window.modals;
 
-import data.GameMap;
+import data.maps.GameMap;
+import data.maps.SquareGameMap;
 import window.Window;
 import window.elements.Modifier;
 import window.elements.layer.LayerPane;
@@ -108,7 +109,7 @@ public class UserInputs {
 		create.setBounds(10, 40, 180, 20);
 
 		ActionListener a = e->{
-			mod.add(nameIN.getText());
+			mod.addTagToObject(nameIN.getText());
 			frame.dispose();
 		};
 
@@ -175,7 +176,7 @@ public class UserInputs {
 
 
 		ActionListener a = e-> {
-				window.setMap(new GameMap(window, Integer.parseInt(mapWidthIn.getText()), Integer.parseInt(mapHeightIn.getText()), Integer.parseInt(tileSizeIn.getText())), true);
+				window.setMap(new SquareGameMap(Integer.parseInt(mapWidthIn.getText()), Integer.parseInt(mapHeightIn.getText()), Integer.parseInt(tileSizeIn.getText())), true);
 				frame.dispose();
 		};
 		create.addActionListener(a);

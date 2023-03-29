@@ -4,7 +4,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import data.GameMap;
+import data.maps.GameMap;
 import data.layer.AreaLayer;
 import data.layer.FreeLayer;
 import data.layer.TileLayer;

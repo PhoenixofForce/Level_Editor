@@ -10,6 +10,12 @@ import java.util.List;
 
 public class Selection {
 
+	public enum Action {
+		ADD, SUBTRACT
+	}
+
+	private record Pair(Rectangle r, Action a) { }
+
 	private Area currentArea;
 	private final List<Pair> rectangles;
 
@@ -149,13 +155,5 @@ public class Selection {
 		}
 		clone.toArea();
 		return clone;
-	}
-
-	public enum Action {
-		ADD, SUBTRACT
-	}
-
-	private record Pair(Rectangle r, Action a) {
-
 	}
 }

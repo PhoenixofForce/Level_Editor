@@ -30,18 +30,4 @@ public class LayerControl extends JToolBar {
 
 		this.toggleHidden.addActionListener(e -> layerPane.toggleHidden());
 	}
-
-	@Override
-	public void enable() {
-		add.setEnabled(true);
-		remove.setEnabled(true);
-		toggleHidden.setEnabled(true);
-	}
-
-	@Override
-	public void disable() {
-		add.setEnabled(false);
-		remove.setEnabled(false);
-		toggleHidden.setEnabled(false);
-	}
 }

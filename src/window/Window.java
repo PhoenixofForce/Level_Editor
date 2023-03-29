@@ -1,6 +1,6 @@
 package window;
 
-import data.GameMap;
+import data.maps.GameMap;
 import data.layer.Layer;
 import window.elements.*;
 import window.elements.MenuBar;
@@ -29,7 +29,7 @@ public class Window extends JFrame {
 
 	private GameMap map;
 
-	public Window() {
+	public Window(GameMap inputMap) {
 		INSTANCE = this;
 
 		//setting window attributes
@@ -38,13 +38,12 @@ public class Window extends JFrame {
 		this.setMinimumSize(new Dimension(800, 600));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-		setMap(new GameMap(this, 100,100,16), true);
+		setMap(inputMap, true);
 
 		tagModifier = new Modifier(this);
 
 		imageDisplay = new ImageList(tagModifier);
 		this.add(imageDisplay, BorderLayout.LINE_END);
-		imageDisplay.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 		imageDisplay.setFocusable(false);
 
 		toolbar = new MainToolBar(this);
@@ -55,7 +54,6 @@ public class Window extends JFrame {
 
 		layerPane = new LayerPane(this, map);
 		this.add(layerPane, BorderLayout.LINE_START);
-		layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight());
 
 		JPanel centerPane = new JPanel();
 		centerPane.setLayout(new BorderLayout());
@@ -85,20 +83,25 @@ public class Window extends JFrame {
 			}
 		}).start();
 
-		this.addWindowStateListener(e -> layerPane.updateUI());
-
-		//resizing components on window resize
+		this.addWindowStateListener(e -> {
+			imageDisplay.onWindowResize(getContentPane().getWidth(), getContentPane().getHeight() - toolbar.getHeight());
+			layerPane.onWindowResize(getContentPane().getWidth(), getContentPane().getHeight() - toolbar.getHeight());
+			layerPane.updateUI();
+		});
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				imageDisplay.reSize(getContentPane().getWidth(), getContentPane().getHeight() - toolbar.getHeight());
-				layerPane.reSize(getContentPane().getWidth(), getContentPane().getHeight() - toolbar.getHeight());
+				imageDisplay.onWindowResize(getContentPane().getWidth(), getContentPane().getHeight() - toolbar.getHeight());
+				layerPane.onWindowResize(getContentPane().getWidth(), getContentPane().getHeight() - toolbar.getHeight());
 			}
 		});
 
 		this.setVisible(true);
-		//setting window size to trigger resize
-		this.setSize(this.getWidth() + 1, this.getHeight());
+		this.setSize(this.getWidth() + 1, this.getHeight());	//setting window size to trigger resize
+	}
+
+	public void updateMap() {
+		this.setMap(map, false);
 	}
 
 	public void setMap(GameMap map, boolean isNewMap) {
@@ -106,7 +109,7 @@ public class Window extends JFrame {
 		if(toolbar != null) toolbar.mapUpdate(this, isNewMap);
 		if(menu != null && isNewMap) menu.reset();
 		if (mapViewer != null) mapViewer.setGameMap(map, isNewMap);
-		if (imageDisplay != null && isNewMap) tagModifier.setTagObject(null);
+		if (imageDisplay != null && isNewMap) tagModifier.setTagObject(map);
 		if (layerPane != null) layerPane.updateGameMap(map, isNewMap);
 	}
 

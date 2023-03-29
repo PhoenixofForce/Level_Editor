@@ -1,6 +1,6 @@
 package data.io.exporter;
 
-import data.GameMap;
+import data.maps.GameMap;
 import data.layer.AreaLayer;
 import data.layer.FreeLayer;
 import data.layer.TileLayer;

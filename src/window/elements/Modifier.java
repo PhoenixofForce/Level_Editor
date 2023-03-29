@@ -23,15 +23,15 @@ public class Modifier extends JPanel{
 	private final Window window;
 	private final Modifier instance;
 
-	private TagObject object;			//Object which tags are being edited
+	private TagObject selectedGameObject;			//Object which tags are being edited
 	private final JLabel goStats;				//Label which shows texture name and coordinate of object
 	private final JButton add;
 	private final JButton remove;			//Buttons to add and remove tags
 
-	private final JTextArea input;			//TextArea to input tag values
-	private final JComboBox<String> attChooser;		//ComboBox to select from existing Tags
+	private final JTextArea tagValueInput;			//TextArea to input tag values
+	private final JComboBox<String> tagSelector;		//ComboBox to select from existing Tags
 
-	private final DocumentListener dc;			//Listener that saves all changes
+	private final DocumentListener changeListener;			//Listener that saves all changes
 
 	public Modifier(Window window) {
 		instance = this;
@@ -42,61 +42,37 @@ public class Modifier extends JPanel{
 		goStats = new JLabel("");
 		this.add(goStats, BorderLayout.PAGE_START);
 
-		input = new JTextArea();
-		input.setEditable(true);
+		tagValueInput = new JTextArea();
+		tagValueInput.setEditable(true);
 
-		dc = new DocumentListener() {
+		changeListener = new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
-					TagObject tagObject = object;
-					int chooserIndex = attChooser.getSelectedIndex();
-					String tagName = attChooser.getItemAt(chooserIndex);
-					String newTagContent = input.getText();
-					String oldTagContent = object.getTag(tagName).getAction();
-
-					Debouncer.debounce("modifier_input_input", () -> new TagChangeCommand(instance, tagObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory()), 250);
-				}
+				changeListener();
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
-					TagObject tagObject = object;
-					int chooserIndex = attChooser.getSelectedIndex();
-					String tagName = attChooser.getItemAt(chooserIndex);
-					String newTagContent = input.getText();
-					String oldTagContent = object.getTag(tagName).getAction();
-
-					Debouncer.debounce("modifier_input_input", () -> new TagChangeCommand(instance, tagObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory()), 250);
-				}
+				changeListener();
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				if (object != null && attChooser.getItemAt(attChooser.getSelectedIndex()) != null &&  object.getTag(attChooser.getItemAt(attChooser.getSelectedIndex())) != null) {
-					TagObject tagObject = object;
-					int chooserIndex = attChooser.getSelectedIndex();
-					String tagName = attChooser.getItemAt(chooserIndex);
-					String newTagContent = input.getText();
-					String oldTagContent = object.getTag(tagName).getAction();
-
-					Debouncer.debounce("modifier_input_input", () -> new TagChangeCommand(instance, tagObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory()), 250);
-				}
+				changeListener();
 			}
 		};
 
 		//ScrollPane to optimize textArea
-		JScrollPane scrollPane = new JScrollPane(input);
+		JScrollPane scrollPane = new JScrollPane(tagValueInput);
 		scrollPane.setPreferredSize(new Dimension(0, 200));
 		this.add(scrollPane, BorderLayout.PAGE_END);
 
-		attChooser = new JComboBox<>();
-		this.add(attChooser, BorderLayout.CENTER);
-		attChooser.addActionListener(e -> {
-			Tag t = object.getTag((String) attChooser.getSelectedItem());
+		tagSelector = new JComboBox<>();
+		this.add(tagSelector, BorderLayout.CENTER);
+		tagSelector.addActionListener(e -> {
+			Tag t = selectedGameObject.getTag((String) tagSelector.getSelectedItem());
 			if(t != null) {
-				input.setText(t.getAction());
+				tagValueInput.setText(t.getAction());
 			}
 		});
 
@@ -107,12 +83,23 @@ public class Modifier extends JPanel{
 		remove = new JButton("-");
 		this.add(remove, BorderLayout.LINE_END);
 		remove.addActionListener(e -> {
-			new TagRemoveCommand(instance, object, (String) attChooser.getSelectedItem()).execute(window.getMapViewer().getCommandHistory());
-			attChooser.removeItem(attChooser.getSelectedItem());
-			if(attChooser.getItemCount() == 0) input.setText("");
+			new TagRemoveCommand(instance, selectedGameObject, (String) tagSelector.getSelectedItem()).execute(window.getMapViewer().getCommandHistory());
+			tagSelector.removeItem(tagSelector.getSelectedItem());
+			if(tagSelector.getItemCount() == 0) tagValueInput.setText("");
 		});
 
 		setTagObject(null);
+	}
+
+	private void changeListener() {
+		boolean objectNotNullAndTagSelected = selectedGameObject != null &&  tagSelector.getSelectedItem() != null;
+		if (objectNotNullAndTagSelected && selectedGameObject.getTag((String) tagSelector.getSelectedItem()) != null) {
+			String tagName = (String) tagSelector.getSelectedItem();
+			String newTagContent = tagValueInput.getText();
+			String oldTagContent = selectedGameObject.getTag(tagName).getAction();
+
+			Debouncer.debounce("modifier_input_input", () -> new TagChangeCommand(instance, selectedGameObject, tagName, oldTagContent, newTagContent).execute(window.getMapViewer().getCommandHistory()), 250);
+		}
 	}
 
 	/**
@@ -120,72 +107,74 @@ public class Modifier extends JPanel{
 	 *
 	 * @param name Name of the new Tag
 	*/
-	public void add(String name) {
+	public void addTagToObject(String name) {
 		//Resets textArea it was disabled
-		if(attChooser.getSelectedItem() == null) {
-			input.setEnabled(true);
-			input.getDocument().addDocumentListener(dc);
+		if(tagSelector.getSelectedItem() == null) {
+			tagValueInput.setEnabled(true);
+			tagValueInput.getDocument().addDocumentListener(changeListener);
 		}
 		//Adds Tag to object
-		new TagAddCommand(instance, object, name).execute(window.getMapViewer().getCommandHistory());
+		new TagAddCommand(instance, selectedGameObject, name).execute(window.getMapViewer().getCommandHistory());
 
 		//Adds TagName to ComboBox and selects it
-		attChooser.addItem(name);
-		attChooser.setSelectedItem(name);
+		tagSelector.addItem(name);
+		tagSelector.setSelectedItem(name);
 
 		//Sets text from textArea to action of the tag
-		Tag t = object.getTag((String) attChooser.getSelectedItem());
-		if (t != null) {
-			input.getDocument().removeDocumentListener(dc);
-			input.setText(t.getAction());
-			input.getDocument().addDocumentListener(dc);
+		Tag tag = selectedGameObject.getTag((String) tagSelector.getSelectedItem());
+		if (tag != null) {
+			tagValueInput.getDocument().removeDocumentListener(changeListener);
+			tagValueInput.setText(tag.getAction());
+			tagValueInput.getDocument().addDocumentListener(changeListener);
 		}
 	}
 
 	/**
 	 * Sets selected Object
 	 *
-	 * @param obj the new selected TagObject
+	 * @param tagObject the new selected TagObject
 	 */
-	public void setTagObject(TagObject obj) {
-		if(obj == null) obj = window.getMap();
+	public void setTagObject(TagObject tagObject) {
+		if(tagObject == null) tagObject = window.getMap();
 
 		//Reset JObjects => Enabling if object is initialized, setting texts empty
-		add.setEnabled(obj != null);
-		remove.setEnabled(obj != null);
+		add.setEnabled(tagObject != null);
+		remove.setEnabled(tagObject != null);
 
-		input.setEnabled(obj != null);
-		input.getDocument().removeDocumentListener(dc);
+		tagValueInput.setEnabled(tagObject != null);
+		tagValueInput.getDocument().removeDocumentListener(changeListener);
 
-		attChooser.setEnabled(obj != null);
-		attChooser.removeAllItems();
+		tagSelector.setEnabled(tagObject != null);
+		tagSelector.removeAllItems();
 		goStats.setText("");
-		input.setText("");
+		tagValueInput.setText("");
 		//Return after reset if object is null
-		if(obj == null) return;
+		if(tagObject == null) return;
 
 		//Set selected object to the new one
-		this.object = obj;
+		this.selectedGameObject = tagObject;
 
 		//Count existing tags and add existing tags to comboBox
-		int c = 0;
-		for(Tag t: obj.getTags()) {
-			attChooser.addItem(t.getName());
-			c++;
+		int tagCount = 0;
+		for(Tag t: tagObject.getTags()) {
+			tagSelector.addItem(t.getName());
+			tagCount++;
 		}
 
 		//Set selected Tag in comboBox to the first, if there are entries
-		if(c > 0) attChooser.setSelectedIndex(0);
+		if(tagCount > 0) tagSelector.setSelectedIndex(0);
+
 		//If an entry is selected set the input text to the action of the tag
-		if(attChooser.getSelectedItem() != null) {
-			Tag t = object.getTag((String) attChooser.getSelectedItem());
-			if (t != null) {
-				input.setText(t.getAction());
+		if(tagSelector.getSelectedItem() != null) {
+			Tag selectedTag = selectedGameObject.getTag((String) tagSelector.getSelectedItem());
+
+			if (selectedTag != null) {
+				tagValueInput.setText(selectedTag.getAction());
 			}
-			input.getDocument().addDocumentListener(dc);
-		} else input.setEnabled(false);
+			tagValueInput.getDocument().addDocumentListener(changeListener);
+		} else tagValueInput.setEnabled(false);
 
 		//Set label text to tagObject information
-		goStats.setText(obj.getText());
+		goStats.setText(tagObject.getText());
 	}
 }

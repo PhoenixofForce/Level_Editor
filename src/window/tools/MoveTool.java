@@ -1,6 +1,6 @@
 package window.tools;
 
-import data.GameMap;
+import data.maps.GameMap;
 import data.Location;
 import data.layer.FreeLayer;
 import data.layer.Layer;

@@ -2,6 +2,7 @@ package window.elements;
 
 import data.*;
 import data.layer.*;
+import data.maps.GameMap;
 import window.EditorError;
 import window.Selection;
 import window.keyCombinations.*;
@@ -14,13 +15,13 @@ import window.tools.TagSelectTool;
 import window.tools.ToolImplementation;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.util.Optional;
 
 public class MapViewer extends JPanel {
 
@@ -70,9 +71,7 @@ public class MapViewer extends JPanel {
 		);
 
 		//change zoom when using mouse-wheel
-		this.addMouseWheelListener(e -> {
-			camera.setZoom(camera.zoom * (float) Math.pow(1.2, -e.getPreciseWheelRotation()));
-		});
+		this.addMouseWheelListener(e -> camera.setZoom(camera.zoom * (float) Math.pow(1.2, -e.getPreciseWheelRotation())));
 
 		MouseAdapter mouseMotionAdapter = new MouseAdapter() {
 
@@ -178,9 +177,9 @@ public class MapViewer extends JPanel {
 
 	public void setGameMap(GameMap map, boolean isNewMap) {
 		this.map = map;
-		this.staticTileGrid = generateStaticTileGrid();
 		if(isNewMap) {
 			centerCamera();
+			this.staticTileGrid = generateStaticTileGrid();
 			commandHistory = new CommandHistory(this);
 		}
 	}
@@ -209,10 +208,9 @@ public class MapViewer extends JPanel {
 		if(isDragged) actionThrewError = implementation.onMouseDrag(commandHistory, button, selectedLayer, selectedTexture, pos, selection, shiftDown, controlDown);
 		else actionThrewError = implementation.onMouseClick(commandHistory, button, selectedLayer, selectedTexture, pos, selection, shiftDown, controlDown);
 
-		if (actionThrewError.isPresent())
-			sendErrorMessage(actionThrewError.get());
+		actionThrewError.ifPresent(this::sendErrorMessage);
 
-		return !actionThrewError.isPresent();
+		return actionThrewError.isEmpty();
 	}
 
 	/**
@@ -272,14 +270,25 @@ public class MapViewer extends JPanel {
 			String selectedTexture = window.getSelectedTexture();
 			Layer selectedLayer = window.getSelectedLayer();
 
-			boolean isAreaLayer = selectedLayer instanceof AreaLayer;
-			if (selectedTexture != null || isAreaLayer) {
-				BufferedImage tex = selectedTexture == null? null: TextureHandler.getImagePng(selectedTexture);
-				if (!(selectedLayer instanceof TileLayer))
-					g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), isAreaLayer? 1: tex.getWidth(), isAreaLayer? 1: tex.getHeight());
-				else
-					g2.drawRect((int) (l.x) * map.getTileSize(), (int) (l.y) * map.getTileSize(), tex.getWidth(), tex.getHeight());
+			int width = 0;
+			int height = 0;
+
+			if(selectedLayer instanceof TileLayer) {
+				l.x = (int) l.x;
+				l.y = (int) l.y;
 			}
+
+			if (selectedLayer instanceof AreaLayer){
+				width = 1;
+				height = 1;
+			}
+			else if (selectedTexture != null) {
+				BufferedImage tex = TextureHandler.getImagePng(selectedTexture);
+				width = tex.getWidth();
+				height = tex.getHeight();
+			}
+
+			if(height > 0 && width > 0) g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), width, height);
 		}
 
 		if(copyLayer != null) {
@@ -316,25 +325,7 @@ public class MapViewer extends JPanel {
 			Since the tile grid does not change, its better to draw this once, when the map changes
 		 */
 
-		BufferedImage out = new BufferedImage( map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize(), BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2 = (Graphics2D) out.getGraphics();
-
-		g2.setColor(Color.LIGHT_GRAY);
-		g2.fillRect(0, 0, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
-
-		//prepares graphics object to draw tile separators
-		g2.setColor(Color.LIGHT_GRAY.darker());
-		g2.setStroke(new BasicStroke(1));
-
-		//draw tile separators
-		for (int x = 0; x < map.getWidth(); x++) {
-			for (int y = 0; y < map.getHeight(); y++) {
-				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), map.getWidth() * map.getTileSize(), y * map.getTileSize());
-				g2.drawLine(x * map.getTileSize(), y * map.getTileSize(), x * map.getTileSize(), map.getHeight() * map.getTileSize());
-			}
-		}
-
-		return out;
+		return map.generateStaticTileGrid();
 	}
 
 	public void setSelectedTool(Tools t) {
@@ -369,10 +360,6 @@ public class MapViewer extends JPanel {
 
 	public void setBulkCommand(Command command) {
 		this.bulkCommand = command;
-	}
-
-	public Location getLastMousePos() {
-		return new Location(lastMousePosX, lastMousePosY);
 	}
 
 	public Location getLastMousePosInMapPosition() {

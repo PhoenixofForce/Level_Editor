@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import data.GameMap;
+import data.maps.GameMap;
 import data.TextureHandler;
 import data.layer.AreaLayer;
 import data.layer.FreeLayer;
@@ -18,6 +18,7 @@ import data.layer.TileLayer;
 import data.layer.layerobjects.Area;
 import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.Tag;
+import data.maps.SquareGameMap;
 import window.Window;
 
 public class UmapImporter implements Importer {
@@ -25,24 +26,33 @@ public class UmapImporter implements Importer {
 	private static final UmapImporter INSTANCE = new UmapImporter();
 	
 	private final FileNameExtensionFilter fileFilter;
+	private int width,
+				height,
+				tileSize;
+
+	private boolean isNewMap;
+
 	private UmapImporter() {
 		this.fileFilter = new FileNameExtensionFilter(".umap Files", "umap");
 	}
 	
 	@Override
 	public GameMap importMap(Window w, File input, boolean isNewMap) {
+		this.isNewMap = isNewMap;
+		this.width = -1;
+		this.height = -1;
+		this.tileSize = -1;
+
 		try {
 			BufferedReader r = new BufferedReader(new FileReader(input));
 			GameMap map = null;
 
-			int width = -1, height = -1, tileSize = -1;
 			List<Tag> mapTags = new ArrayList<>();
 
 			String line = r.readLine();
 			while(line != null) {
-
 				if(line.startsWith("i: ")) {
-					handleImports(line, w, isNewMap);
+					handleImports(line);
 				}
 				else if(line.startsWith("h: ")) {
 					height = Integer.parseInt(line.split(" ")[1]);
@@ -58,31 +68,32 @@ public class UmapImporter implements Importer {
 				}
 				else if(line.startsWith("t_")) {
 					String name = line.split(" ")[0].substring(2).trim();
-					TileLayer l = importTileLayer(line, w, width, height, tileSize);
+					TileLayer l = importTileLayer(line);
 					if(map != null) map.addLayer(name, l);
 				}
 
 				else if(line.startsWith("f_")) {	
 					String name = line.split(" ")[0].substring(2).trim();
-					FreeLayer l = importFreeLayer(line, w, width, height, tileSize);
+					FreeLayer l = importFreeLayer(line);
 					if(map != null) map.addLayer(name, l);
 				}
 
 				else if(line.startsWith("a_")) {
 					String name = line.split(" ")[0].substring(2).trim();
-					AreaLayer l = importAreaLayer(line, w, width, height, tileSize);
+					AreaLayer l = importAreaLayer(line);
 					if(map != null) map.addLayer(name, l);
 				}
 
 				if(width > 0 && height > 0 && tileSize > 0 && map == null) {
-					map = new GameMap(w, width, height, tileSize, false);
+					map = new SquareGameMap(width, height, tileSize);
 				}
 
 				line = r.readLine();
 			}
 
 			for (Tag tag: mapTags) {
-				map.addTag(tag);
+				if(map != null)
+					map.addTag(tag);
 			}
 
 			r.close();
@@ -92,38 +103,31 @@ public class UmapImporter implements Importer {
 		}
 	}
 
-	@Override
-	public TileLayer importTileLayer(String line, Object... o2) {
-		Window w = (Window) o2[0];
-		int width = (int) o2[1];
-		int height = (int) o2[2];
-		int tileSize = (int) o2[3];
-		
+	public TileLayer importTileLayer(String line) {
 		float depth = Float.parseFloat(line.split(" ")[1]);
 		String[][] names = new String[height][width];
 
 		String data = line.split("\\[")[1];
-		for(int y = 4; y < data.split(";").length; y++) {
-			String row = data.split(";")[y];
-			if(y == data.split(";").length-1) row = row.substring(0, row.length()-1);
+		String[] splitData = data.split(";");
 
-			for(int x = 0; x < row.split(",").length; x++) {
-				String tname = row.split(",")[x].trim();
-				names[x][y-4] = tname.startsWith("null")? null: tname;
+		for(int y = 4; y < splitData.length; y++) {
+			String row = splitData[y];
+			if(y == splitData.length - 1) row = row.substring(0, row.length()-1);
+			String[] splitRow = row.split(",");
+
+			for(int x = 0; x < splitRow.length; x++) {
+				String tileName = splitRow[x].trim();
+				names[x][y-4] = tileName.startsWith("null")? null: tileName;
 			}
 		}
 
-		return new TileLayer(w, depth, names, tileSize);
+		return new TileLayer(depth, names, tileSize);
 	}
 
-	@Override
-	public AreaLayer importAreaLayer(String line, Object... o2) {
-		int width = (int) o2[1];
-		int height = (int) o2[2];
-		int tileSize = (int) o2[3];
+	public AreaLayer importAreaLayer(String line) {
 		float depth = Float.parseFloat(line.split(" ")[1]);
 
-		AreaLayer l = new AreaLayer(depth, width, height, tileSize);
+		AreaLayer layer = new AreaLayer(depth, width, height, tileSize);
 		for(int i = 1; i < line.split("\\[area; ").length; i++) {
 			String s = line.split("\\[area; ")[i];
 			s = s.substring(0, s.length()-1);
@@ -133,43 +137,38 @@ public class UmapImporter implements Importer {
 			float x2 = Float.parseFloat(s.split(";")[2]);
 			float y2 = Float.parseFloat(s.split(";")[3]);
 
-			l.set("", x1, y1, false);
-			Area a = l.select(x1, y1);
-			a.setX1(x1);
-			a.setX2(x2 - 1.0f/(float)tileSize);
-			a.setY1(y1);
-			a.setY2(y2 - 1.0f/(float)tileSize);
+			layer.set("", x1, y1, false);
+			Area currentArea = layer.select(x1, y1);
+			currentArea.setX1(x1);
+			currentArea.setX2(x2 - 1.0f/(float)tileSize);
+			currentArea.setY1(y1);
+			currentArea.setY2(y2 - 1.0f/(float)tileSize);
 			
 			int tagStart = s.indexOf("[tag;");
 			if(tagStart >= 0) {
 				List<Tag> objectTags = handleTags(s.substring(tagStart));
-				for(Tag t: objectTags) a.addTag(t);
+				for(Tag t: objectTags) currentArea.addTag(t);
 			}
 		}
 
-		return l;
+		return layer;
 	}
 
-	@Override
-	public FreeLayer importFreeLayer(String line, Object... o2) {
-		int width = (int) o2[1];
-		int height = (int) o2[2];
-		int tileSize = (int) o2[3];
-		
+	public FreeLayer importFreeLayer(String line) {
 		float depth = Float.parseFloat(line.split(" ")[1]);
 
-		FreeLayer l = new FreeLayer(depth, width, height, tileSize);
+		FreeLayer layer = new FreeLayer(depth, width, height, tileSize);
 		for(int i = 1; i < line.split("\\[put; ").length; i++) {
 			String s = line.split("\\[put; ")[i];
 			s = s.substring(0, s.length()-1);
 
-			String gName = s.split(";")[1].trim().startsWith("null")? null: s.split(";")[1].trim();
+			String textureName = s.split(";")[1].trim().startsWith("null")? null: s.split(";")[1].trim();
 
 			float gX = Float.parseFloat(s.split(";")[2]);
 			float gY = Float.parseFloat(s.split(";")[3]);
 
-			l.set(gName, gX, gY, false);
-			GameObject gameObject = l.select(gX, gY);
+			layer.set(textureName, gX, gY, false);
+			GameObject gameObject = layer.select(gX, gY);
 			
 			int tagStart = s.indexOf("[tag;");
 			if(tagStart >= 0) {
@@ -178,28 +177,25 @@ public class UmapImporter implements Importer {
 			}
 		}
 		
-		return l;
+		return layer;
 	}
 
-	@Override
-	public void handleImports(String line, Object... o2) {
-		Window w = (Window) o2[0];
-		boolean isNewMap = (boolean)o2[1];
-		
+	public void handleImports(String line) {
+		Window window = Window.INSTANCE;
+
 		File text = new File(line.substring("i: ".length()));
 		File image = new File(text.getAbsolutePath().substring(0, text.getAbsolutePath().length() - 4) + "png");
 
-		w.getMyMenuBar().addImport(text);
+		window.getMyMenuBar().addImport(text);
 
 		if (text.exists() && image.exists()) {
 			TextureHandler.loadImagePngSpriteSheet(image.getName().substring(0, image.getName().length() - 4), text.getAbsolutePath());
-			if(isNewMap) w.getImageList().update();
+			if(isNewMap) window.getImageList().update();
 		} else {
 			JOptionPane.showMessageDialog(new JFrame(), "Either " + text.getAbsolutePath() + " or " + image.getAbsolutePath() + " does not exist.", "File not found", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
-	@Override
 	public List<Tag> handleTags(String line) {
 		//Input tag(; tag)*
 		List<Tag> out = new ArrayList<>();
@@ -220,8 +216,7 @@ public class UmapImporter implements Importer {
 		
 		return out;
 	}
-	
-	@Override
+
 	public FileNameExtensionFilter getFileFilter() {
 		return fileFilter;
 	}

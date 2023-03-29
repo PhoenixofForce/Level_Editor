@@ -1,6 +1,6 @@
 package window.elements;
 
-import data.GameMap;
+import data.maps.GameMap;
 import data.TextureHandler;
 import data.io.exporter.Exporter;
 import data.io.exporter.MapExporter;

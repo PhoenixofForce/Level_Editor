@@ -1,6 +1,6 @@
 package window.commands;
 
-import data.GameMap;
+import data.maps.GameMap;
 import data.layer.Layer;
 import window.elements.layer.LayerPane;
 

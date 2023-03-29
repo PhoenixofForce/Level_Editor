@@ -41,7 +41,7 @@ public class TileLayer implements Layer {
 	private final Random r;
 
 	private final Window window;
-	public TileLayer(Window window, float depth, String[][] tiles, int tileSize) {
+	public TileLayer(float depth, String[][] tiles, int tileSize) {
 		this.depth = depth;
 		this.tileNames = tiles;
 		this.tileSize = tileSize;
@@ -49,11 +49,11 @@ public class TileLayer implements Layer {
 		this.height = tiles.length;
 
 		r = new Random();
-		this.window = window;
+		this.window = Window.INSTANCE;
 	}
 
-	public TileLayer(Window window, float depth, int width, int height, int tileSize) {
-		this(window, depth, new String[height][width], tileSize);
+	public TileLayer(float depth, int width, int height, int tileSize) {
+		this(depth, new String[height][width], tileSize);
 	}
 
 	@Override
@@ -312,7 +312,7 @@ public class TileLayer implements Layer {
 
 	@Override
 	public TileLayer clone() {
-		TileLayer out = new TileLayer(window, depth, width, height, tileSize);
+		TileLayer out = new TileLayer(depth, width, height, tileSize);
 		for(int y = 0; y < height; y++) {
 			if (width >= 0) System.arraycopy(tileNames[y], 0, out.tileNames[y], 0, width);
 		}
