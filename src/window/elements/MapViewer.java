@@ -281,9 +281,13 @@ public class MapViewer extends JPanel {
 			int width = 0;
 			int height = 0;
 
+			Polygon highlightOutline = null;
+
 			if(selectedLayer instanceof TileLayer) {
 				l.x = (int) l.x;
 				l.y = (int) l.y;
+
+				highlightOutline = map.getCustomTileHighlight().orElse(null);
 			}
 			l = map.mapToWorldSpace(l);
 
@@ -297,7 +301,13 @@ public class MapViewer extends JPanel {
 				height = tex.getHeight();
 			}
 
-			if(height > 0 && width > 0) g2.drawRect((int) (l.x), (int) (l.y), width, height);
+			if(highlightOutline == null) {
+				highlightOutline = new Polygon(new int[]{0, width, width, 0}, new int[]{0, 0, height, height}, 4);
+			}
+
+			highlightOutline.translate((int) l.x, (int) l.y);
+			g2.drawPolygon(highlightOutline);
+
 		}
 
 		if(copyLayer != null) {

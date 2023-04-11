@@ -5,11 +5,13 @@ import jdk.jfr.Experimental;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 @Experimental
 public class IsoGameMap extends GameMap {
 
-    private int tileWidth, tileHeight;
+    private final int tileWidth,
+                        tileHeight;
 
     public IsoGameMap(int width, int height, int tileWidth, int tileHeight) {
         super(width, height, tileWidth, tileHeight);
@@ -17,6 +19,20 @@ public class IsoGameMap extends GameMap {
         this.tileHeight = tileHeight;
     }
 
+    @Override
+    public Optional<Polygon> getCustomTileHighlight() {
+        Polygon highlight = new Polygon(
+                new int[]{tileWidth / 2, tileWidth, tileWidth / 2, 0},
+                new int[]{0, tileHeight / 2, tileHeight, tileHeight / 2},
+                4
+        );
+        Location offset = getDrawingOffset();
+        highlight.translate((int) offset.x, (int) offset.y);
+
+        return Optional.of(highlight);
+    }
+
+    @Override
     public Location getDrawingOffset() {
         return new Location(-tileWidth / 2.0f, -tileHeight);
     }
@@ -34,7 +50,7 @@ public class IsoGameMap extends GameMap {
 
     @Override
     public Location mapToWorldSpace(Location inWorldLocation) {
-        Location worldLocation = new Location(inWorldLocation.x / 1, inWorldLocation.y / 1);
+        Location worldLocation = new Location(inWorldLocation.x, inWorldLocation.y);
 
         double imageHeight = (Math.max(getWidth(), getHeight()) * tileHeight);
         double inverseWorldY = (getHeight() - worldLocation.y);
@@ -47,18 +63,15 @@ public class IsoGameMap extends GameMap {
 
     @Override
     public BufferedImage generateStaticTileGrid() {
-        int isoHeight = tileHeight;
-        int isoWidth = tileWidth;
 
         int mapWidth = getWidth();
         int mapHeight = getHeight();
 
         int tileLength = Math.max(mapWidth, mapHeight);
 
-        BufferedImage out = new BufferedImage( tileLength * isoWidth, tileLength * isoHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage out = new BufferedImage( tileLength * tileWidth, tileLength * tileHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) out.getGraphics();
         g2.setColor(Color.LIGHT_GRAY.brighter());
-        //g2.fillRect(0, 0, out.getWidth(), out.getHeight());
 
         Location corner1 = mapToWorldSpace(new Location(0, 0));
         Location corner2 = mapToWorldSpace(new Location(0, getHeight()));
@@ -70,9 +83,6 @@ public class IsoGameMap extends GameMap {
                 new int[]{ (int) corner1.y, (int) corner2.y, (int) corner3.y, (int) corner4.y },
                 4
         );
-
-        g2.setColor(Color.BLACK);
-        //g2.fillOval((int) corner1.x - 10, (int) corner1.y - 10, 20, 20);
 
         g2.setColor(Color.GRAY);
         for(int xi = 1; xi < mapWidth; xi++) {

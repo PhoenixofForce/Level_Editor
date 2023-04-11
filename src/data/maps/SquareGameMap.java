@@ -11,6 +11,7 @@ public class SquareGameMap extends GameMap {
         super(width, height, tileSize);
     }
 
+    @Override
     public Location getDrawingOffset() {
         return new Location(0, 0);
     }

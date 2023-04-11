@@ -198,9 +198,9 @@ public class TileLayer implements Layer {
 	public List<Location> fill(Area sel, String name, float x2, float y2) {
 		int x = (int) x2;
 		int y = (int) y2;
+
 		if (x >= 0 && y >= 0 && x < width && y < height) {
 			String oldName = tileNames[y][x];
-			System.out.println(Util.textureEquals(window.getAutoTile(), oldName, name));
 			if(Util.textureEquals(window.getAutoTile(), oldName, name)) return null;
 
 			List<Location> out = new ArrayList<>();
@@ -256,9 +256,10 @@ public class TileLayer implements Layer {
 	public void draw(Graphics g, Location topLeft, Location downRight) {
 		record LocatedSprite(Location location, String texture) {}
 
+		//todo: cache this list?
 		List<LocatedSprite> spritesToDraw = new ArrayList<>();
 
-		topLeft = null;	//todo: temporary
+		topLeft = null;	//todo: temporary fix
 		downRight = null;
 		int startX = (int) Math.max(0,  topLeft == null? 0: Math.floor(topLeft.x));
 		int endX = (int) Math.min(tileNames[0].length,  downRight == null? tileNames[0].length: Math.ceil(downRight.x));

@@ -6,11 +6,10 @@ import data.io.exporter.Exporter;
 import data.layer.*;
 import data.layer.layerobjects.TagObject;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * the map contains all layers
@@ -35,6 +34,10 @@ public abstract class GameMap extends TagObject {
 		this.tileHeight = tileHeight;
 
 		TextureHandler.createError(tileWidth);
+	}
+
+	public Optional<Polygon> getCustomTileHighlight() {
+		return Optional.empty();
 	}
 
 	public abstract Location getDrawingOffset();
