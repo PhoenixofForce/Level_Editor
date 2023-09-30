@@ -1,6 +1,7 @@
 package window.elements;
 
 import data.TextureHandler;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -16,6 +17,8 @@ public class ImageList extends JPanel{
 	private final DefaultListModel<ImageIcon> imageDisplayData;
 
 	private Map<String, ImageIcon> icons;
+	@Getter
+	private String selectedImageName;
 
 	public ImageList(Modifier m) {
 		this.setLayout(new BorderLayout());
@@ -59,7 +62,12 @@ public class ImageList extends JPanel{
 
 		this.add(helpPanel, BorderLayout.PAGE_END);
 
-		//images.addListSelectionListener(e -> System.out.println(getSelectedImageName()));	//For Debugging
+		imageDisplay.addListSelectionListener(e -> {
+			if(imageDisplay.getSelectedIndex() < 0) return;
+			for(String s: icons.keySet()) {
+				if(icons.get(s).equals(getSelectedIcon())) selectedImageName = s;
+			}
+		});	//For Debugging
 
 		this.add(m, BorderLayout.PAGE_START);
 	}
@@ -113,13 +121,11 @@ public class ImageList extends JPanel{
 		return imageDisplayData.get(imageDisplay.getSelectedIndex());
 	}
 
-	public String getSelectedImageName() {
-		if(imageDisplay.getSelectedIndex() < 0) return null;
-		for(String s: icons.keySet()) {
-			if(icons.get(s).equals(getSelectedIcon())) return s;
-		}
-
-		return null;
+	public void setSelectedImageByName(String name) {
+		ImageIcon toSelect = icons.get(name);
+		int index = imageDisplayData.indexOf(toSelect);
+		imageDisplay.setSelectedIndex(index);
+		selectedImageName = name;
 	}
 
 	public void reSize(int width, int height) {

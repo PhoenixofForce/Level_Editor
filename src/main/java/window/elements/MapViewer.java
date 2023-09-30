@@ -191,12 +191,23 @@ public class MapViewer extends JPanel {
 			Layer selectedLayer = window.getSelectedLayer();
 
 			boolean isAreaLayer = selectedLayer instanceof AreaLayer;
+			int x = (int) (l.x * map.getTileSize());
+			int y = (int) (l.y * map.getTileSize());
+
+			if (selectedLayer instanceof TileLayer) {
+				x = (int) (l.x) * map.getTileSize();
+				y = (int) (l.y) * map.getTileSize();
+			}
+
 			if (selectedTexture != null || isAreaLayer) {
 				BufferedImage tex = selectedTexture == null? null: TextureHandler.getImagePng(selectedTexture);
-				if (!(selectedLayer instanceof TileLayer))
-					g2.drawRect((int) (l.x * map.getTileSize()), (int) (l.y * map.getTileSize()), isAreaLayer? 1: tex.getWidth(), isAreaLayer? 1: tex.getHeight());
-				else
-					g2.drawRect((int) (l.x) * map.getTileSize(), (int) (l.y) * map.getTileSize(), tex.getWidth(), tex.getHeight());
+				g2.drawRect(x, y, isAreaLayer? 1: tex.getWidth(), isAreaLayer? 1: tex.getHeight());
+			}
+
+			if(selectedTexture != null && !isAreaLayer) {
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+				g2.drawImage(TextureHandler.getImagePng(selectedTexture), x, y, null);
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 			}
 		}
 

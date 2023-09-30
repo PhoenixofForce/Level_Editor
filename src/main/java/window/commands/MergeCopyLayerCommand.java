@@ -8,6 +8,7 @@ import window.elements.MapViewer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MergeCopyLayerCommand implements Command{
 
@@ -29,8 +30,10 @@ public class MergeCopyLayerCommand implements Command{
 	public void execute(CommandHistory commandHistory) {
 		//TODO: SelectedLayer could be other Layer
 		for(GameObject g: copyLayer.getImages()) {
-			GameObject removed = (GameObject) selectedLayer.remove((int)g.x, (int)g.y);
-			overwritten.add(removed != null? removed: new GameObject(null, g.x, g.y, 1, 1));
+			Optional<TagObject> removedObject = selectedLayer.remove((int) g.x, (int) g.y);
+
+			GameObject removed = (GameObject) removedObject.orElse(new GameObject(null, g.x, g.y, 1, 1));
+			overwritten.add(removed);
 			selectedLayer.set(g.name, (int)g.x, (int)g.y, false);
 		}
 

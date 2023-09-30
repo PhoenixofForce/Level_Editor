@@ -7,6 +7,7 @@ import window.elements.Modifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RemoveCommand implements Command {
 
@@ -23,10 +24,10 @@ public class RemoveCommand implements Command {
 
 		this.toDeletes = new ArrayList<>();
 
-		TagObject toDelete = layer.remove(position.x, position.y);
-		if(toDelete != null) {
+		Optional<TagObject> toDelete = layer.remove(position.x, position.y);
+		if(toDelete.isPresent()) {
 			this.positions.add(position);
-			toDeletes.add(toDelete);
+			toDeletes.add(toDelete.get());
 			mod.setTagObject(null);
 		}
 	}
@@ -37,10 +38,10 @@ public class RemoveCommand implements Command {
 	}
 
 	public void add(Location position) {
-		TagObject toDelete = layer.remove(position.x, position.y);
-		if(toDelete != null) {
+		Optional<TagObject> toDelete = layer.remove(position.x, position.y);
+		if(toDelete.isPresent()) {
 			this.positions.add(position);
-			toDeletes.add(toDelete);
+			toDeletes.add(toDelete.get());
 			mod.setTagObject(null);
 		}
 	}
@@ -53,16 +54,16 @@ public class RemoveCommand implements Command {
 	}
 
 	@Override
-	public boolean hasDifferentEffectThanLastCommand(Command lastCommand) {
-		return !equals(lastCommand) && !positions.isEmpty();
-	}
-
-	@Override
 	public void redo() {
 		for (Location position : positions) {
 			layer.remove(position.x, position.y);
 		}
 		mod.setTagObject(null);
+	}
+
+	@Override
+	public boolean hasDifferentEffectThanLastCommand(Command lastCommand) {
+		return !equals(lastCommand) && !positions.isEmpty();
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class FreeLayer implements Layer {
 
@@ -55,8 +56,9 @@ public class FreeLayer implements Layer {
 
 	@Override
 	public boolean drag(float x, float y, float targetX, float targetY) {
-		GameObject gameObject = select(x, y);
-		if (gameObject == null) return false;
+		Optional<TagObject> optionalGameObject = select(x, y);
+		if (optionalGameObject.isEmpty()) return false;
+		GameObject gameObject = (GameObject) optionalGameObject.get();
 
 		gameObject.move(targetX - x, targetY - y);
 		if (isGameObjectInBounds(gameObject)) {
@@ -68,19 +70,19 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public TagObject remove(float x, float y) {
+	public Optional<TagObject> remove(float x, float y) {
 		GameObject gameObject = find(x, y);
-		if(gameObject == null) return null;
+		if(gameObject == null) return Optional.empty();
 
 		synchronized (images) {
 			images.remove(gameObject);
 		}
 
-		return gameObject;
+		return Optional.of(gameObject);
 	}
 
 	@Override
-	public GameObject select(float x, float y) {
+	public Optional<TagObject> select(float x, float y) {
 		GameObject gameObject = find(x, y);
 		if (gameObject != null) {
 			synchronized (images) {
@@ -88,7 +90,12 @@ public class FreeLayer implements Layer {
 				images.add(gameObject);
 			}
 		}
-		return gameObject;
+		return Optional.ofNullable(gameObject);
+	}
+
+	@Override
+	public Optional<String> textureAt(float x, float y) {
+		return select(x, y).map(GameObject.class::cast).map(go -> go.name);
 	}
 
 	public void moveAll(float dx, float dy) {
@@ -139,32 +146,31 @@ public class FreeLayer implements Layer {
 	}
 
 	@Override
-	public float smallestX() {
+	public Location smallestPoint() {
 		float smallestX = Integer.MAX_VALUE;
 		for(GameObject g: images) if(g.x < smallestX) smallestX = g.x;
-		return smallestX == Integer.MAX_VALUE? -1: smallestX;
-	}
+		smallestX =  smallestX == Integer.MAX_VALUE? -1: smallestX;
 
-	@Override
-	public float smallestY() {
 		float smallestY = Integer.MAX_VALUE;
 		for(GameObject g: images) if(g.y < smallestY) smallestY = g.y;
-		return smallestY == Integer.MAX_VALUE? -1: smallestY;
+		smallestY =  smallestY == Integer.MAX_VALUE? -1: smallestY;
+
+		return new Location(smallestX, smallestY);
 	}
 
 	@Override
-	public float biggestX() {
-		float smallestX = Integer.MIN_VALUE;
-		for(GameObject g: images) if(g.x > smallestX) smallestX = g.x;
-		return smallestX == Integer.MIN_VALUE? -1: smallestX;
+	public Location biggestPoint() {
+		float biggestX = Integer.MIN_VALUE;
+		for(GameObject g: images) if(g.x > biggestX) biggestX = g.x;
+		biggestX = biggestX == Integer.MIN_VALUE? -1: biggestX;
+
+		float biggestY = Integer.MIN_VALUE;
+		for(GameObject g: images) if(g.y > biggestY) biggestY = g.y;
+		biggestY = biggestY == Integer.MIN_VALUE? -1: biggestY;
+
+		return new Location(biggestX, biggestY);
 	}
 
-	@Override
-	public float biggestY() {
-		float smallestY = Integer.MIN_VALUE;
-		for(GameObject g: images) if(g.y > smallestY) smallestY = g.y;
-		return smallestY == Integer.MIN_VALUE? -1: smallestY;
-	}
 
 	@Override
 	public FreeLayer clone() {

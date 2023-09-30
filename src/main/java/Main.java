@@ -6,15 +6,14 @@ public class Main {
 	public static void main(String[] args) {
 		/*	TODO:
 			More Important:
-			-Strg LC => copy Texture (color picker)
 			-selection => delete....
 
 			-Improved Save-Directory
 			-presets
 			-change layer settings
 			-open last/ view last edited files
-			-view used resources (?)
-			-settings (?)
+			-view used resources (delete loaded sheets, reload, change path)
+			-application settings (button remapping, colors, ...)
 		 */
 
 		Window window = new Window();

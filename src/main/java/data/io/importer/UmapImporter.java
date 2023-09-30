@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -18,6 +19,7 @@ import data.layer.TileLayer;
 import data.layer.layerobjects.Area;
 import data.layer.layerobjects.GameObject;
 import data.layer.layerobjects.Tag;
+import data.layer.layerobjects.TagObject;
 import window.Window;
 
 public class UmapImporter implements Importer {
@@ -134,16 +136,20 @@ public class UmapImporter implements Importer {
 			float y2 = Float.parseFloat(s.split(";")[3]);
 
 			l.set("", x1, y1, false);
-			Area a = l.select(x1, y1);
-			a.setX1(x1);
-			a.setX2(x2 - 1.0f/(float)tileSize);
-			a.setY1(y1);
-			a.setY2(y2 - 1.0f/(float)tileSize);
-			
-			int tagStart = s.indexOf("[tag;");
-			if(tagStart >= 0) {
-				List<Tag> objectTags = handleTags(s.substring(tagStart));
-				for(Tag t: objectTags) a.addTag(t);
+			Optional<TagObject> optionalArea = l.select(x1, y1);
+			if(optionalArea.isPresent()) {
+				Area a = (Area) optionalArea.get();
+
+				a.setX1(x1);
+				a.setX2(x2 - 1.0f / (float) tileSize);
+				a.setY1(y1);
+				a.setY2(y2 - 1.0f / (float) tileSize);
+
+				int tagStart = s.indexOf("[tag;");
+				if (tagStart >= 0) {
+					List<Tag> objectTags = handleTags(s.substring(tagStart));
+					for (Tag t : objectTags) a.addTag(t);
+				}
 			}
 		}
 
@@ -169,12 +175,16 @@ public class UmapImporter implements Importer {
 			float gY = Float.parseFloat(s.split(";")[3]);
 
 			l.set(gName, gX, gY, false);
-			GameObject gameObject = l.select(gX, gY);
+			Optional<TagObject> optionalGameObject = l.select(gX, gY);
 			
-			int tagStart = s.indexOf("[tag;");
-			if(tagStart >= 0) {
-				List<Tag> objectTags = handleTags(s.substring(tagStart));
-				for(Tag t: objectTags) gameObject.addTag(t);
+			if(optionalGameObject.isPresent()) {
+				GameObject gameObject = (GameObject) optionalGameObject.get();
+
+				int tagStart = s.indexOf("[tag;");
+				if(tagStart >= 0) {
+					List<Tag> objectTags = handleTags(s.substring(tagStart));
+					for(Tag t: objectTags) gameObject.addTag(t);
+				}
 			}
 		}
 		

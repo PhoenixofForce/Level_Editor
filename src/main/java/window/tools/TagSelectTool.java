@@ -19,10 +19,9 @@ public class TagSelectTool implements ToolImplementation {
         }
 
         Window window = Window.INSTANCE;
-        TagObject obj = layer.select(pos.x, pos.y);
+        Optional<TagObject> obj = layer.select(pos.x, pos.y);
 
-        window.getTagModifier().setTagObject(obj);
-
+        window.getTagModifier().setTagObject(obj.orElse(window.getMap()));
         return Optional.empty();
     }
 

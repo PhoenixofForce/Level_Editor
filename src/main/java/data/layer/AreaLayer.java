@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A Layer in which the user can mark areas
@@ -70,7 +71,7 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public Area select(float x, float y) {
+	public Optional<TagObject> select(float x, float y) {
 		Area area = find(x, y, true);
 
 		//brings area to the top
@@ -80,7 +81,7 @@ public class AreaLayer implements Layer {
 		}
 
 		selected = area;
-		return area;
+		return Optional.ofNullable(area);
 	}
 
 	@Override
@@ -121,15 +122,15 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public TagObject remove(float x, float y) {
+	public Optional<TagObject> remove(float x, float y) {
 		Area area = find(x, y, true);
 
 		if (area != null) {
 			areas.remove(area);
-			return area;
+			return Optional.of(area);
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	@Override
@@ -152,31 +153,29 @@ public class AreaLayer implements Layer {
 	}
 
 	@Override
-	public float smallestX() {
+	public Location smallestPoint() {
 		float smallestX = Integer.MAX_VALUE;
 		for(Area a: areas) if(a.getSmallerX() < smallestX) smallestX = a.getSmallerX();
-		return smallestX == Integer.MAX_VALUE? -1: smallestX;
-	}
+		smallestX = smallestX == Integer.MAX_VALUE? -1: smallestX;
 
-	@Override
-	public float smallestY() {
 		float smallestY = Integer.MAX_VALUE;
 		for(Area a: areas) if(a.getSmallerY() < smallestY) smallestY = a.getSmallerX();
-		return smallestY == Integer.MAX_VALUE? -1: smallestY;
+		smallestY = smallestY == Integer.MAX_VALUE? -1: smallestY;
+
+		return new Location(smallestX, smallestY);
 	}
 
 	@Override
-	public float biggestX() {
-		float smallestX = Integer.MIN_VALUE;
-		for(Area a: areas) if(a.getBiggerX() > smallestX) smallestX = a.getBiggerX();
-		return smallestX == Integer.MIN_VALUE? -1: smallestX;
-	}
+	public Location biggestPoint() {
+		float biggestX = Integer.MIN_VALUE;
+		for(Area a: areas) if(a.getBiggerX() > biggestX) biggestX = a.getBiggerX();
+		biggestX =  biggestX == Integer.MIN_VALUE? -1: biggestX;
 
-	@Override
-	public float biggestY() {
-		float smallestY = Integer.MIN_VALUE;
-		for(Area a: areas) if(a.getBiggerY() > smallestY) smallestY = a.getBiggerX();
-		return smallestY == Integer.MIN_VALUE? -1: smallestY;
+		float biggestY = Integer.MIN_VALUE;
+		for(Area a: areas) if(a.getBiggerY() > biggestY) biggestY = a.getBiggerX();
+		biggestY = biggestY == Integer.MIN_VALUE? -1: biggestY;
+
+		return new Location(biggestX, biggestY);
 	}
 
 	@Override

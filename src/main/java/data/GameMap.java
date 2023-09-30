@@ -66,15 +66,13 @@ public class GameMap extends TagObject {
 		for(String s: layers.keySet()) {
 			Layer l = layers.get(s);
 
-			float csx = l.smallestX(),
-					csy = l.smallestY(),
-					cbx = l.biggestX(),
-					cby = l.biggestY();
+			Location smallestPoint = l.smallestPoint();
+			Location biggestPoint = l.biggestPoint();
 
-			if(csx < sx && csx != -1) sx = (int) Math.floor(csx);
-			if(csy < sy && csy != -1) sy = (int) Math.floor(csy);
-			if(cbx > bx) bx = (int) Math.ceil(cbx);
-			if(cby > by) by = (int) Math.ceil(cby);
+			if(smallestPoint.x < sx && smallestPoint.x != -1) sx = (int) Math.floor(smallestPoint.x);
+			if(smallestPoint.y < sy && smallestPoint.y != -1) sy = (int) Math.floor(smallestPoint.y);
+			if(biggestPoint.x > bx) bx = (int) Math.ceil(biggestPoint.x);
+			if(biggestPoint.y > by) by = (int) Math.ceil(biggestPoint.y);
 
 		}
 

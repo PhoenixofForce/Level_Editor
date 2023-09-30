@@ -46,7 +46,7 @@ public class SelectedTilesMoveCommand implements Command{
 
 	@Override
 	public void redo() {
-		for(int[] i: resetPositions) resetTextures.add(layer.remove(i[0], i[1]));
+		for(int[] i: resetPositions) resetTextures.add(layer.remove(i[0], i[1]).orElse(null));
 		mv.setCopyLayer(copyLayer);
 	}
 
